@@ -354,6 +354,8 @@ typedef struct{
 	int direction;
 	int passi;
 	int passi_in_immersione;
+	bool is_fase_pre_immersione;
+	bool is_fase_immersione;
 }CocodrileControl;
 
 // struttura dati generale del gioco, contiene tutti i dati significativi per la gestione

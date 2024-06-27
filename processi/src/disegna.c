@@ -49,9 +49,6 @@ void drawProcess(int *pipe_fd)
 			contatore_pari=0;
 			contatore_dispari++;
 		}
-	
-		
-
 
 		
 			if (thereIsSpaceForCoccodrilloOnFila(gameData, 1) && sec%7==0 && contatore_dispari==1)
@@ -68,6 +65,13 @@ void drawProcess(int *pipe_fd)
 					int pid_coccodrillo = avviaCoccodrillo(gameData->pipe, &(coccodrillo_init), id);
 					gameData->pids.pidCoccodrilli[id] = pid_coccodrillo;
 					gameData->contatori.contCoccodrilli++;
+					gameData->controlloCoccodrilli[id].direction=1;
+					gameData->controlloCoccodrilli[id].id=id;
+					gameData->controlloCoccodrilli[id].offset_deep=0;
+					gameData->controlloCoccodrilli[id].is_buono=false;
+					gameData->controlloCoccodrilli[id].is_going_deep=false;
+					gameData->controlloCoccodrilli[id].is_going_up=false;
+					gameData->controlloCoccodrilli[id].passi=0;
 				}
 			}
 
@@ -164,7 +168,7 @@ void drawProcess(int *pipe_fd)
 					int pid_coccodrillo = avviaCoccodrillo(gameData->pipe, &(coccodrillo_init), id);
 					gameData->pids.pidCoccodrilli[id] = pid_coccodrillo;
 					gameData->contatori.contCoccodrilli++;
-					gameData->controlloCoccodrilli[id].direction=1;
+					gameData->controlloCoccodrilli[id].direction=-1;
 					gameData->controlloCoccodrilli[id].id=id;
 					gameData->controlloCoccodrilli[id].offset_deep=0;
 					gameData->controlloCoccodrilli[id].is_buono=false;
@@ -189,7 +193,7 @@ void drawProcess(int *pipe_fd)
 					int pid_coccodrillo = avviaCoccodrillo(gameData->pipe, &(coccodrillo_init), id);
 					gameData->pids.pidCoccodrilli[id] = pid_coccodrillo;
 					gameData->contatori.contCoccodrilli++;
-					gameData->controlloCoccodrilli[id].direction=1;
+					gameData->controlloCoccodrilli[id].direction=-1;
 					gameData->controlloCoccodrilli[id].id=id;
 					gameData->controlloCoccodrilli[id].offset_deep=0;
 					gameData->controlloCoccodrilli[id].is_buono=false;
@@ -214,7 +218,7 @@ void drawProcess(int *pipe_fd)
 					int pid_coccodrillo = avviaCoccodrillo(gameData->pipe, &(coccodrillo_init), id);
 					gameData->pids.pidCoccodrilli[id] = pid_coccodrillo;
 					gameData->contatori.contCoccodrilli++;
-					gameData->controlloCoccodrilli[id].direction=1;
+					gameData->controlloCoccodrilli[id].direction=-1;
 					gameData->controlloCoccodrilli[id].id=id;
 					gameData->controlloCoccodrilli[id].offset_deep=0;
 					gameData->controlloCoccodrilli[id].is_buono=false;
@@ -239,7 +243,7 @@ void drawProcess(int *pipe_fd)
 					int pid_coccodrillo = avviaCoccodrillo(gameData->pipe, &(coccodrillo_init), id);
 					gameData->pids.pidCoccodrilli[id] = pid_coccodrillo;
 					gameData->contatori.contCoccodrilli++;
-					gameData->controlloCoccodrilli[id].direction=1;
+					gameData->controlloCoccodrilli[id].direction=-1;
 					gameData->controlloCoccodrilli[id].id=id;
 					gameData->controlloCoccodrilli[id].offset_deep=0;
 					gameData->controlloCoccodrilli[id].is_buono=false;

@@ -29,4 +29,6 @@ void aggiornaTempo(GameData* gameData);
 void normalUpdate(GameData* gameData);
 
 void printPianta(GameData *gameData, PipeData *old_pos, TipoSprite tipoSprite);
+
+void handleCoccodrilloMovement(GameData* gameData);
 #endif

@@ -292,8 +292,10 @@ void normalUpdate(GameData *gameData)
 		}
 		else
 		{
+			
 			aggiornaOggetto(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_DX_C);
-			gameData->controlloCoccodrilli[gameData->pipeData.id].passi++;
+			handleCoccodrilloMovement(gameData);
+			// gameData->controlloCoccodrilli[gameData->pipeData.id].passi++;
 		}
 		break;
 	case 'c':
@@ -306,8 +308,10 @@ void normalUpdate(GameData *gameData)
 			gameData->contatori.contCoccodrilli--;
 		}
 		else{
+			
 			aggiornaOggetto(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_SX_C);
-			gameData->controlloCoccodrilli[gameData->pipeData.id].passi++;
+			handleCoccodrilloMovement(gameData);
+			// gameData->controlloCoccodrilli[gameData->pipeData.id].passi++;
 		}
 		break;
 	case 'T':
@@ -334,3 +338,11 @@ void printPianta(GameData *gameData, PipeData *old_pos, TipoSprite tipoSprite)
 	}
 }
 
+void handleCoccodrilloMovement(GameData* gameData){
+	CocodrileControl* controlloCoccodrillo = &(gameData->controlloCoccodrilli[gameData->pipeData.id]);
+	if(controlloCoccodrillo->passi%10==0 && !(controlloCoccodrillo.is_fase_immersione) && !(controlloCoccodrillo.fase_pre_immersione) ){
+		controlloCoccodrillo.is_fase_pre_immersione=true;
+	}
+	gameData->controlloCoccodrilli[gameData->pipeData.id].passi++;
+	return;
+}
