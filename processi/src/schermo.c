@@ -2,7 +2,7 @@
 
 void aggiorna(GameData *gameData)
 {
-	
+
 	// individuazione della possibile collisione
 	Collisione collisione = detectCollisione(gameData);
 
@@ -16,7 +16,7 @@ void aggiorna(GameData *gameData)
 		// se collisione aggiornamento particolareggiato
 		handleCollisione(gameData, collisione);
 	}
-	
+
 	// qui aggiornamento del tempo(calcolo)
 	// aggiornaTempo(gameData);
 
@@ -59,7 +59,8 @@ void stampaSpriteInMatrice(PipeData *datiNuovi, Sprite *sprite, GameData *gameDa
 			row = startRow + i;
 			col = startCol + j;
 			// controllo che col non sfori
-			if(col<=LASTGAMECOL && col>=FIRSTGAMECOL){
+			if (col <= LASTGAMECOL && col >= FIRSTGAMECOL)
+			{
 				schermo->screenMatrix[row][col].ch = sprite->sprite[i][j];
 				schermo->screenMatrix[row][col].color = sprite->color;
 				schermo->screenMatrix[row][col].is_changed = true;
@@ -90,14 +91,14 @@ void pulisciSpriteInMatrice(PipeData *datiVecchi, Sprite *sprite, GameData *game
 			for (int j = col; j < col + maxCols; j++)
 			{
 				// controllo che j non sfori
-				if(j<=LASTGAMECOL && j>=FIRSTGAMECOL){
+				if (j <= LASTGAMECOL && j >= FIRSTGAMECOL)
+				{
 					schermo->screenMatrix[i][j].is_changed = true;
 					schermo->screenMatrix[i][j].ch = schermo->staticScreenMatrix[i][j].ch;
 					schermo->screenMatrix[i][j].color = schermo->staticScreenMatrix[i][j].color;
 					schermo->screenMatrix[i][j].tipo = schermo->staticScreenMatrix[i][j].tipo;
 					schermo->screenMatrix[i][j].id = schermo->staticScreenMatrix[i][j].id;
 				}
-				
 			}
 		}
 	}
@@ -286,38 +287,36 @@ void normalUpdate(GameData *gameData)
 		{
 			uccidiCoccodrillo(gameData->pids.pidCoccodrilli, gameData->pipeData.id);
 			cancellaOggetto(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_DX_C);
-			gameData->controlloCoccodrilli[gameData->pipeData.id].passi=0;
-			gameData->controlloCoccodrilli[gameData->pipeData.id].passi_in_immersione=0;
+			// todo reset del controlloCoccodrilli, da finire
+			gameData->controlloCoccodrilli[gameData->pipeData.id].passi = 0;
+			gameData->controlloCoccodrilli[gameData->pipeData.id].passi_in_immersione = 0;
 			gameData->contatori.contCoccodrilli--;
 		}
 		else
 		{
-			
-			aggiornaOggetto(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_DX_C);
 			handleCoccodrilloMovement(gameData);
-			// gameData->controlloCoccodrilli[gameData->pipeData.id].passi++;
 		}
 		break;
 	case 'c':
 		// controllo che il coccodrillo non abbia sforato a sinistra
-		if(gameData->pipeData.x<FIRSTGAMECOL - 9){
+		if (gameData->pipeData.x < FIRSTGAMECOL - 9)
+		{
 			uccidiCoccodrillo(gameData->pids.pidCoccodrilli, gameData->pipeData.id);
 			cancellaOggetto(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_SX_C);
-			gameData->controlloCoccodrilli[gameData->pipeData.id].passi=0;
-			gameData->controlloCoccodrilli[gameData->pipeData.id].passi_in_immersione=0;
+			// todo reset del controlloCoccodrilli, da finire
+			gameData->controlloCoccodrilli[gameData->pipeData.id].passi = 0;
+			gameData->controlloCoccodrilli[gameData->pipeData.id].passi_in_immersione = 0;
 			gameData->contatori.contCoccodrilli--;
 		}
-		else{
-			
-			aggiornaOggetto(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_SX_C);
+		else
+		{
 			handleCoccodrilloMovement(gameData);
-			// gameData->controlloCoccodrilli[gameData->pipeData.id].passi++;
 		}
 		break;
 	case 'T':
 		// arrivato tempo di gioco
 		gameData->gameInfo.tempo.milliseconds = gameData->pipeData.x;
-		
+
 	default:
 		break;
 	}
@@ -338,11 +337,89 @@ void printPianta(GameData *gameData, PipeData *old_pos, TipoSprite tipoSprite)
 	}
 }
 
-void handleCoccodrilloMovement(GameData* gameData){
-	CocodrileControl* controlloCoccodrillo = &(gameData->controlloCoccodrilli[gameData->pipeData.id]);
-	if(controlloCoccodrillo->passi%10==0 && !(controlloCoccodrillo.is_fase_immersione) && !(controlloCoccodrillo.fase_pre_immersione) ){
-		controlloCoccodrillo.is_fase_pre_immersione=true;
+void handleCoccodrilloMovement(GameData *gameData)
+{
+	CocodrileControl *controlloCoccodrillo = &(gameData->controlloCoccodrilli[gameData->pipeData.id]);
+	// capire in che fase si trova il coccodrillo
+	if (controlloCoccodrillo->is_fase_immersione)
+	{
+		// questione fase immersione
+		// 3 casi:
+		// 1. il coccodrillo si sta immergendo
+		// 2. il coccodrillo è interamente sotto l'acqua
+		// 3. il coccodrillo sta riemergendo
+		gameData->controlloCoccodrilli[gameData->pipeData.id].passi++;
 	}
-	gameData->controlloCoccodrilli[gameData->pipeData.id].passi++;
+	else
+	{
+		if (controlloCoccodrillo->is_fase_pre_immersione)
+		{
+			// questione lampeggio e passaggio a fase immersione
+			// come posso fare test?
+			// dopo fase pre immersione lo faccio andare di nuovo in fase normale
+			if (controlloCoccodrillo->passi % 2 == 0)
+			{
+				// lo faccio lampeggiare
+				controlloCoccodrillo->lampeggia = true;
+			}
+			else
+			{
+				controlloCoccodrillo->lampeggia = false;
+			}
+
+			if (controlloCoccodrillo->lampeggia)
+			{
+				if (gameData->pipeData.type == 'C')
+				{
+					aggiornaOggetto(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_DX_L);
+				}
+				if (gameData->pipeData.type == 'c')
+				{
+					aggiornaOggetto(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_SX_L);
+				}
+			}
+			else
+			{
+
+				if (gameData->pipeData.type == 'C')
+				{
+					aggiornaOggetto(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_DX_C);
+				}
+				if (gameData->pipeData.type == 'c')
+				{
+					aggiornaOggetto(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_SX_C);
+				}
+			}
+			gameData->controlloCoccodrilli[gameData->pipeData.id].passi++;
+			gameData->controlloCoccodrilli[gameData->pipeData.id].passi_in_pre_immersione++;
+			if(gameData->controlloCoccodrilli[gameData->pipeData.id].passi_in_pre_immersione>=5){
+				controlloCoccodrillo->is_fase_pre_immersione=false;
+				controlloCoccodrillo->is_fase_immersione=true;
+				controlloCoccodrillo->passi_in_pre_immersione=0;
+			}
+		}
+		else
+		{
+			// aggiornamento normale
+			// switch su tipo del coccodrillo in base alla direzione
+			if (gameData->pipeData.type == 'C')
+			{
+				aggiornaOggetto(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_DX_C);
+			}
+
+			if (gameData->pipeData.type == 'c')
+			{
+				aggiornaOggetto(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_SX_C);
+			}
+
+			if ((controlloCoccodrillo->passi +1) % 30 == 0)
+			{
+				controlloCoccodrillo->is_fase_pre_immersione = true;
+			}
+			gameData->controlloCoccodrilli[gameData->pipeData.id].passi++;
+		}
+	}
+
+	
 	return;
 }

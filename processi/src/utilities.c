@@ -29,6 +29,7 @@ void inizializzaColorazione()
     init_pair(PIANTA_COL, COLOR_BLACK, COLOR_GREEN);           // colore pianta
     init_pair(COCCODRILLOBUONO_COL, COLOR_GREEN, COLOR_BLACK); // colore coccodrillo
     init_pair(COCCODRILLOCATTIVO_COL,COLOR_RED,COLOR_BLACK); // colore coccodrillo cattivo
+    init_pair(LAMPEGGIA,COLOR_GREEN,COLOR_WHITE);  // colore coccodrillo che lampeggia
     return;
 }
 

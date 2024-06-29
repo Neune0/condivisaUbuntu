@@ -128,6 +128,7 @@
 #define LAVA_COL 13 // colore lava
 #define LVL_COL 14 // colore dell'hud per il livello
 #define TEMPO_COL 15 // colore hud per il tempo
+#define LAMPEGGIA 16 // colore coccodrillo quando lampeggia
 
 // massimo numero di oggetti per tipo
 #define MAXNCOCCODRILLI 24
@@ -137,7 +138,7 @@
 #define MAXNTANE 5
 
 // quantita oggetti
-#define N_SPRITES 11
+#define N_SPRITES 13
 
 // tempo
 #define TEMPOLVL1 60 // numero di secondi per manche per il primo livello
@@ -172,7 +173,9 @@ typedef enum{
 	S_COCCODRILLO_SX,
 	S_COCCODRILLO_DX,
 	S_COCCODRILLO_SX_C,
-	S_COCCODRILLO_DX_C
+	S_COCCODRILLO_DX_C,
+	S_COCCODRILLO_DX_L,
+	S_COCCODRILLO_SX_L
 }TipoSprite;
 
 // rappresenta il tipo di collisione
@@ -356,6 +359,8 @@ typedef struct{
 	int passi_in_immersione;
 	bool is_fase_pre_immersione;
 	bool is_fase_immersione;
+	bool lampeggia;
+	int passi_in_pre_immersione;
 }CocodrileControl;
 
 // struttura dati generale del gioco, contiene tutti i dati significativi per la gestione

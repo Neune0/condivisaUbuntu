@@ -34,6 +34,7 @@ void inizializzaControlloCoccodrilli(GameData* gameData){
 		gameData->controlloCoccodrilli[i].passi_in_immersione=0;
 		gameData->controlloCoccodrilli[i].is_fase_pre_immersione=false;
 		gameData->controlloCoccodrilli[i].is_fase_immersione=false;
+		gameData->controlloCoccodrilli[i].passi_in_pre_immersione=0;
 	}
 	return;
 }
@@ -288,6 +289,8 @@ void inizializzaSprites(Sprite* sprites){
 	sprites[S_COCCODRILLO_DX] = inizializzaSprite(COCCODRILLO_H,COCCODRILLO_W,sprite_coccodrillo_dx,COCCODRILLOBUONO_COL,COCCODRILLO_BUONO_OBJ);
 	sprites[S_COCCODRILLO_SX_C] = inizializzaSprite(COCCODRILLO_H,COCCODRILLO_W,sprite_coccodrillo_sx_c,COCCODRILLOCATTIVO_COL,COCCODRILLO_CATTIVO_OBJ);
 	sprites[S_COCCODRILLO_DX_C] = inizializzaSprite(COCCODRILLO_H,COCCODRILLO_W,sprite_coccodrillo_dx_c,COCCODRILLOCATTIVO_COL,COCCODRILLO_CATTIVO_OBJ);
+	sprites[S_COCCODRILLO_SX_L] = inizializzaSprite(COCCODRILLO_H,COCCODRILLO_W,sprite_coccodrillo_sx_c,LAMPEGGIA,COCCODRILLO_BUONO_OBJ);
+	sprites[S_COCCODRILLO_DX_L] = inizializzaSprite(COCCODRILLO_H,COCCODRILLO_W,sprite_coccodrillo_dx_c,LAMPEGGIA,COCCODRILLO_BUONO_OBJ);
 	return;
 }
 Sprite inizializzaSprite(int rows, int cols, char sprite[rows][cols], int color, TipoObj tipo_oggetto) {
