@@ -54,6 +54,14 @@ Collisione detectCollisione(GameData *gameData)
                     collisione.id_oggetto_passivo = schermo->screenMatrix[row][col].id;
                     return collisione;
                     break;
+                case COCCODRILLO_BUONO_OBJ:
+                    collisione.tipoCollisione = RANA_COCCODRILLO_BUONO;
+                    collisione.id_oggetto_attivo = gameData->pipeData.id;
+                    collisione.oggetto_attivo = RANA_OBJ;
+                    collisione.id_oggetto_passivo= schermo->screenMatrix[row][col].id;
+                    collisione.oggetto_passivo= COCCODRILLO_BUONO_OBJ;
+                    return collisione;
+                    break;
                 default:
                     break;
                 }

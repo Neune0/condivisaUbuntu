@@ -185,7 +185,8 @@ typedef enum{
 	RANA_FIUME,
 	RANA_TANA_APERTA,
 	RANA_TANA_CHIUSA,
-	PROIETTILE_COCCODRILLO_CATTIVO
+	PROIETTILE_COCCODRILLO_CATTIVO,
+	RANA_COCCODRILLO_BUONO
 }TipoCollisione;
 
 // enumerazione per il tipo di oggetto su schermo
