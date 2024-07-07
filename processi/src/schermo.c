@@ -495,10 +495,18 @@ void handleCoccodrilloMovement(GameData *gameData)
 				if (gameData->controlloCoccodrilli[gameData->pipeData.id].is_buono)
 				{
 					aggiornaOggetto(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_SX);
+					if(gameData->controlloCoccodrilli[gameData->pipeData.id].rana_on){
+						// ci stampo sopra la rana
+						aggiornaOggettoNew(gameData,gameData->oldPos.coccodrilli[gameData->pipeData.id],&(gameData->oldPos.rana),S_RANA);
+					}
 				}
 				else
 				{
 					aggiornaOggetto(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_SX_C);
+					if(gameData->controlloCoccodrilli[gameData->pipeData.id].rana_on){
+						// ci stampo sopra la rana
+						aggiornaOggettoNew(gameData,gameData->oldPos.coccodrilli[gameData->pipeData.id],&(gameData->oldPos.rana),S_RANA);
+					}
 				}
 			}
 			if (!(controlloCoccodrillo->is_buono))
@@ -660,4 +668,21 @@ void cancellaOggettoDaMatrice(GameData *gameData, PipeData oggetto, PipeData *ol
 		datiVecchi->y = 0;
 	}
 	return;
+}
+
+void aggiornaOggettoNew(GameData *gameData,PipeData new_pos, PipeData *old_pos, TipoSprite tipoSprite)
+{
+	PipeData *datiNuovi = &(new_pos);			  // i dati nuovi passati in pipe
+	PipeData *datiVecchi = &(old_pos[gameData->pipeData.id]); // dati al passo precedentes
+
+	// se le coordinate sono cambiate, pulisci l'area vecchia e stampa il nuovo sprite
+	if (datiNuovi->x != datiVecchi->x || datiNuovi->y != datiVecchi->y)
+	{
+
+		pulisciSpriteInMatrice(datiVecchi, &(gameData->sprites[tipoSprite]), gameData);
+		stampaMatrice(gameData->schermo.screenMatrix);
+		stampaSpriteInMatrice(datiNuovi, &(gameData->sprites[tipoSprite]), gameData);
+		stampaMatrice(gameData->schermo.screenMatrix);
+		aggiornaOldPos(datiVecchi, datiNuovi);
+	}
 }

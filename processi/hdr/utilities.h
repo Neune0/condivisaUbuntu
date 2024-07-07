@@ -359,6 +359,7 @@ typedef struct{
 	bool is_going_up;
 	bool is_deep;
 	bool lampeggia;
+	bool rana_on;
 
 	int offset_deep;
 	int direction;

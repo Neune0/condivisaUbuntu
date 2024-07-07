@@ -58,8 +58,8 @@ Collisione detectCollisione(GameData *gameData)
                     collisione.tipoCollisione = RANA_COCCODRILLO_BUONO;
                     collisione.id_oggetto_attivo = gameData->pipeData.id;
                     collisione.oggetto_attivo = RANA_OBJ;
-                    collisione.id_oggetto_passivo= schermo->screenMatrix[row][col].id;
-                    collisione.oggetto_passivo= COCCODRILLO_BUONO_OBJ;
+                    collisione.id_oggetto_passivo = schermo->screenMatrix[row][col].id;
+                    collisione.oggetto_passivo = COCCODRILLO_BUONO_OBJ;
                     return collisione;
                     break;
                 default:
@@ -166,42 +166,86 @@ void handleCollisione(GameData *gameData, Collisione collisione)
         if (collisione.oggetto_attivo == P_OBJ)
         {
             uccidiProiettile(gameData->pids.pidProiettili, collisione.id_oggetto_attivo); // uccide il processo proiettile
-			// ucciso processo proiettile e impostato a zero il pid in array pid proiettili
-			cancellaOggetto(gameData, gameData->oldPos.proiettili, S_PROIETTILE);
-			gameData->contatori.contProiettili--;
+            // ucciso processo proiettile e impostato a zero il pid in array pid proiettili
+            cancellaOggetto(gameData, gameData->oldPos.proiettili, S_PROIETTILE);
+            gameData->contatori.contProiettili--;
 
             // il coccodrillo diventa buono
-            gameData->controlloCoccodrilli[collisione.id_oggetto_passivo].is_buono=true;
+            gameData->controlloCoccodrilli[collisione.id_oggetto_passivo].is_buono = true;
 
             // il coccodrillo esce da tutte le fasi in cui si trova
-            gameData->controlloCoccodrilli[collisione.id_oggetto_passivo].offset_deep=0;
-            gameData->controlloCoccodrilli[collisione.id_oggetto_passivo].is_fase_pre_immersione=false;
-            gameData->controlloCoccodrilli[collisione.id_oggetto_passivo].is_fase_immersione=false;
-            gameData->controlloCoccodrilli[collisione.id_oggetto_passivo].is_going_deep=false;
-            gameData->controlloCoccodrilli[collisione.id_oggetto_passivo].is_going_up=false;
-            gameData->controlloCoccodrilli[collisione.id_oggetto_passivo].passi_in_immersione=0;
-            gameData->controlloCoccodrilli[collisione.id_oggetto_passivo].passi_in_pre_immersione=0;
-            gameData->controlloCoccodrilli[collisione.id_oggetto_passivo].passi_deep=0;
+            gameData->controlloCoccodrilli[collisione.id_oggetto_passivo].offset_deep = 0;
+            gameData->controlloCoccodrilli[collisione.id_oggetto_passivo].is_fase_pre_immersione = false;
+            gameData->controlloCoccodrilli[collisione.id_oggetto_passivo].is_fase_immersione = false;
+            gameData->controlloCoccodrilli[collisione.id_oggetto_passivo].is_going_deep = false;
+            gameData->controlloCoccodrilli[collisione.id_oggetto_passivo].is_going_up = false;
+            gameData->controlloCoccodrilli[collisione.id_oggetto_passivo].passi_in_immersione = 0;
+            gameData->controlloCoccodrilli[collisione.id_oggetto_passivo].passi_in_pre_immersione = 0;
+            gameData->controlloCoccodrilli[collisione.id_oggetto_passivo].passi_deep = 0;
         }
         else
         {
             // l'oggetto attivo è il tronco
             uccidiProiettile(gameData->pids.pidProiettili, collisione.id_oggetto_passivo); // uccide il processo proiettile
-			// ucciso processo proiettile e impostato a zero il pid in array pid proiettili
-			cancellaOggetto(gameData, gameData->oldPos.proiettili, S_PROIETTILE);
-			gameData->contatori.contProiettili--;
+            // ucciso processo proiettile e impostato a zero il pid in array pid proiettili
+            cancellaOggetto(gameData, gameData->oldPos.proiettili, S_PROIETTILE);
+            gameData->contatori.contProiettili--;
 
-             // il coccodrillo diventa buono
-            gameData->controlloCoccodrilli[collisione.id_oggetto_attivo].is_buono=true;
+            // il coccodrillo diventa buono
+            gameData->controlloCoccodrilli[collisione.id_oggetto_attivo].is_buono = true;
             // il coccodrillo esce da tutte le fasi in cui si trova
-            gameData->controlloCoccodrilli[collisione.id_oggetto_attivo].offset_deep=0;
-            gameData->controlloCoccodrilli[collisione.id_oggetto_attivo].is_fase_pre_immersione=false;
-            gameData->controlloCoccodrilli[collisione.id_oggetto_attivo].is_fase_immersione=false;
-            gameData->controlloCoccodrilli[collisione.id_oggetto_attivo].is_going_deep=false;
-            gameData->controlloCoccodrilli[collisione.id_oggetto_attivo].is_going_up=false;
-            gameData->controlloCoccodrilli[collisione.id_oggetto_attivo].passi_in_immersione=0;
-            gameData->controlloCoccodrilli[collisione.id_oggetto_attivo].passi_in_pre_immersione=0;
-            gameData->controlloCoccodrilli[collisione.id_oggetto_attivo].passi_deep=0;
+            gameData->controlloCoccodrilli[collisione.id_oggetto_attivo].offset_deep = 0;
+            gameData->controlloCoccodrilli[collisione.id_oggetto_attivo].is_fase_pre_immersione = false;
+            gameData->controlloCoccodrilli[collisione.id_oggetto_attivo].is_fase_immersione = false;
+            gameData->controlloCoccodrilli[collisione.id_oggetto_attivo].is_going_deep = false;
+            gameData->controlloCoccodrilli[collisione.id_oggetto_attivo].is_going_up = false;
+            gameData->controlloCoccodrilli[collisione.id_oggetto_attivo].passi_in_immersione = 0;
+            gameData->controlloCoccodrilli[collisione.id_oggetto_attivo].passi_in_pre_immersione = 0;
+            gameData->controlloCoccodrilli[collisione.id_oggetto_attivo].passi_deep = 0;
+        }
+        break;
+    case RANA_COCCODRILLO_BUONO:
+        if(collisione.oggetto_attivo==RANA_OBJ){
+            //reset di tutti i coccodrilli a rana_on false
+            for(int i=0;i<MAXNCOCCODRILLI;i++){
+                gameData->controlloCoccodrilli[i].rana_on=false;
+            }
+            // imposta a true rana_on del coccodrillo coinvolto nella collisione
+            gameData->controlloCoccodrilli[collisione.id_oggetto_passivo].rana_on=true;
+
+            // stampo il coccodrillo buono
+            if(gameData->controlloCoccodrilli[collisione.id_oggetto_passivo].direction==1){
+                aggiornaOggettoNew(gameData,gameData->oldPos.coccodrilli[collisione.id_oggetto_passivo],gameData->oldPos.coccodrilli,S_COCCODRILLO_DX);
+            }
+            else{
+                 aggiornaOggettoNew(gameData,gameData->oldPos.coccodrilli[collisione.id_oggetto_passivo],gameData->oldPos.coccodrilli,S_COCCODRILLO_SX);
+            }
+
+            // stampo sopra il coccodrillo buono la rana
+             aggiornaOggettoNew(gameData,gameData->oldPos.coccodrilli[collisione.id_oggetto_passivo],&(gameData->oldPos.rana),S_RANA);
+
+        }else{
+            // l'oggetto attivo e il coccodrillo buono
+            //reset di tutti i coccodrilli a rana_on false
+            for(int i=0;i<MAXNCOCCODRILLI;i++){
+                gameData->controlloCoccodrilli[i].rana_on=false;
+            }
+            // imposta a true rana_on del coccodrillo coinvolto nella collisione
+            gameData->controlloCoccodrilli[collisione.id_oggetto_attivo].rana_on=true;
+
+            // stampo il coccodrillo buono
+            if(gameData->controlloCoccodrilli[gameData->pipeData.id].direction==1){
+                 aggiornaOggetto(gameData,gameData->oldPos.coccodrilli,S_COCCODRILLO_DX);
+            }
+            else{
+                aggiornaOggetto(gameData,gameData->oldPos.coccodrilli,S_COCCODRILLO_SX);
+            }
+            
+            // stampo sopra il coccodrillo buono la rana
+            aggiornaOggetto(gameData, &(gameData->oldPos.rana), S_RANA);
+           
+
+            
         }
         break;
     default:

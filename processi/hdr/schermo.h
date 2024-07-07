@@ -37,4 +37,6 @@ void aggiornaOggettoCoccodrillo(GameData *gameData, PipeData *old_pos, TipoSprit
 void stampaCoccodrilloInMatrice(PipeData *datiNuovi, Sprite *sprite, GameData *gameData,CocodrileControl* controlloCoccodrillo);
 
 void cancellaOggettoDaMatrice(GameData* gameData, PipeData oggetto ,PipeData* old_pos, TipoSprite tipoSprite);
+
+void aggiornaOggettoNew(GameData *gameData,PipeData new_pos, PipeData *old_pos, TipoSprite tipoSprite);
 #endif
