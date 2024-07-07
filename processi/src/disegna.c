@@ -73,182 +73,178 @@ void drawProcess(int *pipe_fd)
 			}
 		}
 
-		if (false)
+		if (thereIsSpaceForCoccodrilloOnFila(gameData, 2) && sec % 7 == 0 && contatore_dispari == 1)
 		{
 
-			if (thereIsSpaceForCoccodrilloOnFila(gameData, 3) && sec % 7 == 0 && contatore_dispari == 1)
+			// avvia coccodrillo
+			int id = id_disponibile(gameData->pids.pidCoccodrilli, MAXNCOCCODRILLI);
+			if (id != -1)
 			{
-
-				// avvia coccodrillo
-				int id = id_disponibile(gameData->pids.pidCoccodrilli, MAXNCOCCODRILLI);
-				if (id != -1)
-				{
-					PipeData coccodrillo_init;
-					coccodrillo_init.x = FIRSTGAMECOL - 9;
-					coccodrillo_init.y = FILA_TRE;
-					coccodrillo_init.type = 'C';
-					coccodrillo_init.id = id;
-					int pid_coccodrillo = avviaCoccodrillo(gameData->pipe, &(coccodrillo_init), id);
-					gameData->pids.pidCoccodrilli[id] = pid_coccodrillo;
-					gameData->contatori.contCoccodrilli++;
-					gameData->controlloCoccodrilli[id].direction = 1;
-					gameData->controlloCoccodrilli[id].id = id;
-					gameData->controlloCoccodrilli[id].offset_deep = 0;
-					gameData->controlloCoccodrilli[id].is_buono = false;
-					gameData->controlloCoccodrilli[id].is_going_deep = false;
-					gameData->controlloCoccodrilli[id].is_going_up = false;
-					gameData->controlloCoccodrilli[id].passi = 0;
-				}
+				PipeData coccodrillo_init;
+				coccodrillo_init.x = LASTGAMECOL;
+				coccodrillo_init.y = FILA_DUE;
+				coccodrillo_init.type = 'c';
+				coccodrillo_init.id = id;
+				int pid_coccodrillo = avviaCoccodrillo(gameData->pipe, &(coccodrillo_init), id);
+				gameData->pids.pidCoccodrilli[id] = pid_coccodrillo;
+				gameData->contatori.contCoccodrilli++;
+				gameData->controlloCoccodrilli[id].direction = -1;
+				gameData->controlloCoccodrilli[id].id = id;
+				gameData->controlloCoccodrilli[id].offset_deep = 0;
+				gameData->controlloCoccodrilli[id].is_buono = false;
+				gameData->controlloCoccodrilli[id].is_going_deep = false;
+				gameData->controlloCoccodrilli[id].is_going_up = false;
+				gameData->controlloCoccodrilli[id].passi = 0;
 			}
+		}
 
-			if (thereIsSpaceForCoccodrilloOnFila(gameData, 5) && sec % 7 == 0 && contatore_dispari == 1)
+		if (thereIsSpaceForCoccodrilloOnFila(gameData, 3) && sec % 7 == 0 && contatore_dispari == 1)
+		{
+
+			// avvia coccodrillo
+			int id = id_disponibile(gameData->pids.pidCoccodrilli, MAXNCOCCODRILLI);
+			if (id != -1)
 			{
-
-				// avvia coccodrillo
-				int id = id_disponibile(gameData->pids.pidCoccodrilli, MAXNCOCCODRILLI);
-				if (id != -1)
-				{
-					PipeData coccodrillo_init;
-					coccodrillo_init.x = FIRSTGAMECOL - 9;
-					coccodrillo_init.y = FILA_CINQUE;
-					coccodrillo_init.type = 'C';
-					coccodrillo_init.id = id;
-					int pid_coccodrillo = avviaCoccodrillo(gameData->pipe, &(coccodrillo_init), id);
-					gameData->pids.pidCoccodrilli[id] = pid_coccodrillo;
-					gameData->contatori.contCoccodrilli++;
-					gameData->controlloCoccodrilli[id].direction = 1;
-					gameData->controlloCoccodrilli[id].id = id;
-					gameData->controlloCoccodrilli[id].offset_deep = 0;
-					gameData->controlloCoccodrilli[id].is_buono = false;
-					gameData->controlloCoccodrilli[id].is_going_deep = false;
-					gameData->controlloCoccodrilli[id].is_going_up = false;
-					gameData->controlloCoccodrilli[id].passi = 0;
-				}
+				PipeData coccodrillo_init;
+				coccodrillo_init.x = FIRSTGAMECOL - 9;
+				coccodrillo_init.y = FILA_TRE;
+				coccodrillo_init.type = 'C';
+				coccodrillo_init.id = id;
+				int pid_coccodrillo = avviaCoccodrillo(gameData->pipe, &(coccodrillo_init), id);
+				gameData->pids.pidCoccodrilli[id] = pid_coccodrillo;
+				gameData->contatori.contCoccodrilli++;
+				gameData->controlloCoccodrilli[id].direction = 1;
+				gameData->controlloCoccodrilli[id].id = id;
+				gameData->controlloCoccodrilli[id].offset_deep = 0;
+				gameData->controlloCoccodrilli[id].is_buono = false;
+				gameData->controlloCoccodrilli[id].is_going_deep = false;
+				gameData->controlloCoccodrilli[id].is_going_up = false;
+				gameData->controlloCoccodrilli[id].passi = 0;
 			}
+		}
 
-			if (thereIsSpaceForCoccodrilloOnFila(gameData, 7) && sec % 7 == 0 && contatore_dispari == 1)
+		if (thereIsSpaceForCoccodrilloOnFila(gameData, 5) && sec % 7 == 0 && contatore_dispari == 1)
+		{
+
+			// avvia coccodrillo
+			int id = id_disponibile(gameData->pids.pidCoccodrilli, MAXNCOCCODRILLI);
+			if (id != -1)
 			{
-
-				// avvia coccodrillo
-				int id = id_disponibile(gameData->pids.pidCoccodrilli, MAXNCOCCODRILLI);
-				if (id != -1)
-				{
-					PipeData coccodrillo_init;
-					coccodrillo_init.x = FIRSTGAMECOL - 9;
-					coccodrillo_init.y = FILA_SETTE;
-					coccodrillo_init.type = 'C';
-					coccodrillo_init.id = id;
-					int pid_coccodrillo = avviaCoccodrillo(gameData->pipe, &(coccodrillo_init), id);
-					gameData->pids.pidCoccodrilli[id] = pid_coccodrillo;
-					gameData->contatori.contCoccodrilli++;
-					gameData->controlloCoccodrilli[id].direction = 1;
-					gameData->controlloCoccodrilli[id].id = id;
-					gameData->controlloCoccodrilli[id].offset_deep = 0;
-					gameData->controlloCoccodrilli[id].is_buono = false;
-					gameData->controlloCoccodrilli[id].is_going_deep = false;
-					gameData->controlloCoccodrilli[id].is_going_up = false;
-					gameData->controlloCoccodrilli[id].passi = 0;
-				}
+				PipeData coccodrillo_init;
+				coccodrillo_init.x = FIRSTGAMECOL - 9;
+				coccodrillo_init.y = FILA_CINQUE;
+				coccodrillo_init.type = 'C';
+				coccodrillo_init.id = id;
+				int pid_coccodrillo = avviaCoccodrillo(gameData->pipe, &(coccodrillo_init), id);
+				gameData->pids.pidCoccodrilli[id] = pid_coccodrillo;
+				gameData->contatori.contCoccodrilli++;
+				gameData->controlloCoccodrilli[id].direction = 1;
+				gameData->controlloCoccodrilli[id].id = id;
+				gameData->controlloCoccodrilli[id].offset_deep = 0;
+				gameData->controlloCoccodrilli[id].is_buono = false;
+				gameData->controlloCoccodrilli[id].is_going_deep = false;
+				gameData->controlloCoccodrilli[id].is_going_up = false;
+				gameData->controlloCoccodrilli[id].passi = 0;
 			}
+		}
 
-			if (thereIsSpaceForCoccodrilloOnFila(gameData, 8) && sec % 7 == 0 && contatore_dispari == 1)
+		if (thereIsSpaceForCoccodrilloOnFila(gameData, 7) && sec % 7 == 0 && contatore_dispari == 1)
+		{
+
+			// avvia coccodrillo
+			int id = id_disponibile(gameData->pids.pidCoccodrilli, MAXNCOCCODRILLI);
+			if (id != -1)
 			{
-
-				// avvia coccodrillo
-				int id = id_disponibile(gameData->pids.pidCoccodrilli, MAXNCOCCODRILLI);
-				if (id != -1)
-				{
-					PipeData coccodrillo_init;
-					coccodrillo_init.x = LASTGAMECOL;
-					coccodrillo_init.y = FILA_OTTO;
-					coccodrillo_init.type = 'c';
-					coccodrillo_init.id = id;
-					int pid_coccodrillo = avviaCoccodrillo(gameData->pipe, &(coccodrillo_init), id);
-					gameData->pids.pidCoccodrilli[id] = pid_coccodrillo;
-					gameData->contatori.contCoccodrilli++;
-					gameData->controlloCoccodrilli[id].direction = -1;
-					gameData->controlloCoccodrilli[id].id = id;
-					gameData->controlloCoccodrilli[id].offset_deep = 0;
-					gameData->controlloCoccodrilli[id].is_buono = false;
-					gameData->controlloCoccodrilli[id].is_going_deep = false;
-					gameData->controlloCoccodrilli[id].is_going_up = false;
-					gameData->controlloCoccodrilli[id].passi = 0;
-				}
+				PipeData coccodrillo_init;
+				coccodrillo_init.x = FIRSTGAMECOL - 9;
+				coccodrillo_init.y = FILA_SETTE;
+				coccodrillo_init.type = 'C';
+				coccodrillo_init.id = id;
+				int pid_coccodrillo = avviaCoccodrillo(gameData->pipe, &(coccodrillo_init), id);
+				gameData->pids.pidCoccodrilli[id] = pid_coccodrillo;
+				gameData->contatori.contCoccodrilli++;
+				gameData->controlloCoccodrilli[id].direction = 1;
+				gameData->controlloCoccodrilli[id].id = id;
+				gameData->controlloCoccodrilli[id].offset_deep = 0;
+				gameData->controlloCoccodrilli[id].is_buono = false;
+				gameData->controlloCoccodrilli[id].is_going_deep = false;
+				gameData->controlloCoccodrilli[id].is_going_up = false;
+				gameData->controlloCoccodrilli[id].passi = 0;
 			}
+		}
 
-			if (thereIsSpaceForCoccodrilloOnFila(gameData, 6) && sec % 7 == 0 && contatore_dispari == 1)
+		if (thereIsSpaceForCoccodrilloOnFila(gameData, 8) && sec % 7 == 0 && contatore_dispari == 1)
+		{
+
+			// avvia coccodrillo
+			int id = id_disponibile(gameData->pids.pidCoccodrilli, MAXNCOCCODRILLI);
+			if (id != -1)
 			{
-
-				// avvia coccodrillo
-				int id = id_disponibile(gameData->pids.pidCoccodrilli, MAXNCOCCODRILLI);
-				if (id != -1)
-				{
-					PipeData coccodrillo_init;
-					coccodrillo_init.x = LASTGAMECOL;
-					coccodrillo_init.y = FILA_SEI;
-					coccodrillo_init.type = 'c';
-					coccodrillo_init.id = id;
-					int pid_coccodrillo = avviaCoccodrillo(gameData->pipe, &(coccodrillo_init), id);
-					gameData->pids.pidCoccodrilli[id] = pid_coccodrillo;
-					gameData->contatori.contCoccodrilli++;
-					gameData->controlloCoccodrilli[id].direction = -1;
-					gameData->controlloCoccodrilli[id].id = id;
-					gameData->controlloCoccodrilli[id].offset_deep = 0;
-					gameData->controlloCoccodrilli[id].is_buono = false;
-					gameData->controlloCoccodrilli[id].is_going_deep = false;
-					gameData->controlloCoccodrilli[id].is_going_up = false;
-					gameData->controlloCoccodrilli[id].passi = 0;
-				}
+				PipeData coccodrillo_init;
+				coccodrillo_init.x = LASTGAMECOL;
+				coccodrillo_init.y = FILA_OTTO;
+				coccodrillo_init.type = 'c';
+				coccodrillo_init.id = id;
+				int pid_coccodrillo = avviaCoccodrillo(gameData->pipe, &(coccodrillo_init), id);
+				gameData->pids.pidCoccodrilli[id] = pid_coccodrillo;
+				gameData->contatori.contCoccodrilli++;
+				gameData->controlloCoccodrilli[id].direction = -1;
+				gameData->controlloCoccodrilli[id].id = id;
+				gameData->controlloCoccodrilli[id].offset_deep = 0;
+				gameData->controlloCoccodrilli[id].is_buono = false;
+				gameData->controlloCoccodrilli[id].is_going_deep = false;
+				gameData->controlloCoccodrilli[id].is_going_up = false;
+				gameData->controlloCoccodrilli[id].passi = 0;
 			}
+		}
 
-			if (thereIsSpaceForCoccodrilloOnFila(gameData, 4) && sec % 7 == 0 && contatore_dispari == 1)
+		if (thereIsSpaceForCoccodrilloOnFila(gameData, 6) && sec % 7 == 0 && contatore_dispari == 1)
+		{
+
+			// avvia coccodrillo
+			int id = id_disponibile(gameData->pids.pidCoccodrilli, MAXNCOCCODRILLI);
+			if (id != -1)
 			{
-
-				// avvia coccodrillo
-				int id = id_disponibile(gameData->pids.pidCoccodrilli, MAXNCOCCODRILLI);
-				if (id != -1)
-				{
-					PipeData coccodrillo_init;
-					coccodrillo_init.x = LASTGAMECOL;
-					coccodrillo_init.y = FILA_QUATTRO;
-					coccodrillo_init.type = 'c';
-					coccodrillo_init.id = id;
-					int pid_coccodrillo = avviaCoccodrillo(gameData->pipe, &(coccodrillo_init), id);
-					gameData->pids.pidCoccodrilli[id] = pid_coccodrillo;
-					gameData->contatori.contCoccodrilli++;
-					gameData->controlloCoccodrilli[id].direction = -1;
-					gameData->controlloCoccodrilli[id].id = id;
-					gameData->controlloCoccodrilli[id].offset_deep = 0;
-					gameData->controlloCoccodrilli[id].is_buono = false;
-					gameData->controlloCoccodrilli[id].is_going_deep = false;
-					gameData->controlloCoccodrilli[id].is_going_up = false;
-					gameData->controlloCoccodrilli[id].passi = 0;
-				}
+				PipeData coccodrillo_init;
+				coccodrillo_init.x = LASTGAMECOL;
+				coccodrillo_init.y = FILA_SEI;
+				coccodrillo_init.type = 'c';
+				coccodrillo_init.id = id;
+				int pid_coccodrillo = avviaCoccodrillo(gameData->pipe, &(coccodrillo_init), id);
+				gameData->pids.pidCoccodrilli[id] = pid_coccodrillo;
+				gameData->contatori.contCoccodrilli++;
+				gameData->controlloCoccodrilli[id].direction = -1;
+				gameData->controlloCoccodrilli[id].id = id;
+				gameData->controlloCoccodrilli[id].offset_deep = 0;
+				gameData->controlloCoccodrilli[id].is_buono = false;
+				gameData->controlloCoccodrilli[id].is_going_deep = false;
+				gameData->controlloCoccodrilli[id].is_going_up = false;
+				gameData->controlloCoccodrilli[id].passi = 0;
 			}
+		}
 
-			if (thereIsSpaceForCoccodrilloOnFila(gameData, 2) && sec % 7 == 0 && contatore_dispari == 1)
+		if (thereIsSpaceForCoccodrilloOnFila(gameData, 4) && sec % 7 == 0 && contatore_dispari == 1)
+		{
+
+			// avvia coccodrillo
+			int id = id_disponibile(gameData->pids.pidCoccodrilli, MAXNCOCCODRILLI);
+			if (id != -1)
 			{
-
-				// avvia coccodrillo
-				int id = id_disponibile(gameData->pids.pidCoccodrilli, MAXNCOCCODRILLI);
-				if (id != -1)
-				{
-					PipeData coccodrillo_init;
-					coccodrillo_init.x = LASTGAMECOL;
-					coccodrillo_init.y = FILA_DUE;
-					coccodrillo_init.type = 'c';
-					coccodrillo_init.id = id;
-					int pid_coccodrillo = avviaCoccodrillo(gameData->pipe, &(coccodrillo_init), id);
-					gameData->pids.pidCoccodrilli[id] = pid_coccodrillo;
-					gameData->contatori.contCoccodrilli++;
-					gameData->controlloCoccodrilli[id].direction = -1;
-					gameData->controlloCoccodrilli[id].id = id;
-					gameData->controlloCoccodrilli[id].offset_deep = 0;
-					gameData->controlloCoccodrilli[id].is_buono = false;
-					gameData->controlloCoccodrilli[id].is_going_deep = false;
-					gameData->controlloCoccodrilli[id].is_going_up = false;
-					gameData->controlloCoccodrilli[id].passi = 0;
-				}
+				PipeData coccodrillo_init;
+				coccodrillo_init.x = LASTGAMECOL;
+				coccodrillo_init.y = FILA_QUATTRO;
+				coccodrillo_init.type = 'c';
+				coccodrillo_init.id = id;
+				int pid_coccodrillo = avviaCoccodrillo(gameData->pipe, &(coccodrillo_init), id);
+				gameData->pids.pidCoccodrilli[id] = pid_coccodrillo;
+				gameData->contatori.contCoccodrilli++;
+				gameData->controlloCoccodrilli[id].direction = -1;
+				gameData->controlloCoccodrilli[id].id = id;
+				gameData->controlloCoccodrilli[id].offset_deep = 0;
+				gameData->controlloCoccodrilli[id].is_buono = false;
+				gameData->controlloCoccodrilli[id].is_going_deep = false;
+				gameData->controlloCoccodrilli[id].is_going_up = false;
+				gameData->controlloCoccodrilli[id].passi = 0;
 			}
 		}
 
@@ -309,6 +305,8 @@ void drawProcess(int *pipe_fd)
 
 		mvprintw(29, 106, "                      ");
 		mvprintw(29, 106, "passi c id 0: %d", gameData->controlloCoccodrilli[0].passi);
+		mvprintw(30, 106, "                               ");
+		mvprintw(30, 106, "offset deep: %d", gameData->controlloCoccodrilli[0].offset_deep);
 
 		refresh();
 	}

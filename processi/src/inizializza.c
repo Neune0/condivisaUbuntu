@@ -35,6 +35,7 @@ void inizializzaControlloCoccodrilli(GameData* gameData){
 		gameData->controlloCoccodrilli[i].is_fase_pre_immersione=false;
 		gameData->controlloCoccodrilli[i].is_fase_immersione=false;
 		gameData->controlloCoccodrilli[i].passi_in_pre_immersione=0;
+		gameData->controlloCoccodrilli[i].passi_deep=0;
 	}
 	return;
 }
@@ -65,10 +66,10 @@ void avviaProcessiBase(int* pipe_fd,Pids* pids){
 	// avvia il processo che gestisce il movimento della rana
 	pids->pidRana = avviaRana(pipe_fd);
 	// qui vanno fatti partire i processi delle piante
-	//pids->pidNemici[0]=avviaNemico(pipe_fd,0);
-	//pids->pidNemici[1]=avviaNemico(pipe_fd,1);
-	//pids->pidNemici[2]=avviaNemico(pipe_fd,2);
-	//pids->pidNemici[3]=avviaNemico(pipe_fd,3);
+	pids->pidNemici[0]=avviaNemico(pipe_fd,0);
+	pids->pidNemici[1]=avviaNemico(pipe_fd,1);
+	pids->pidNemici[2]=avviaNemico(pipe_fd,2);
+	pids->pidNemici[3]=avviaNemico(pipe_fd,3);
 	avviaTempo(pipe_fd);
 	return;
 }

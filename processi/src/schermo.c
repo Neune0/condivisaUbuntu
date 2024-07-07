@@ -8,11 +8,13 @@ void aggiorna(GameData *gameData)
 
 	if (collisione.tipoCollisione == NO_COLLISIONE)
 	{
+		
 		// aggiornamento normale se no collisione
 		normalUpdate(gameData);
 	}
 	else
 	{
+		 mvprintw(31, 106, "                               ");
 		// se collisione aggiornamento particolareggiato
 		handleCollisione(gameData, collisione);
 	}
@@ -348,6 +350,71 @@ void handleCoccodrilloMovement(GameData *gameData)
 		// 1. il coccodrillo si sta immergendo
 		// 2. il coccodrillo è interamente sotto l'acqua
 		// 3. il coccodrillo sta riemergendo
+		if (controlloCoccodrillo->is_going_deep)
+		{
+			if (controlloCoccodrillo->direction == 1)
+			{
+				// il coccodrillo va verso destra
+				// cancellare lo posso lasciare come prima
+				// invece disegnare lo devo modificare
+				aggiornaOggettoCoccodrillo(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_DX_C, controlloCoccodrillo);
+			}
+			else
+			{
+				// il coccodrillo va verso sinistra
+				aggiornaOggettoCoccodrillo(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_SX_C, controlloCoccodrillo);
+			}
+			// incremento offset per disegno
+			controlloCoccodrillo->offset_deep++;
+			// controllo su offset per disegno
+			if (controlloCoccodrillo->offset_deep > COCCODRILLO_W )
+			{
+				controlloCoccodrillo->is_going_deep = false;
+				controlloCoccodrillo->is_deep = true;
+			}
+		}
+		else
+		{
+			
+			if (controlloCoccodrillo->is_going_up)
+			{
+				if (controlloCoccodrillo->direction != 1)
+				{
+					// il coccodrillo va verso destra
+					// cancellare lo posso lasciare come prima
+					// invece disegnare lo devo modificare
+					aggiornaOggettoCoccodrillo(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_DX_C, controlloCoccodrillo);
+				}
+				else
+				{
+					// il coccodrillo va verso sinistra
+					aggiornaOggettoCoccodrillo(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_SX_C, controlloCoccodrillo);
+				}
+				// sta riemergendo
+				controlloCoccodrillo->offset_deep--;
+				if (controlloCoccodrillo->offset_deep <= 0)
+				{
+					controlloCoccodrillo->is_going_up = false;
+					controlloCoccodrillo->is_fase_immersione = false;
+					controlloCoccodrillo->offset_deep=0;
+					controlloCoccodrillo->passi_deep=0;
+					controlloCoccodrillo->passi_in_immersione=0;
+					controlloCoccodrillo->passi_in_pre_immersione=0;
+				}
+			}
+			else
+			{
+				// è completamente sotto acqua non lo devo neanche disegnare
+				controlloCoccodrillo->passi_deep++;
+				if (controlloCoccodrillo->passi_deep >= 8)
+				{
+					controlloCoccodrillo->is_deep = false;
+					controlloCoccodrillo->is_going_up = true;
+					controlloCoccodrillo->passi_deep = 0;
+					controlloCoccodrillo->offset_deep-=2;
+				}
+			}
+		}
 		gameData->controlloCoccodrilli[gameData->pipeData.id].passi++;
 	}
 	else
@@ -392,10 +459,12 @@ void handleCoccodrilloMovement(GameData *gameData)
 			}
 			gameData->controlloCoccodrilli[gameData->pipeData.id].passi++;
 			gameData->controlloCoccodrilli[gameData->pipeData.id].passi_in_pre_immersione++;
-			if(gameData->controlloCoccodrilli[gameData->pipeData.id].passi_in_pre_immersione>=5){
-				controlloCoccodrillo->is_fase_pre_immersione=false;
-				controlloCoccodrillo->is_fase_immersione=true;
-				controlloCoccodrillo->passi_in_pre_immersione=0;
+			if (gameData->controlloCoccodrilli[gameData->pipeData.id].passi_in_pre_immersione >= 5)
+			{
+				controlloCoccodrillo->is_fase_pre_immersione = false;
+				controlloCoccodrillo->is_fase_immersione = true;
+				controlloCoccodrillo->is_going_deep=true;
+				controlloCoccodrillo->passi_in_pre_immersione = 0;
 			}
 		}
 		else
@@ -404,22 +473,179 @@ void handleCoccodrilloMovement(GameData *gameData)
 			// switch su tipo del coccodrillo in base alla direzione
 			if (gameData->pipeData.type == 'C')
 			{
-				aggiornaOggetto(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_DX_C);
+				if(gameData->controlloCoccodrilli[gameData->pipeData.id].is_buono){
+					aggiornaOggetto(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_DX);
+				}
+				else{
+					aggiornaOggetto(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_DX_C);
+				}
 			}
 
 			if (gameData->pipeData.type == 'c')
 			{
-				aggiornaOggetto(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_SX_C);
+				if(gameData->controlloCoccodrilli[gameData->pipeData.id].is_buono){
+					aggiornaOggetto(gameData,gameData->oldPos.coccodrilli,S_COCCODRILLO_SX);
+				}
+				else{
+					aggiornaOggetto(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_SX_C);
+				}
 			}
-
-			if ((controlloCoccodrillo->passi +1) % 30 == 0)
+			if(!(controlloCoccodrillo->is_buono)){
+				if ((controlloCoccodrillo->passi + 1) % 30 == 0)
 			{
 				controlloCoccodrillo->is_fase_pre_immersione = true;
 			}
+			}
+			
 			gameData->controlloCoccodrilli[gameData->pipeData.id].passi++;
 		}
 	}
 
-	
 	return;
+}
+
+void aggiornaOggettoCoccodrillo(GameData *gameData, PipeData *old_pos, TipoSprite tipoSprite, CocodrileControl *controlloCoccodrillo)
+{
+	PipeData *datiNuovi = &(gameData->pipeData);			  // i dati nuovi passati in pipe
+	PipeData *datiVecchi = &(old_pos[gameData->pipeData.id]); // dati al passo precedentes
+
+	// se le coordinate sono cambiate, pulisci l'area vecchia e stampa il nuovo sprite
+	if (datiNuovi->x != datiVecchi->x || datiNuovi->y != datiVecchi->y)
+	{
+
+		pulisciSpriteInMatrice(datiVecchi, &(gameData->sprites[tipoSprite]), gameData);
+		stampaMatrice(gameData->schermo.screenMatrix);
+		stampaCoccodrilloInMatrice(datiNuovi, &(gameData->sprites[tipoSprite]), gameData, controlloCoccodrillo);
+		stampaMatrice(gameData->schermo.screenMatrix);
+		aggiornaOldPos(datiVecchi, datiNuovi);
+	}
+}
+
+void stampaCoccodrilloInMatrice(PipeData *datiNuovi, Sprite *sprite, GameData *gameData, CocodrileControl *controlloCoccodrillo)
+{
+	int startRow = datiNuovi->y;
+	int startCol = datiNuovi->x;
+	int maxRows = sprite->max_row;
+	int maxCols = sprite->max_col;
+
+	int direzione = controlloCoccodrillo->direction;
+	int offset = controlloCoccodrillo->offset_deep;
+
+	int row = 0, col = 0;
+
+	Schermo *schermo = &(gameData->schermo);
+	PipeData *pipeData = &(gameData->pipeData);
+
+	for (int i = 0; i < maxRows; i++)
+	{
+		if (controlloCoccodrillo->is_going_deep)
+		{
+			if (direzione == 1)
+			{
+				// coccodrillo verso destra
+				for (int j = 0; j < maxCols - offset; j++)
+				{
+					row = startRow + i;
+					col = startCol + j;
+					// controllo che col non sfori
+					if (col <= LASTGAMECOL && col >= FIRSTGAMECOL)
+					{
+						schermo->screenMatrix[row][col].ch = sprite->sprite[i][j];
+						schermo->screenMatrix[row][col].color = sprite->color;
+						schermo->screenMatrix[row][col].is_changed = true;
+						schermo->screenMatrix[row][col].id = pipeData->id;
+						schermo->screenMatrix[row][col].tipo = sprite->tipo;
+					}
+				}
+			}
+			else
+			{
+				// coccodrillo verso sinistra
+				for (int j = offset; j < maxCols; j++)
+				{
+					row = startRow + i;
+					col = startCol + j;
+					// controllo che col non sfori
+					if (col <= LASTGAMECOL && col >= FIRSTGAMECOL)
+					{
+						schermo->screenMatrix[row][col].ch = sprite->sprite[i][j];
+						schermo->screenMatrix[row][col].color = sprite->color;
+						schermo->screenMatrix[row][col].is_changed = true;
+						schermo->screenMatrix[row][col].id = pipeData->id;
+						schermo->screenMatrix[row][col].tipo = sprite->tipo;
+					}
+				}
+			}
+		}
+		else
+		{
+			// sto riemergendo
+			int quanto_disegno = COCCODRILLO_W - offset;
+			if (direzione == 1)
+			{
+				// coccodrillo verso destra in riemersione
+				// coccodrillo verso sinistra
+				for (int j = maxCols - quanto_disegno; j < maxCols; j++)
+				{
+					row = startRow + i;
+					col = startCol + j;
+					// controllo che col non sfori
+					if (col <= LASTGAMECOL && col >= FIRSTGAMECOL)
+					{
+						schermo->screenMatrix[row][col].ch = sprite->sprite[i][j];
+						schermo->screenMatrix[row][col].color = sprite->color;
+						schermo->screenMatrix[row][col].is_changed = true;
+						schermo->screenMatrix[row][col].id = pipeData->id;
+						schermo->screenMatrix[row][col].tipo = sprite->tipo;
+					}
+				}
+			}
+			else
+			{
+				// coccodrillo verso sinistra in riemersione
+				for (int j = 0; j < quanto_disegno; j++)
+				{
+					row = startRow + i;
+					col = startCol + j;
+					// controllo che col non sfori
+					if (col <= LASTGAMECOL && col >= FIRSTGAMECOL)
+					{
+						schermo->screenMatrix[row][col].ch = sprite->sprite[i][j];
+						schermo->screenMatrix[row][col].color = sprite->color;
+						schermo->screenMatrix[row][col].is_changed = true;
+						schermo->screenMatrix[row][col].id = pipeData->id;
+						schermo->screenMatrix[row][col].tipo = sprite->tipo;
+					}
+				}
+			}
+		}
+	}
+	return;
+}
+
+/** Cancella dalla matrice uno specifico oggetto passato al parametro nemico
+ 
+@param gameData riferimento a tutti i dati di gioco
+@param oggetto è il riferimento al nemico da cancellare dalla matrice
+@param old_pos vettore delle posizioni di tutti gli oggetti
+@param tiposprite il tipo della sprite
+*/
+void cancellaOggettoDaMatrice(GameData* gameData, PipeData oggetto ,PipeData* old_pos, TipoSprite tipoSprite)
+{
+    //int id = gameData->pipeData.id;
+
+    int id = oggetto.id;
+
+    PipeData* datiVecchi = &(old_pos[id]); // dati al passo precedente
+
+    if (id >= 0) // se l'id è un indice di array valido
+    {
+        pulisciSpriteInMatrice(datiVecchi, &(gameData->sprites[tipoSprite]), gameData);
+
+		stampaMatrice(gameData->schermo.screenMatrix);
+		datiVecchi->type = ' ';
+		datiVecchi->x = 0;
+		datiVecchi->y = 0;
+    }
+    return;
 }

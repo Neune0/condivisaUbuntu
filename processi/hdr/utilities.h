@@ -184,7 +184,8 @@ typedef enum{
 	NO_COLLISIONE,
 	RANA_FIUME,
 	RANA_TANA_APERTA,
-	RANA_TANA_CHIUSA
+	RANA_TANA_CHIUSA,
+	PROIETTILE_COCCODRILLO_CATTIVO
 }TipoCollisione;
 
 // enumerazione per il tipo di oggetto su schermo
@@ -349,18 +350,21 @@ typedef struct{
 }RanaAbsPos;
 
 typedef struct{
-	bool is_buono;
 	int id;
+	bool is_buono;
+	bool is_fase_pre_immersione;
+	bool is_fase_immersione;
 	bool is_going_deep;
 	bool is_going_up;
+	bool is_deep;
+	bool lampeggia;
+
 	int offset_deep;
 	int direction;
 	int passi;
 	int passi_in_immersione;
-	bool is_fase_pre_immersione;
-	bool is_fase_immersione;
-	bool lampeggia;
 	int passi_in_pre_immersione;
+	int passi_deep;
 }CocodrileControl;
 
 // struttura dati generale del gioco, contiene tutti i dati significativi per la gestione

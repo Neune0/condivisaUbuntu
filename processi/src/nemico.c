@@ -62,7 +62,7 @@ void nemico(int *pipe_fd, int id)
 		if (contatore % 100 == 0)
 		{
 			nemico.x++;
-			if(nemico.x-initialX>5){
+			if(nemico.x-initialX>4){
 				nemico.x=initialX;
 			}
 			write(pipe_fd[1], &nemico, sizeof(PipeData));

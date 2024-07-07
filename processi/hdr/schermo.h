@@ -31,4 +31,10 @@ void normalUpdate(GameData* gameData);
 void printPianta(GameData *gameData, PipeData *old_pos, TipoSprite tipoSprite);
 
 void handleCoccodrilloMovement(GameData* gameData);
+
+void aggiornaOggettoCoccodrillo(GameData *gameData, PipeData *old_pos, TipoSprite tipoSprite,CocodrileControl* controlloCoccodrillo);
+
+void stampaCoccodrilloInMatrice(PipeData *datiNuovi, Sprite *sprite, GameData *gameData,CocodrileControl* controlloCoccodrillo);
+
+void cancellaOggettoDaMatrice(GameData* gameData, PipeData oggetto ,PipeData* old_pos, TipoSprite tipoSprite);
 #endif
