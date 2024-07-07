@@ -367,6 +367,7 @@ typedef struct{
 	int passi_in_immersione;
 	int passi_in_pre_immersione;
 	int passi_deep;
+	int offset_rana;
 }CocodrileControl;
 
 // struttura dati generale del gioco, contiene tutti i dati significativi per la gestione
@@ -408,6 +409,8 @@ typedef struct{
 	int id_oggetto_attivo;
 	TipoObj oggetto_passivo; // oggetto che sta fermo e subisce la collisione
 	int id_oggetto_passivo;
+	int hit_point_x;
+	int hit_point_y;
 }Collisione;
 
 // inizializza ncurses ed i colori utilizzati

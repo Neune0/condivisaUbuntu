@@ -37,6 +37,7 @@ void inizializzaControlloCoccodrilli(GameData* gameData){
 		gameData->controlloCoccodrilli[i].passi_in_pre_immersione=0;
 		gameData->controlloCoccodrilli[i].passi_deep=0;
 		gameData->controlloCoccodrilli[i].rana_on=false;
+		gameData->controlloCoccodrilli[i].offset_rana=0;
 	}
 	return;
 }

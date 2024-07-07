@@ -9,8 +9,10 @@ void aggiorna(GameData *gameData)
 	{
 		mvprintw(32, 106, "                   ");
 		mvprintw(33, 106, "                                    ");
+		mvprintw(34,206,"                          ");
 		mvprintw(32, 106, "collisione data: ");
 		mvprintw(33, 106, "tip co: %d, oA: %d %d, oP: %d %d", collisione.tipoCollisione, collisione.oggetto_attivo, collisione.id_oggetto_attivo, collisione.oggetto_passivo, collisione.id_oggetto_passivo);
+		mvprintw(34,106,"hit point x: %d y: %d",collisione.hit_point_x,collisione.hit_point_y);
 	}
 
 	if (collisione.tipoCollisione == NO_COLLISIONE)
@@ -483,6 +485,11 @@ void handleCoccodrilloMovement(GameData *gameData)
 				if (gameData->controlloCoccodrilli[gameData->pipeData.id].is_buono)
 				{
 					aggiornaOggetto(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_DX);
+					if(gameData->controlloCoccodrilli[gameData->pipeData.id].rana_on){
+						// ci stampo sopra la rana
+						stampaSpriteInMatrice(&(gameData->oldPos.coccodrilli[gameData->pipeData.id]), &(gameData->sprites[S_RANA]),gameData);
+						
+					}
 				}
 				else
 				{
@@ -497,16 +504,14 @@ void handleCoccodrilloMovement(GameData *gameData)
 					aggiornaOggetto(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_SX);
 					if(gameData->controlloCoccodrilli[gameData->pipeData.id].rana_on){
 						// ci stampo sopra la rana
-						aggiornaOggettoNew(gameData,gameData->oldPos.coccodrilli[gameData->pipeData.id],&(gameData->oldPos.rana),S_RANA);
+						stampaSpriteInMatrice(&(gameData->oldPos.coccodrilli[gameData->pipeData.id]), &(gameData->sprites[S_RANA]),gameData);
+						
 					}
 				}
 				else
 				{
 					aggiornaOggetto(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_SX_C);
-					if(gameData->controlloCoccodrilli[gameData->pipeData.id].rana_on){
-						// ci stampo sopra la rana
-						aggiornaOggettoNew(gameData,gameData->oldPos.coccodrilli[gameData->pipeData.id],&(gameData->oldPos.rana),S_RANA);
-					}
+		
 				}
 			}
 			if (!(controlloCoccodrillo->is_buono))

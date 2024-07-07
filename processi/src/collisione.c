@@ -4,6 +4,8 @@ Collisione detectCollisione(GameData *gameData)
 {
     Collisione collisione;
     collisione.tipoCollisione = NO_COLLISIONE;
+    collisione.hit_point_y=0;
+    collisione.hit_point_x=0;
     Schermo *schermo = &(gameData->schermo); // lo schermo di gioco
 
     // switch sul carattere in pipe
@@ -60,6 +62,8 @@ Collisione detectCollisione(GameData *gameData)
                     collisione.oggetto_attivo = RANA_OBJ;
                     collisione.id_oggetto_passivo = schermo->screenMatrix[row][col].id;
                     collisione.oggetto_passivo = COCCODRILLO_BUONO_OBJ;
+                    collisione.hit_point_x=col;
+                    collisione.hit_point_y=row;
                     return collisione;
                     break;
                 default:
