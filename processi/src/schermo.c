@@ -485,9 +485,18 @@ void handleCoccodrilloMovement(GameData *gameData)
 				if (gameData->controlloCoccodrilli[gameData->pipeData.id].is_buono)
 				{
 					aggiornaOggetto(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_DX);
-					if(gameData->controlloCoccodrilli[gameData->pipeData.id].rana_on){
+					// se la rana è su quel coccodrillo
+					if(gameData->ranaAbsPos.id_coccodrillo == gameData->pipeData.id){
 						// ci stampo sopra la rana
-						stampaSpriteInMatrice(&(gameData->oldPos.coccodrilli[gameData->pipeData.id]), &(gameData->sprites[S_RANA]),gameData);
+						PipeData rana;
+						rana.x= gameData->oldPos.coccodrilli[gameData->pipeData.id].x + gameData->ranaAbsPos.offset_on_coccodrillo;
+						rana.y= gameData->oldPos.coccodrilli[gameData->pipeData.id].y;
+						rana.id=0;
+						rana.type='X';
+						// aggiorno rana abs pos
+						gameData->ranaAbsPos.x=rana.x;
+						gameData->ranaAbsPos.y=rana.y;
+						stampaSpriteInMatrice(&(rana), &(gameData->sprites[S_RANA]),gameData);
 						
 					}
 				}
@@ -502,9 +511,18 @@ void handleCoccodrilloMovement(GameData *gameData)
 				if (gameData->controlloCoccodrilli[gameData->pipeData.id].is_buono)
 				{
 					aggiornaOggetto(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_SX);
-					if(gameData->controlloCoccodrilli[gameData->pipeData.id].rana_on){
+					// se la rana è su quel coccodrillo
+					if(gameData->ranaAbsPos.id_coccodrillo == gameData->pipeData.id){
 						// ci stampo sopra la rana
-						stampaSpriteInMatrice(&(gameData->oldPos.coccodrilli[gameData->pipeData.id]), &(gameData->sprites[S_RANA]),gameData);
+						PipeData rana;
+						rana.x= gameData->oldPos.coccodrilli[gameData->pipeData.id].x + gameData->ranaAbsPos.offset_on_coccodrillo;
+						rana.y= gameData->oldPos.coccodrilli[gameData->pipeData.id].y;
+						rana.id=0;
+						rana.type='X';
+						// aggiorno rana abs pos
+						gameData->ranaAbsPos.x=rana.x;
+						gameData->ranaAbsPos.y=rana.y;
+						stampaSpriteInMatrice(&(rana), &(gameData->sprites[S_RANA]),gameData);
 						
 					}
 				}

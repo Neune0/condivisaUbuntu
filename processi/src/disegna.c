@@ -26,12 +26,26 @@ void drawProcess(int *pipe_fd)
 		read(pipe_fd[0], &(gameData->pipeData), sizeof(PipeData)); // Leggi le coordinate inviate dalla pipe
 
 		// per debug
-		mvprintw(0, 106, "                                   ");
-		mvprintw(0, 106, "pipeData type:%c id:%d x:%d y:%d", gameData->pipeData.type, gameData->pipeData.id, gameData->pipeData.x, gameData->pipeData.y);
-		refresh();
+		switch (gameData->pipeData.type)
+		{
+		case 'T': // tempo
+			// non fa nulla
+			break;
+		case 'X': // rana
+			break;
+		default:
+			break;
+		}
+		// if (gameData->pipeData.type != 'T')
+		// {
+		// 	mvprintw(0, 106, "                                   ");
+		// 	mvprintw(0, 106, "pipeData type:%c id:%d x:%d y:%d", gameData->pipeData.type, gameData->pipeData.id, gameData->pipeData.x, gameData->pipeData.y);
+		// 	refresh();
+		// }
 		// fine debug
 
 		aggiorna(gameData); // aggiorna stato del gioco
+		printVite(gameData);
 		// printTempo(gameData); // aggiorna hud del tempo
 		// stampaMatrice(gameData->schermo.screenMatrix); // stampa a video solo celle della matrice dinamica modificate rispetto al ciclo precedente
 		// refresh(); // Aggiorna la finestra
@@ -251,62 +265,8 @@ void drawProcess(int *pipe_fd)
 		mvprintw(2, 106, "                                            ");
 		mvprintw(2, 106, "ctPN: %d, ctN: %d, ctP: %d, ctC: %d", gameData->contatori.contProiettiliN, gameData->contatori.contNemici, gameData->contatori.contProiettili, gameData->contatori.contCoccodrilli);
 
-		mvprintw(3, 105, "--------------------------------------------|");
-
-		mvprintw(4, 106, "pid pN");
-		mvprintw(5, 106, "                                ");
-		for (int i = 0; i < MAXNPROIETTILINEMICI; i++)
-		{
-			mvprintw(5, 106 + (i * 8), "%d:%d ", i, gameData->pids.pidProiettiliNemici[i]);
-		}
-
-		mvprintw(6, 105, "--------------------------------------------|");
-		mvprintw(7, 106, "pid p");
-		mvprintw(8, 106, "                                      ");
-		for (int i = 0; i < MAXNPROIETTILI; i++)
-		{
-			mvprintw(8, 106 + (i * 8), "%d:%d ", i, gameData->pids.pidProiettili[i]);
-		}
-		mvprintw(9, 105, "--------------------------------------------|");
-
-		mvprintw(10, 106, "pid coccodrilli");
-
-		// pulizia righe pid coccodrilli
-		mvprintw(11, 106, "                                            ");
-		mvprintw(12, 106, "                                            ");
-		mvprintw(13, 106, "                                            ");
-		mvprintw(14, 106, "                                            ");
-		mvprintw(15, 106, "                                            ");
-		mvprintw(16, 106, "                                            ");
-		mvprintw(17, 106, "                                            ");
-		int off_riga = 0;
-		int off_colonna = 0;
-
-		for (int i = 0; i < MAXNCOCCODRILLI; i++)
-		{
-
-			if (i % 4 == 0)
-			{
-				off_riga++;
-			}
-			if (off_colonna >= 4)
-			{
-				off_colonna = 0;
-			}
-			mvprintw(11 + off_riga, 106 + (off_colonna * 8), "%d:%d ", i, gameData->pids.pidCoccodrilli[i]);
-			off_colonna++;
-		}
-		mvprintw(24, 106, "tempo di gioco: %d", gameData->gameInfo.tempo.milliseconds);
-		mvprintw(25, 106, "sec: %d", sec);
-		mvprintw(26, 106, "                                            ");
-		mvprintw(27, 106, "                                            ");
-		mvprintw(26, 106, "contatore pari: %d", contatore_pari);
-		mvprintw(27, 106, "contatore dispari: %d", contatore_dispari);
-
-		mvprintw(29, 106, "                      ");
-		mvprintw(29, 106, "passi c id 0: %d", gameData->controlloCoccodrilli[0].passi);
-		mvprintw(30, 106, "                               ");
-		mvprintw(30, 106, "offset deep: %d", gameData->controlloCoccodrilli[0].offset_deep);
+		mvprintw(36, 106, "                                  ");
+		mvprintw(36, 106, "tempo di gioco: %d secondi", sec);
 
 		refresh();
 	}

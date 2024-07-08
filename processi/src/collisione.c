@@ -25,6 +25,22 @@ Collisione detectCollisione(GameData *gameData)
             return collisione;
         }
 
+        // se la rana si è spostata lungo un coccodrillo devo modificare solo l'offset della rana
+        if(gameData->pipeData.x != 0 && gameData->ranaAbsPos.on_coccodrillo){
+            
+            int offset= gameData->ranaAbsPos.offset_on_coccodrillo + gameData->pipeData.x;
+            // se il movimento lungo il coccodrillo è lecito ovvero non sfora:
+            if(offset>=0 && offset<=9){
+                // aggiorno offset
+                gameData->ranaAbsPos.offset_on_coccodrillo += gameData->pipeData.x;
+            }
+            else{
+                // non c'è aggiornamento ne collisione
+                return collisione;
+            }
+            
+        }
+
         for (int row = ranaPos.y; row < ranaPos.y + RANA_H; row++)
         {
             for (int col = ranaPos.x; col < ranaPos.x + RANA_W; col++)
@@ -97,7 +113,7 @@ Collisione detectCollisione(GameData *gameData)
         }
 
         break;
-    // tronco sull if controllo che sia cattivo
+    // coccodrillo sull if controllo che sia cattivo
     case 'C':
     case 'c':
         PipeData coccodrilloData = gameData->pipeData;
@@ -162,6 +178,8 @@ void handleCollisione(GameData *gameData, Collisione collisione)
         // schermata vite--
         // faccio ripartire la rana
         resetRana(gameData);
+        gameData->ranaAbsPos.on_coccodrillo=false;
+        gameData->ranaAbsPos.id_coccodrillo=-1;
         aggiornaOggetto(gameData, &(gameData->oldPos.rana), S_RANA);
         break;
     case PROIETTILE_COCCODRILLO_CATTIVO:
@@ -210,33 +228,32 @@ void handleCollisione(GameData *gameData, Collisione collisione)
         break;
     case RANA_COCCODRILLO_BUONO:
         if(collisione.oggetto_attivo==RANA_OBJ){
-            //reset di tutti i coccodrilli a rana_on false
-            for(int i=0;i<MAXNCOCCODRILLI;i++){
-                gameData->controlloCoccodrilli[i].rana_on=false;
-            }
-            // imposta a true rana_on del coccodrillo coinvolto nella collisione
-            gameData->controlloCoccodrilli[collisione.id_oggetto_passivo].rana_on=true;
-
             // stampo il coccodrillo buono
             if(gameData->controlloCoccodrilli[collisione.id_oggetto_passivo].direction==1){
                 aggiornaOggettoNew(gameData,gameData->oldPos.coccodrilli[collisione.id_oggetto_passivo],gameData->oldPos.coccodrilli,S_COCCODRILLO_DX);
             }
             else{
-                 aggiornaOggettoNew(gameData,gameData->oldPos.coccodrilli[collisione.id_oggetto_passivo],gameData->oldPos.coccodrilli,S_COCCODRILLO_SX);
+                aggiornaOggettoNew(gameData,gameData->oldPos.coccodrilli[collisione.id_oggetto_passivo],gameData->oldPos.coccodrilli,S_COCCODRILLO_SX);
             }
 
             // stampo sopra il coccodrillo buono la rana
-             aggiornaOggettoNew(gameData,gameData->oldPos.coccodrilli[collisione.id_oggetto_passivo],&(gameData->oldPos.rana),S_RANA);
+            // aggiorno abs pos rana
+            gameData->ranaAbsPos.x = collisione.hit_point_x;
+            gameData->ranaAbsPos.y = collisione.hit_point_y;
+            gameData->ranaAbsPos.on_coccodrillo=true;
+            gameData->ranaAbsPos.id_coccodrillo= collisione.id_oggetto_passivo;
+             // aggiorno offset rana su coccodrillo
+            gameData->ranaAbsPos.offset_on_coccodrillo= collisione.hit_point_x- gameData->oldPos.coccodrilli[collisione.id_oggetto_passivo].x;
+            // stampo e aggiorno rana
+            PipeData ranaData;
+            ranaData.x= gameData->ranaAbsPos.x;
+            ranaData.type='X';
+            ranaData.y=gameData->ranaAbsPos.y;
+            ranaData.id= 0;
+            aggiornaOggettoNew(gameData,ranaData,&(gameData->oldPos.rana),S_RANA);
 
         }else{
             // l'oggetto attivo e il coccodrillo buono
-            //reset di tutti i coccodrilli a rana_on false
-            for(int i=0;i<MAXNCOCCODRILLI;i++){
-                gameData->controlloCoccodrilli[i].rana_on=false;
-            }
-            // imposta a true rana_on del coccodrillo coinvolto nella collisione
-            gameData->controlloCoccodrilli[collisione.id_oggetto_attivo].rana_on=true;
-
             // stampo il coccodrillo buono
             if(gameData->controlloCoccodrilli[gameData->pipeData.id].direction==1){
                  aggiornaOggetto(gameData,gameData->oldPos.coccodrilli,S_COCCODRILLO_DX);
@@ -244,12 +261,21 @@ void handleCollisione(GameData *gameData, Collisione collisione)
             else{
                 aggiornaOggetto(gameData,gameData->oldPos.coccodrilli,S_COCCODRILLO_SX);
             }
-            
+             // aggiorno abs pos rana
+            gameData->ranaAbsPos.x = collisione.hit_point_x;
+            gameData->ranaAbsPos.y = collisione.hit_point_y;
+            gameData->ranaAbsPos.on_coccodrillo=true;
+            gameData->ranaAbsPos.id_coccodrillo= collisione.id_oggetto_attivo;
+             // aggiorno offset rana su coccodrillo
+            gameData->ranaAbsPos.offset_on_coccodrillo = collisione.hit_point_x - gameData->oldPos.coccodrilli[collisione.id_oggetto_attivo].x ;
+             // stampo e aggiorno rana
+            PipeData ranaData;
+            ranaData.x= gameData->ranaAbsPos.x;
+            ranaData.type='X';
+            ranaData.y=gameData->ranaAbsPos.y;
+            ranaData.id= 0;
             // stampo sopra il coccodrillo buono la rana
-            aggiornaOggetto(gameData, &(gameData->oldPos.rana), S_RANA);
-           
-
-            
+            aggiornaOggettoNew(gameData,ranaData, &(gameData->oldPos.rana), S_RANA);
         }
         break;
     default:

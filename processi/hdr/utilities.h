@@ -348,6 +348,9 @@ typedef struct{
 typedef struct{
 	int x;
 	int y;
+	bool on_coccodrillo;
+	int id_coccodrillo;
+	int offset_on_coccodrillo;
 }RanaAbsPos;
 
 typedef struct{
