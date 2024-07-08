@@ -54,6 +54,8 @@ Collisione detectCollisione(GameData *gameData)
                     collisione.oggetto_attivo = RANA_OBJ;
                     collisione.oggetto_passivo = FIUME_OBJ;
                     collisione.id_oggetto_passivo = 0;
+                    collisione.hit_point_x=col;
+                    collisione.hit_point_y=row;
                     return collisione;
                     break;
                 case TANA_OPEN_OBJ:
@@ -62,6 +64,8 @@ Collisione detectCollisione(GameData *gameData)
                     collisione.oggetto_attivo = RANA_OBJ;
                     collisione.oggetto_passivo = TANA_OPEN_OBJ;
                     collisione.id_oggetto_passivo = schermo->screenMatrix[row][col].id;
+                    collisione.hit_point_x=col;
+                    collisione.hit_point_y=row;
                     return collisione;
                     break;
                 case TANA_CLOSE_OBJ:
@@ -70,6 +74,8 @@ Collisione detectCollisione(GameData *gameData)
                     collisione.oggetto_attivo = RANA_OBJ;
                     collisione.oggetto_passivo = TANA_CLOSE_OBJ;
                     collisione.id_oggetto_passivo = schermo->screenMatrix[row][col].id;
+                    collisione.hit_point_x=col;
+                    collisione.hit_point_y=row;
                     return collisione;
                     break;
                 case COCCODRILLO_BUONO_OBJ:
@@ -105,6 +111,8 @@ Collisione detectCollisione(GameData *gameData)
                     collisione.oggetto_attivo = P_OBJ;
                     collisione.oggetto_passivo = COCCODRILLO_CATTIVO_OBJ;
                     collisione.id_oggetto_passivo = schermo->screenMatrix[row][col].id;
+                    collisione.hit_point_x=col;
+                    collisione.hit_point_y=row;
                     break;
                 default:
                     break;
@@ -133,6 +141,9 @@ Collisione detectCollisione(GameData *gameData)
                         collisione.oggetto_attivo = COCCODRILLO_CATTIVO_OBJ;
                         collisione.oggetto_passivo = P_OBJ;
                         collisione.id_oggetto_passivo = schermo->screenMatrix[row][col].id;
+                        collisione.hit_point_x=col;
+                        collisione.hit_point_y=row;
+                        return collisione;
                         break;
                     default:
                         break;
