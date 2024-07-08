@@ -61,14 +61,20 @@ void nemico(int *pipe_fd, int id)
 		// parte relativa al lancio dei proiettili
 		if (contatore % 100 == 0)
 		{
-			nemico.x++;
-			if(nemico.x-initialX>4){
+			if(nemico.x-initialX>=3){
 				nemico.x=initialX;
 			}
+			if(nemico.x-initialX==1){
+				nemico.y = ARGINEROWSTART + 2;
+			}
+			else{
+				nemico.y= ARGINEROWSTART + 1;
+			}
 			write(pipe_fd[1], &nemico, sizeof(PipeData));
+			nemico.x++;
 		}
 		contatore = (contatore + 1) % 50;
-		usleep(10000); // Aspetta un po' prima di generare nuove coordinate
+		usleep(20000); // Aspetta un po' prima di generare nuove coordinate
 	}
 }
 

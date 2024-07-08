@@ -55,6 +55,14 @@ void drawProcess(int *pipe_fd)
 			mvprintw(5, 106, "                                            ");
 			mvprintw(5, 106, "Last P: id: %d x: %d y: %d", gameData->pipeData.id, gameData->pipeData.x, gameData->pipeData.y);
 			break;
+		case 'S': // proiettile sparato da rana
+			mvprintw(6, 106, "                                            ");
+			mvprintw(6, 106, "Last S: id: %d x: %d y: %d", gameData->pipeData.id, gameData->pipeData.x, gameData->pipeData.y);
+			break;
+		case 's':
+			mvprintw(7, 106, "                                            ");
+			mvprintw(7, 106, "Last s: id: %d x: %d y: %d", gameData->pipeData.id, gameData->pipeData.x, gameData->pipeData.y);
+			break;
 		default:
 			break;
 		}
