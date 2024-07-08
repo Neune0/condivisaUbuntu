@@ -32,16 +32,33 @@ void drawProcess(int *pipe_fd)
 			// non fa nulla
 			break;
 		case 'X': // rana
+			mvprintw(0, 106, "                                            ");
+			mvprintw(0, 106, "Last X: id: %d x: %d y: %d", gameData->pipeData.id, gameData->pipeData.x, gameData->pipeData.y);
+			break;
+		case 'C':
+			mvprintw(1, 106, "                                            ");
+			mvprintw(1, 106, "Last C: id: %d x: %d y: %d", gameData->pipeData.id, gameData->pipeData.x, gameData->pipeData.y);
+			break;
+		case 'c':
+			mvprintw(2, 106, "                                            ");
+			mvprintw(2, 106, "Last c: id: %d x: %d y: %d", gameData->pipeData.id, gameData->pipeData.x, gameData->pipeData.y);
+			break;
+		case 'n':
+			mvprintw(3, 106, "                                            ");
+			mvprintw(3, 106, "Last n: id: %d x: %d y: %d", gameData->pipeData.id, gameData->pipeData.x, gameData->pipeData.y);
+			break;
+		case 'p':
+			mvprintw(4, 106, "                                            ");
+			mvprintw(4, 106, "Last p: id: %d x: %d y: %d", gameData->pipeData.id, gameData->pipeData.x, gameData->pipeData.y);
+			break;
+		case 'P':
+			mvprintw(5, 106, "                                            ");
+			mvprintw(5, 106, "Last P: id: %d x: %d y: %d", gameData->pipeData.id, gameData->pipeData.x, gameData->pipeData.y);
 			break;
 		default:
 			break;
 		}
-		// if (gameData->pipeData.type != 'T')
-		// {
-		// 	mvprintw(0, 106, "                                   ");
-		// 	mvprintw(0, 106, "pipeData type:%c id:%d x:%d y:%d", gameData->pipeData.type, gameData->pipeData.id, gameData->pipeData.x, gameData->pipeData.y);
-		// 	refresh();
-		// }
+		refresh();
 		// fine debug
 
 		aggiorna(gameData); // aggiorna stato del gioco
@@ -262,13 +279,17 @@ void drawProcess(int *pipe_fd)
 			}
 		}
 
-		mvprintw(2, 106, "                                            ");
-		mvprintw(2, 106, "ctPN: %d, ctN: %d, ctP: %d, ctC: %d", gameData->contatori.contProiettiliN, gameData->contatori.contNemici, gameData->contatori.contProiettili, gameData->contatori.contCoccodrilli);
+		// per debug
+		mvprintw(34,106,"                                            ");
+		mvprintw(34,106,"Rana x: %d y: %d idC: %d offC: %d",gameData->ranaAbsPos.x,gameData->ranaAbsPos.y,gameData->ranaAbsPos.id_coccodrillo,gameData->ranaAbsPos.offset_on_coccodrillo);
+		mvprintw(35, 106, "                                            ");
+		mvprintw(35, 106, "ctPN: %d, ctN: %d, ctP: %d, ctC: %d", gameData->contatori.contProiettiliN, gameData->contatori.contNemici, gameData->contatori.contProiettili, gameData->contatori.contCoccodrilli);
 
 		mvprintw(36, 106, "                                  ");
 		mvprintw(36, 106, "tempo di gioco: %d secondi", sec);
 
 		refresh();
+		// fine debug
 	}
 
 	// if sul tipo di uscita dal gioco

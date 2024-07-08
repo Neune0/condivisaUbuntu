@@ -151,11 +151,6 @@ Collisione detectCollisione(GameData *gameData)
 
 void handleCollisione(GameData *gameData, Collisione collisione)
 {
-    if (collisione.tipoCollisione == PROIETTILE_COCCODRILLO_CATTIVO)
-    {
-        mvprintw(31, 106, "collisione p_c");
-    }
-
     switch (collisione.tipoCollisione)
     {
     case RANA_FIUME:

@@ -7,12 +7,10 @@ void aggiorna(GameData *gameData)
 	Collisione collisione = detectCollisione(gameData);
 	if (collisione.tipoCollisione != NO_COLLISIONE)
 	{
-		mvprintw(32, 106, "                   ");
-		mvprintw(33, 106, "                                    ");
-		mvprintw(34,206,"                          ");
-		mvprintw(32, 106, "collisione data: ");
-		mvprintw(33, 106, "tip co: %d, oA: %d %d, oP: %d %d", collisione.tipoCollisione, collisione.oggetto_attivo, collisione.id_oggetto_attivo, collisione.oggetto_passivo, collisione.id_oggetto_passivo);
-		mvprintw(34,106,"hit point x: %d y: %d",collisione.hit_point_x,collisione.hit_point_y);
+		mvprintw(32,106,"                                            ");
+		mvprintw(33,106,"                                            ");
+		mvprintw(32, 106, "hit data: tipo: %d oA: %d %d oP: %d %d", collisione.tipoCollisione, collisione.oggetto_attivo, collisione.id_oggetto_attivo, collisione.oggetto_passivo, collisione.id_oggetto_passivo);
+		mvprintw(33,106,"hit point x: %d y: %d",collisione.hit_point_x,collisione.hit_point_y);
 	}
 
 	if (collisione.tipoCollisione == NO_COLLISIONE)
