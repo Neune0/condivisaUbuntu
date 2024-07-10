@@ -13,6 +13,7 @@ Collisione detectCollisione(GameData *gameData)
     {
     // rana
     case 'X':
+    {
         // calcolo posizone assoluta della rana in potenza
         // ovvero sommo a abspos la posizione relativa in pipe
         RanaAbsPos ranaPos;
@@ -94,8 +95,10 @@ Collisione detectCollisione(GameData *gameData)
             }
         }
         break;
+    }
     // proiettile rana
     case 'P':
+    {
         PipeData proiettileData = gameData->pipeData;
 
         for (int row = proiettileData.y; row < proiettileData.y + PROIETTILE_H; row++)
@@ -113,6 +116,17 @@ Collisione detectCollisione(GameData *gameData)
                     collisione.id_oggetto_passivo = schermo->screenMatrix[row][col].id;
                     collisione.hit_point_x=col;
                     collisione.hit_point_y=row;
+                    return collisione;
+                    break;
+                case N_OBJ:
+                    collisione.tipoCollisione = PROIETTILE_NEMICO;
+                    collisione.id_oggetto_attivo =  proiettileData.id;
+                    collisione.oggetto_attivo = P_OBJ;
+                    collisione.oggetto_passivo = N_OBJ;
+                    collisione.id_oggetto_passivo = schermo->screenMatrix[row][col].id;
+                    collisione.hit_point_x=col;
+                    collisione.hit_point_y=row;
+                    return collisione;
                     break;
                 default:
                     break;
@@ -121,6 +135,7 @@ Collisione detectCollisione(GameData *gameData)
         }
 
         break;
+    }
     // coccodrillo sull if controllo che sia cattivo
     case 'C':
     case 'c':
