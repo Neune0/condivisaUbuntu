@@ -30,6 +30,8 @@ void drawProcess(int *pipe_fd)
 		{
 		case 'T': // tempo
 			// non fa nulla
+			mvprintw(8, 106, "                                            ");
+			mvprintw(8, 106, "Last T: sec: %d", gameData->pipeData.x);
 			break;
 		case 'X': // rana
 			mvprintw(0, 106, "                                            ");
@@ -66,15 +68,11 @@ void drawProcess(int *pipe_fd)
 		default:
 			break;
 		}
-		refresh();
 		// fine debug
 
 		aggiorna(gameData); // aggiorna stato del gioco
 		printVite(gameData);
-		printTempo(gameData); // aggiorna hud del tempo
-		// stampaMatrice(gameData->schermo.screenMatrix); // stampa a video solo celle della matrice dinamica modificate rispetto al ciclo precedente
-		// refresh(); // Aggiorna la finestra
-
+		
 		sec = gameData->gameInfo.secondi_di_gioco;
 
 		if (sec % 2 == 0)
@@ -87,6 +85,8 @@ void drawProcess(int *pipe_fd)
 			contatore_pari = 0;
 			contatore_dispari++;
 		}
+
+		// questa parte va chiusa dentro una funzione a parte
 
 		if (thereIsSpaceForCoccodrilloOnFila(gameData, 1) && sec % 7 == 0 && contatore_dispari == 1)
 		{
