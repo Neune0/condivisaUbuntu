@@ -72,7 +72,7 @@ void drawProcess(int *pipe_fd)
 
 		aggiorna(gameData); // aggiorna stato del gioco
 		printVite(gameData);
-		
+
 		sec = gameData->gameInfo.secondi_di_gioco;
 
 		if (sec % 2 == 0)
@@ -288,18 +288,29 @@ void drawProcess(int *pipe_fd)
 		}
 
 		// per debug
-		mvprintw(34,106,"                                            ");
-		mvprintw(34,106,"Rana x: %d y: %d idC: %d offC: %d",gameData->ranaAbsPos.x,gameData->ranaAbsPos.y,gameData->ranaAbsPos.id_coccodrillo,gameData->ranaAbsPos.offset_on_coccodrillo);
+		mvprintw(34, 106, "                                            ");
+		mvprintw(34, 106, "Rana x: %d y: %d idC: %d offC: %d", gameData->ranaAbsPos.x, gameData->ranaAbsPos.y, gameData->ranaAbsPos.id_coccodrillo, gameData->ranaAbsPos.offset_on_coccodrillo);
 		mvprintw(35, 106, "                                            ");
 		mvprintw(35, 106, "ctPN: %d, ctN: %d, ctP: %d, ctC: %d", gameData->contatori.contProiettiliN, gameData->contatori.contNemici, gameData->contatori.contProiettili, gameData->contatori.contCoccodrilli);
 
 		mvprintw(36, 106, "                                  ");
 		mvprintw(36, 106, "tempo di gioco: %d secondi", sec);
+		mvprintw(37, 106, "                                            ");
+		mvprintw(37, 106, "contPari: %d contDispari: %d", contatore_pari, contatore_dispari);
 
 		// se il tempo di gioco supera il max per manche la rana muore e la manche riparte
 		// mi serve una funzione per lo start della manche
-		if(gameData->gameInfo.secondi_di_gioco>TEMPOLVL1){
+		if (gameData->gameInfo.secondi_di_gioco > TEMPOLVL1)
+		{
 			// uccidi rana e restart rana
+			gameData->gameInfo.vite--;
+			resetRana(gameData);
+			gameData->ranaAbsPos.on_coccodrillo = false;
+			gameData->ranaAbsPos.id_coccodrillo = -1;
+			aggiornaOggetto(gameData, &(gameData->oldPos.rana), S_RANA);
+
+			// termino e faccio ripartire il processo che gestisce il tempo
+			
 		}
 		refresh();
 		// fine debug

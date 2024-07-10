@@ -141,7 +141,7 @@
 #define N_SPRITES 13
 
 // tempo
-#define TEMPOLVL1 60 // numero di secondi per manche per il primo livello
+#define TEMPOLVL1 10 // numero di secondi per manche per il primo livello
 #define TEMPOLVL2 90 // numero di secondi per manche per il secondo livello
 #define TEMPOLVL3 120 // numero di secondi per manche per il terzo livello
 
