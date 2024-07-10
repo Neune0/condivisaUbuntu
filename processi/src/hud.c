@@ -43,6 +43,7 @@ void printInitTempo(GameData* gameData){
 			schermo->screenMatrix[row][col].color = TEMPO_COL;
 			schermo->screenMatrix[row][col].id = 0;
 			schermo->screenMatrix[row][col].tipo = HUD_OBJ;
+            schermo->screenMatrix[row][col].is_changed = true;
         }
     }
     return;
@@ -50,7 +51,7 @@ void printInitTempo(GameData* gameData){
 
 void printTempo(GameData* gameData){
     Schermo* schermo = &(gameData->schermo);
-    int secondi= gameData->gameInfo.tempo.secondi;
+    int secondi= gameData->gameInfo.secondi_di_gioco;
     int maxSeconds = 0; // nuermo massimo di secondi per manche a seconda del livello
     switch (gameData->gameInfo.livello)
     {

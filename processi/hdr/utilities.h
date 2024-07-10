@@ -278,17 +278,6 @@ typedef struct{
 	TipoObj tipo;
 }Sprite;
 
-// struttura per il tempo di gioco
-// - secondi: secondi rimanenti per la manche
-// - start: istante di tempo iniziale
-// - current: istante di tempo corrente
-typedef struct{
-	int secondi;
-	time_t start;
-	time_t current;
-	int milliseconds;
-}Tempo;
-
 // struttura per le info di gioco
 // - tempo : per gestione del tempo
 // - vite : le vite rimanenti della rana
@@ -296,7 +285,7 @@ typedef struct{
 // - livello : il livello del gioco
 // - mache : il numero di manche attuale all'interno del livello
 typedef struct {
-	Tempo tempo;
+	int secondi_di_gioco;
 	bool tempoIsChanged;
 	int vite;
 	bool viteIsChanged;
@@ -316,6 +305,7 @@ typedef struct {
 // - pidCoccodrilli : array dei pid dei processi coccodrillo
 typedef struct{
 	pid_t pidRana;
+	pid_t pidTempo;
 	pid_t pidProiettili[MAXNPROIETTILI];
 	pid_t pidProiettiliNemici[MAXNPROIETTILINEMICI];
 	pid_t pidNemici[MAXNNEMICI];
@@ -362,7 +352,6 @@ typedef struct{
 	bool is_going_up;
 	bool is_deep;
 	bool lampeggia;
-	bool rana_on;
 
 	int offset_deep;
 	int direction;
@@ -370,7 +359,6 @@ typedef struct{
 	int passi_in_immersione;
 	int passi_in_pre_immersione;
 	int passi_deep;
-	int offset_rana;
 }CocodrileControl;
 
 // struttura dati generale del gioco, contiene tutti i dati significativi per la gestione
