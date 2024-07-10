@@ -27,7 +27,7 @@ void aggiorna(GameData *gameData)
 	}
 
 	// qui aggiornamento del tempo(calcolo)
-	// aggiornaTempo(gameData);
+	aggiornaTempo(gameData);
 
 	return;
 }
@@ -208,8 +208,8 @@ void stampaTanaChiusa(Tana tana, GameData *gameData)
 
 void aggiornaTempo(GameData *gameData)
 {
-	gameData->gameInfo.tempo.current = time(NULL);
-	gameData->gameInfo.tempo.secondi = difftime(gameData->gameInfo.tempo.current, gameData->gameInfo.tempo.start);
+	
+	
 	return;
 }
 
@@ -324,8 +324,7 @@ void normalUpdate(GameData *gameData)
 		break;
 	case 'T':
 		// arrivato tempo di gioco
-		gameData->gameInfo.tempo.milliseconds = gameData->pipeData.x;
-
+		gameData->gameInfo.secondi_di_gioco = gameData->pipeData.x;
 	default:
 		break;
 	}

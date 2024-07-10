@@ -71,11 +71,11 @@ void drawProcess(int *pipe_fd)
 
 		aggiorna(gameData); // aggiorna stato del gioco
 		printVite(gameData);
-		// printTempo(gameData); // aggiorna hud del tempo
+		printTempo(gameData); // aggiorna hud del tempo
 		// stampaMatrice(gameData->schermo.screenMatrix); // stampa a video solo celle della matrice dinamica modificate rispetto al ciclo precedente
 		// refresh(); // Aggiorna la finestra
 
-		sec = gameData->gameInfo.tempo.milliseconds / 1000;
+		sec = gameData->gameInfo.secondi_di_gioco;
 
 		if (sec % 2 == 0)
 		{
@@ -296,6 +296,11 @@ void drawProcess(int *pipe_fd)
 		mvprintw(36, 106, "                                  ");
 		mvprintw(36, 106, "tempo di gioco: %d secondi", sec);
 
+		// se il tempo di gioco supera il max per manche la rana muore e la manche riparte
+		// mi serve una funzione per lo start della manche
+		if(gameData->gameInfo.secondi_di_gioco>TEMPOLVL1){
+			// uccidi rana e restart rana
+		}
 		refresh();
 		// fine debug
 	}

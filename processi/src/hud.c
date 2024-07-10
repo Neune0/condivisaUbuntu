@@ -50,7 +50,7 @@ void printInitTempo(GameData* gameData){
 
 void printTempo(GameData* gameData){
     Schermo* schermo = &(gameData->schermo);
-    int secondi= gameData->gameInfo.tempo.secondi;
+    int secondi= gameData->gameInfo.secondi_di_gioco;
     int maxSeconds = 0; // nuermo massimo di secondi per manche a seconda del livello
     switch (gameData->gameInfo.livello)
     {

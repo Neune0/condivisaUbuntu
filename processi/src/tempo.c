@@ -30,7 +30,7 @@ void tempoProcess(int* pipe_fd) {
     // inizializzazione pipeData per comunicazione
 	PipeData pipeData;
 	// coordinate relative iniziali nulle
-	pipeData.x=(int)millisec;
+	pipeData.x=(int)(millisec /1000);
 	pipeData.y=0;
 	pipeData.type='T';
 	pipeData.id=0;
@@ -43,7 +43,7 @@ void tempoProcess(int* pipe_fd) {
 		usleep(8000);
 		gettimeofday(&end, NULL);
 	    millisec = (end.tv_sec - start.tv_sec) * 1000 + (end.tv_usec - start.tv_usec) / 1000;
-        pipeData.x=(int)millisec;
+        pipeData.x=(int)(millisec/1000);
          write(pipe_fd[1], &pipeData, sizeof(PipeData));
     }
     return;

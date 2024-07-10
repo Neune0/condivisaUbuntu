@@ -17,7 +17,6 @@ void inizializza(GameData* gameData, int* pipe_fd){
 	inizializzaSchermo(gameData); 
 	
 	inizializzaContatori(gameData);
-	inizializzaTempo(gameData);
 	inizializzaControlloCoccodrilli(gameData);
 	return;
 }
@@ -36,8 +35,6 @@ void inizializzaControlloCoccodrilli(GameData* gameData){
 		gameData->controlloCoccodrilli[i].is_fase_immersione=false;
 		gameData->controlloCoccodrilli[i].passi_in_pre_immersione=0;
 		gameData->controlloCoccodrilli[i].passi_deep=0;
-		gameData->controlloCoccodrilli[i].rana_on=false;
-		gameData->controlloCoccodrilli[i].offset_rana=0;
 	}
 	return;
 }
@@ -108,7 +105,7 @@ void inizializzaOldPos(OldPos* old_pos){
 
 void inizializzaGameInfo(GameData* gamedata){
 	GameInfo* gameInfo = &(gamedata->gameInfo);
-	gameInfo->tempo.secondi=0;
+	gameInfo->secondi_di_gioco=0;
 	gameInfo->vite=3;
 	gameInfo->punteggio=0;
 	gameInfo->livello= 1;
@@ -379,9 +376,4 @@ void inizializzaBox(GameData* gameData){
 		schermo->screenMatrix[row][BORDERCOLDX].id = 0;
     }
     return;
-}
-
-void inizializzaTempo(GameData* gameData){
-	gameData->gameInfo.tempo.start = time(NULL);
-	return;
 }
