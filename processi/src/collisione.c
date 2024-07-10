@@ -91,15 +91,15 @@ Collisione detectCollisione(GameData *gameData)
                     return collisione;
                     break;
                 case PN_OBJ:
-                collisione.tipoCollisione = PROIETTILENEMICO_RANA;
-                collisione.id_oggetto_attivo = gameData->pipeData.id;
-                collisione.oggetto_attivo = RANA_OBJ;
-                collisione.id_oggetto_passivo = schermo->screenMatrix[row][col].id;
-                collisione.oggetto_passivo = PN_OBJ;
-                collisione.hit_point_x = col;
-                collisione.hit_point_y = row;
-                return collisione;
-                break;
+                    collisione.tipoCollisione = PROIETTILENEMICO_RANA;
+                    collisione.id_oggetto_attivo = gameData->pipeData.id;
+                    collisione.oggetto_attivo = RANA_OBJ;
+                    collisione.id_oggetto_passivo = schermo->screenMatrix[row][col].id;
+                    collisione.oggetto_passivo = PN_OBJ;
+                    collisione.hit_point_x = col;
+                    collisione.hit_point_y = row;
+                    return collisione;
+                    break;
                 default:
                     break;
                 }
@@ -176,7 +176,7 @@ Collisione detectCollisione(GameData *gameData)
 
         break;
     }
-    case 'C':  // coccodrillo
+    case 'C': // coccodrillo
     case 'c':
     {
         PipeData coccodrilloData = gameData->pipeData;
@@ -371,6 +371,71 @@ void handleCollisione(GameData *gameData, Collisione collisione)
             gameData->contatori.contNemici--;
         }
 
+        break;
+    }
+    case PROIETTILENEMICO_RANA:
+    {
+        if (collisione.oggetto_attivo == RANA_OBJ)
+        {
+            // l'oggetto attivo è la rana
+
+            // uccido la rana
+            // stampo la rana sopra il fiume
+            int newPosAbsRanaX = gameData->pipeData.x + gameData->ranaAbsPos.x;
+            int newPosAbsRanaY = gameData->pipeData.y + gameData->ranaAbsPos.y;
+            gameData->pipeData.x = newPosAbsRanaX;
+            gameData->pipeData.y = newPosAbsRanaY;
+            // normale aggiornamento
+            aggiornaOggetto(gameData, &(gameData->oldPos.rana), S_RANA);
+            gameData->ranaAbsPos.x = gameData->pipeData.x;
+            gameData->ranaAbsPos.y = gameData->pipeData.y;
+            stampaMatrice(gameData->schermo.screenMatrix); // stampa a video solo celle della matrice dinamica modificate rispetto al ciclo precedente
+            refresh();                                     // Aggiorna la finestra
+            usleep(500000);
+
+            // riproduco suono plof
+            // tolgo una vita alla rana
+            gameData->gameInfo.vite--;
+            // schermata vite--
+            // faccio ripartire la rana
+            resetRana(gameData);
+            gameData->ranaAbsPos.on_coccodrillo = false;
+            gameData->ranaAbsPos.id_coccodrillo = -1;
+            aggiornaOggetto(gameData, &(gameData->oldPos.rana), S_RANA);
+
+            // uccido il proiettile nemico
+            // uccisione del proiettile amico che ha colpito il nemico
+            uccidiProiettileNemico(gameData->pids.pidProiettiliNemici, collisione.id_oggetto_passivo); // uccide il processo proiettile
+            // ucciso processo proiettile e impostato a zero il pid in array pid proiettili
+            cancellaOggettoDaMatrice(gameData,gameData->oldPos.proiettiliNemici[collisione.id_oggetto_passivo], gameData->oldPos.proiettiliNemici, S_PROIETTILE_NEMICO);
+            gameData->contatori.contProiettiliN--;
+        }
+        else
+        {
+            // l'oggetto attivo è il proiettile nemico
+            // uccisione del proiettile nemico
+            uccidiProiettileNemico(gameData->pids.pidProiettiliNemici, collisione.id_oggetto_attivo); // uccide il processo proiettile
+            // ucciso processo proiettile e impostato a zero il pid in array pid proiettili
+            cancellaOggettoDaMatrice(gameData,gameData->oldPos.proiettiliNemici[collisione.id_oggetto_attivo], gameData->oldPos.proiettiliNemici, S_PROIETTILE_NEMICO);
+            gameData->contatori.contProiettiliN--;
+
+            // uccido la rana
+            gameData->gameInfo.vite--;
+            // schermata vite--
+            // faccio ripartire la rana
+            resetRana(gameData);
+            gameData->ranaAbsPos.on_coccodrillo = false;
+            gameData->ranaAbsPos.id_coccodrillo = -1;
+            inizializzaPosRana(&(gameData->ranaAbsPos));
+
+            gameData->pipeData.id=0;
+            gameData->pipeData.x=gameData->ranaAbsPos.x;
+            gameData->pipeData.y= gameData->ranaAbsPos.y;
+            gameData->pipeData.type = 'X';
+            aggiornaOggetto(gameData,&(gameData->oldPos.rana),S_RANA);
+
+
+        }
         break;
     }
     default:
