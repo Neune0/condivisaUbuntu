@@ -11,8 +11,7 @@ Collisione detectCollisione(GameData *gameData)
     // switch sul carattere in pipe
     switch (gameData->pipeData.type)
     {
-    // rana
-    case 'X':
+    case 'X': // rana
     {
         // calcolo posizone assoluta della rana in potenza
         // ovvero sommo a abspos la posizione relativa in pipe
@@ -91,6 +90,16 @@ Collisione detectCollisione(GameData *gameData)
                     collisione.hit_point_y = row;
                     return collisione;
                     break;
+                case PN_OBJ:
+                collisione.tipoCollisione = PROIETTILENEMICO_RANA;
+                collisione.id_oggetto_attivo = gameData->pipeData.id;
+                collisione.oggetto_attivo = RANA_OBJ;
+                collisione.id_oggetto_passivo = schermo->screenMatrix[row][col].id;
+                collisione.oggetto_passivo = PN_OBJ;
+                collisione.hit_point_x = col;
+                collisione.hit_point_y = row;
+                return collisione;
+                break;
                 default:
                     break;
                 }
@@ -98,8 +107,7 @@ Collisione detectCollisione(GameData *gameData)
         }
         break;
     }
-    // proiettile rana
-    case 'P':
+    case 'P': // proiettile rana
     {
         PipeData proiettileData = gameData->pipeData;
 
@@ -138,9 +146,39 @@ Collisione detectCollisione(GameData *gameData)
 
         break;
     }
-    // coccodrillo sull if controllo che sia cattivo
-    case 'C':
+    case 'p': // proiettile nemico
+    {
+        PipeData proiettileData = gameData->pipeData;
+
+        for (int row = proiettileData.y; row < proiettileData.y + PROIETTILE_H; row++)
+        {
+            for (int col = proiettileData.x; col < proiettileData.x + PROIETTILE_W; col++)
+            {
+
+                switch (schermo->screenMatrix[row][col].tipo)
+                {
+
+                case RANA_OBJ:
+                    collisione.tipoCollisione = PROIETTILENEMICO_RANA;
+                    collisione.id_oggetto_attivo = proiettileData.id;
+                    collisione.oggetto_attivo = PN_OBJ;
+                    collisione.oggetto_passivo = RANA_OBJ;
+                    collisione.id_oggetto_passivo = schermo->screenMatrix[row][col].id;
+                    collisione.hit_point_x = col;
+                    collisione.hit_point_y = row;
+                    return collisione;
+                    break;
+                default:
+                    break;
+                }
+            }
+        }
+
+        break;
+    }
+    case 'C':  // coccodrillo
     case 'c':
+    {
         PipeData coccodrilloData = gameData->pipeData;
 
         if (!(gameData->controlloCoccodrilli[coccodrilloData.id].is_buono))
@@ -170,8 +208,11 @@ Collisione detectCollisione(GameData *gameData)
         }
 
         break;
+    }
     default:
+    {
         break;
+    }
     }
 
     return collisione;
@@ -324,13 +365,12 @@ void handleCollisione(GameData *gameData, Collisione collisione)
             gameData->contatori.contProiettili--;
 
             // uccisione del nemico (pianta)
-            uccidiNemico(gameData->pids.pidNemici,collisione.id_oggetto_passivo);
+            uccidiNemico(gameData->pids.pidNemici, collisione.id_oggetto_passivo);
             // cancella oggetto nemico
-            cancellaOggettoDaMatrice(gameData,gameData->oldPos.nemici[collisione.id_oggetto_passivo],gameData->oldPos.nemici,S_PIANTA);
+            cancellaOggettoDaMatrice(gameData, gameData->oldPos.nemici[collisione.id_oggetto_passivo], gameData->oldPos.nemici, S_PIANTA);
             gameData->contatori.contNemici--;
         }
 
-       
         break;
     }
     default:
