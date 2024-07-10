@@ -310,7 +310,10 @@ void drawProcess(int *pipe_fd)
 			aggiornaOggetto(gameData, &(gameData->oldPos.rana), S_RANA);
 
 			// termino e faccio ripartire il processo che gestisce il tempo
-			
+			resetTempo(gameData);
+			gameData->gameInfo.secondi_di_gioco=0;
+			// reinizializzo l'hud del tempo
+			printInitTempo(gameData);
 		}
 		refresh();
 		// fine debug

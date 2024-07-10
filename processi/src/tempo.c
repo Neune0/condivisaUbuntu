@@ -20,7 +20,15 @@ pid_t avviaTempo(int *pipe_fd)
 	return tempo_pid;
 }
 
-// il main del processo rana
+// per riavviare il processo tempo
+void resetTempo(GameData* gameData){
+	kill(gameData->pids.pidTempo, SIGKILL);
+	waitpid(gameData->pids.pidTempo, NULL,0);
+	gameData->pids.pidTempo = avviaTempo(gameData->pipe);
+	return;
+}
+
+// il main del processo tempo
 void tempoProcess(int *pipe_fd)
 {
 

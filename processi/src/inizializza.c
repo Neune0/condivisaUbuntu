@@ -69,7 +69,7 @@ void avviaProcessiBase(int* pipe_fd,Pids* pids){
 	pids->pidNemici[1]=avviaNemico(pipe_fd,1);
 	pids->pidNemici[2]=avviaNemico(pipe_fd,2);
 	pids->pidNemici[3]=avviaNemico(pipe_fd,3);
-	avviaTempo(pipe_fd);
+	pids->pidTempo = avviaTempo(pipe_fd);
 	return;
 }
 

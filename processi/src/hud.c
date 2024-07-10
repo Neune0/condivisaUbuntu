@@ -43,6 +43,7 @@ void printInitTempo(GameData* gameData){
 			schermo->screenMatrix[row][col].color = TEMPO_COL;
 			schermo->screenMatrix[row][col].id = 0;
 			schermo->screenMatrix[row][col].tipo = HUD_OBJ;
+            schermo->screenMatrix[row][col].is_changed = true;
         }
     }
     return;
