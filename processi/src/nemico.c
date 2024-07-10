@@ -29,6 +29,9 @@ void nemico(int *pipe_fd, int id)
 	nemico.id = id;
 	int initialX = 0;
 	nemico.y = ARGINEROWSTART + 1;
+
+	// Seme unico per ogni processo
+    unsigned int seed = time(NULL) ^ (getpid() << 16); 
 	// switch su id in modo da asseganre coordinate iniziali
 	switch (id)
 	{
@@ -50,6 +53,10 @@ void nemico(int *pipe_fd, int id)
 	}
 	nemico.x = initialX;
 	nemico.type = 'n';
+	// numero randomico tra min e max compresi
+        int randomico = generaRandom_r(600000 , 600000*25,&seed);
+        // piccola usleep
+        usleep(randomico);
 	write(pipe_fd[1], &nemico, sizeof(PipeData)); // prima scrittura
 
 
