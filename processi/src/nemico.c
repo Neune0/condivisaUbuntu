@@ -78,9 +78,19 @@ void nemico(int *pipe_fd, int id)
 	}
 }
 
-void killNemico(pid_t pid_nemico)
+
+void uccidiNemico(pid_t *array_pid_nemici, int id_nemico)
 {
-	kill(pid_nemico, SIGKILL);
-	waitpid(pid_nemico, NULL, 0);
-	return;
+	if ((id_nemico != -1) && (array_pid_nemici[id_nemico] != 0))
+	{
+		kill(array_pid_nemici[id_nemico], SIGKILL);
+
+		int err = waitpid(array_pid_nemici[id_nemico], NULL, 0);
+		if (err == -1)
+		{
+			perror("Errore nella waitpid");
+			exit(1);
+		}
+		array_pid_nemici[id_nemico] = 0;
+	}
 }
