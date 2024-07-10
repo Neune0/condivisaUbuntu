@@ -64,11 +64,7 @@ void inizializzaSchermo(GameData* gameData){
 void avviaProcessiBase(int* pipe_fd,Pids* pids){
 	// avvia il processo che gestisce il movimento della rana
 	pids->pidRana = avviaRana(pipe_fd);
-	// qui vanno fatti partire i processi delle piante
-	pids->pidNemici[0]=avviaNemico(pipe_fd,0);
-	pids->pidNemici[1]=avviaNemico(pipe_fd,1);
-	pids->pidNemici[2]=avviaNemico(pipe_fd,2);
-	pids->pidNemici[3]=avviaNemico(pipe_fd,3);
+	// avvia il processo che tiene il tempo di gioco
 	pids->pidTempo = avviaTempo(pipe_fd);
 	return;
 }

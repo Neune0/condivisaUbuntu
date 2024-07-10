@@ -292,6 +292,7 @@ void normalUpdate(GameData *gameData)
 	{
 		// prima print del nemico
 		printPianta(gameData, gameData->oldPos.nemici, S_PIANTA);
+		gameData->contatori.contNemici++;
 		break;
 	}
 	case 'C': // movimento coccodrillo verso destra
