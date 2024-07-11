@@ -142,7 +142,7 @@ Collisione detectCollisione(GameData *gameData)
                     collisione.tipoCollisione = PROIETTILE_PROIETTILENEMICO;
                     collisione.id_oggetto_attivo = proiettileData.id;
                     collisione.oggetto_attivo = P_OBJ;
-                    collisione.id_oggetto_passivo =schermo->screenMatrix[row][col].id;
+                    collisione.id_oggetto_passivo = schermo->screenMatrix[row][col].id;
                     collisione.hit_point_x = col;
                     collisione.hit_point_y = row;
                     return collisione;
@@ -426,7 +426,7 @@ void handleCollisione(GameData *gameData, Collisione collisione)
             // uccisione del proiettile amico che ha colpito il nemico
             uccidiProiettileNemico(gameData->pids.pidProiettiliNemici, collisione.id_oggetto_passivo); // uccide il processo proiettile
             // ucciso processo proiettile e impostato a zero il pid in array pid proiettili
-            cancellaOggettoDaMatrice(gameData,gameData->oldPos.proiettiliNemici[collisione.id_oggetto_passivo], gameData->oldPos.proiettiliNemici, S_PROIETTILE_NEMICO);
+            cancellaOggettoDaMatrice(gameData, gameData->oldPos.proiettiliNemici[collisione.id_oggetto_passivo], gameData->oldPos.proiettiliNemici, S_PROIETTILE_NEMICO);
             gameData->contatori.contProiettiliN--;
         }
         else
@@ -435,7 +435,7 @@ void handleCollisione(GameData *gameData, Collisione collisione)
             // uccisione del proiettile nemico
             uccidiProiettileNemico(gameData->pids.pidProiettiliNemici, collisione.id_oggetto_attivo); // uccide il processo proiettile
             // ucciso processo proiettile e impostato a zero il pid in array pid proiettili
-            cancellaOggettoDaMatrice(gameData,gameData->oldPos.proiettiliNemici[collisione.id_oggetto_attivo], gameData->oldPos.proiettiliNemici, S_PROIETTILE_NEMICO);
+            cancellaOggettoDaMatrice(gameData, gameData->oldPos.proiettiliNemici[collisione.id_oggetto_attivo], gameData->oldPos.proiettiliNemici, S_PROIETTILE_NEMICO);
             gameData->contatori.contProiettiliN--;
 
             // uccido la rana
@@ -447,12 +447,42 @@ void handleCollisione(GameData *gameData, Collisione collisione)
             gameData->ranaAbsPos.id_coccodrillo = -1;
             inizializzaPosRana(&(gameData->ranaAbsPos));
 
-            gameData->pipeData.id=0;
-            gameData->pipeData.x=gameData->ranaAbsPos.x;
-            gameData->pipeData.y= gameData->ranaAbsPos.y;
+            gameData->pipeData.id = 0;
+            gameData->pipeData.x = gameData->ranaAbsPos.x;
+            gameData->pipeData.y = gameData->ranaAbsPos.y;
             gameData->pipeData.type = 'X';
-            aggiornaOggetto(gameData,&(gameData->oldPos.rana),S_RANA);
+            aggiornaOggetto(gameData, &(gameData->oldPos.rana), S_RANA);
+        }
+        break;
+    }
+    case PROIETTILE_PROIETTILENEMICO:
+    {
+        if(collisione.oggetto_attivo== P_OBJ){
+            // il proiettile amivo è l'oggetto attivo
+            // uccido il proiettile amico
+            
+            uccidiProiettile(gameData->pids.pidProiettili, collisione.id_oggetto_attivo); // uccide il processo proiettile
+            // ucciso processo proiettile e impostato a zero il pid in array pid proiettili
+            cancellaOggetto(gameData, gameData->oldPos.proiettili, S_PROIETTILE);
+            gameData->contatori.contProiettili--;
 
+            // uccido il proiettile nemico
+            uccidiProiettileNemico(gameData->pids.pidProiettiliNemici, collisione.id_oggetto_passivo); // uccide il processo proiettile
+            cancellaOggettoDaMatrice(gameData,gameData->oldPos.proiettiliNemici[collisione.id_oggetto_passivo],gameData->oldPos.proiettiliNemici,S_PROIETTILE_NEMICO);
+            gameData->contatori.contProiettiliN--;
+        }
+        else{
+            // il proiettile nemico è l'oggetto attivo
+            // uccido il proiettile nemico
+            uccidiProiettileNemico(gameData->pids.pidProiettiliNemici, collisione.id_oggetto_attivo); // uccide il processo proiettile
+            // ucciso processo proiettile e impostato a zero il pid in array pid proiettili
+            cancellaOggettoDaMatrice(gameData, gameData->oldPos.proiettiliNemici[collisione.id_oggetto_attivo], gameData->oldPos.proiettiliNemici, S_PROIETTILE_NEMICO);
+            gameData->contatori.contProiettiliN--;
+
+            // uccido il proiettile amico
+            uccidiProiettile(gameData->pids.pidProiettili,collisione.id_oggetto_passivo);
+            cancellaOggettoDaMatrice(gameData,gameData->oldPos.proiettili[collisione.id_oggetto_passivo],gameData->oldPos.proiettili,S_PROIETTILE);
+            gameData->contatori.contProiettili--;
 
         }
         break;
