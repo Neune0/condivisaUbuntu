@@ -192,7 +192,8 @@ typedef enum{
 	PROIETTILE_PROIETTILENEMICO,
 	NEMICO_RANA,
 	RANA_LAVA,
-	RANA_COCCODRILLO_CATTIVO
+	RANA_COCCODRILLO_CATTIVO,
+	RANA_MARCIAPIEDE
 }TipoCollisione;
 
 // enumerazione per il tipo di oggetto su schermo
