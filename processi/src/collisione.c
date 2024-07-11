@@ -108,6 +108,7 @@ Collisione detectCollisione(GameData *gameData)
                     collisione.oggetto_passivo = N_OBJ;
                     collisione.hit_point_x = col;
                     collisione.hit_point_y = row;
+                    
                     return collisione;
                 default:
                     break;
@@ -241,29 +242,30 @@ Collisione detectCollisione(GameData *gameData)
     {
         PipeData nemicoData = gameData->pipeData;
 
-            for (int row = nemicoData.y; row < nemicoData.y + PIANTA_H; row++)
+        for (int row = nemicoData.y; row < nemicoData.y + PIANTA_H; row++)
+        {
+            for (int col = nemicoData.x; col < nemicoData.x + PIANTA_W; col++)
             {
-                for (int col = nemicooData.x; col < nemicoData.x + PIANTA_W; col++)
-                {
 
-                    switch (schermo->screenMatrix[row][col].tipo)
-                    {
-                    case RANA_OBJ:
-                        collisione.tipoCollisione = NEMICO_RANA;
-                        collisione.id_oggetto_attivo = namicoData.id;
-                        collisione.oggetto_attivo = N_OBJ;
-                        collisione.oggetto_passivo = RANA_OBJ;
-                        collisione.id_oggetto_passivo = schermo->screenMatrix[row][col].id;
-                        collisione.hit_point_x = col;
-                        collisione.hit_point_y = row;
-                        return collisione;
-                        break;
-                    default:
-                        break;
-                    }
+                switch (schermo->screenMatrix[row][col].tipo)
+                {
+                case RANA_OBJ:
+                    collisione.tipoCollisione = NEMICO_RANA;
+                    collisione.id_oggetto_attivo = nemicoData.id;
+                    collisione.oggetto_attivo = N_OBJ;
+                    collisione.oggetto_passivo = RANA_OBJ;
+                    collisione.id_oggetto_passivo = schermo->screenMatrix[row][col].id;
+                    collisione.hit_point_x = col;
+                    collisione.hit_point_y = row;
+                   
+                    return collisione;
+                    break;
+                default:
+                    break;
                 }
             }
-        
+        }
+
         break;
     }
     default:
@@ -495,10 +497,11 @@ void handleCollisione(GameData *gameData, Collisione collisione)
     }
     case PROIETTILE_PROIETTILENEMICO:
     {
-        if(collisione.oggetto_attivo== P_OBJ){
+        if (collisione.oggetto_attivo == P_OBJ)
+        {
             // il proiettile amivo è l'oggetto attivo
             // uccido il proiettile amico
-            
+
             uccidiProiettile(gameData->pids.pidProiettili, collisione.id_oggetto_attivo); // uccide il processo proiettile
             // ucciso processo proiettile e impostato a zero il pid in array pid proiettili
             cancellaOggetto(gameData, gameData->oldPos.proiettili, S_PROIETTILE);
@@ -506,10 +509,11 @@ void handleCollisione(GameData *gameData, Collisione collisione)
 
             // uccido il proiettile nemico
             uccidiProiettileNemico(gameData->pids.pidProiettiliNemici, collisione.id_oggetto_passivo); // uccide il processo proiettile
-            cancellaOggettoDaMatrice(gameData,gameData->oldPos.proiettiliNemici[collisione.id_oggetto_passivo],gameData->oldPos.proiettiliNemici,S_PROIETTILE_NEMICO);
+            cancellaOggettoDaMatrice(gameData, gameData->oldPos.proiettiliNemici[collisione.id_oggetto_passivo], gameData->oldPos.proiettiliNemici, S_PROIETTILE_NEMICO);
             gameData->contatori.contProiettiliN--;
         }
-        else{
+        else
+        {
             // il proiettile nemico è l'oggetto attivo
             // uccido il proiettile nemico
             uccidiProiettileNemico(gameData->pids.pidProiettiliNemici, collisione.id_oggetto_attivo); // uccide il processo proiettile
@@ -518,10 +522,42 @@ void handleCollisione(GameData *gameData, Collisione collisione)
             gameData->contatori.contProiettiliN--;
 
             // uccido il proiettile amico
-            uccidiProiettile(gameData->pids.pidProiettili,collisione.id_oggetto_passivo);
-            cancellaOggettoDaMatrice(gameData,gameData->oldPos.proiettili[collisione.id_oggetto_passivo],gameData->oldPos.proiettili,S_PROIETTILE);
+            uccidiProiettile(gameData->pids.pidProiettili, collisione.id_oggetto_passivo);
+            cancellaOggettoDaMatrice(gameData, gameData->oldPos.proiettili[collisione.id_oggetto_passivo], gameData->oldPos.proiettili, S_PROIETTILE);
             gameData->contatori.contProiettili--;
+        }
+        break;
+    }
+    case NEMICO_RANA:
+    {
+        if (collisione.oggetto_attivo == RANA_OBJ)
+        {
+            // la rana è l'oggetto attivo
+            // uccido la rana
 
+
+            // tolgo una vita alla rana
+            gameData->gameInfo.vite--;
+         
+            // faccio ripartire la rana
+            resetRana(gameData);
+            gameData->ranaAbsPos.on_coccodrillo = false;
+            gameData->ranaAbsPos.id_coccodrillo = -1;
+            aggiornaOggetto(gameData, &(gameData->oldPos.rana), S_RANA);
+
+            // reprint del nemico
+            stampaSpriteInMatrice(&(gameData->oldPos.nemici[collisione.id_oggetto_passivo]), &(gameData->sprites[S_PIANTA]), gameData);
+            
+        }
+        else
+        {
+
+            beep();
+            // la pianta è l'oggetto attivo
+            
+            // uccido la pianta ma non la rana
+             // uccisione del nemico (pianta)
+            uccidiNemico(gameData->pids.pidNemici, collisione.id_oggetto_attivo);
         }
         break;
     }

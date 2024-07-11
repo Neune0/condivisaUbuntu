@@ -287,6 +287,8 @@ void drawProcess(int *pipe_fd)
 		}
 
 		avviaNemici(gameData);
+		mvprintw(33,106,"                                         ");
+		mvprintw(33,106,"old pos nemici[1]: x:%d y:%d id:%d ",gameData->oldPos.nemici[1].x,gameData->oldPos.nemici[1].y,gameData->oldPos.nemici[1].id);
 		// per debug
 		mvprintw(34, 106, "                                            ");
 		mvprintw(34, 106, "Rana x: %d y: %d idC: %d offC: %d", gameData->ranaAbsPos.x, gameData->ranaAbsPos.y, gameData->ranaAbsPos.id_coccodrillo, gameData->ranaAbsPos.offset_on_coccodrillo);
