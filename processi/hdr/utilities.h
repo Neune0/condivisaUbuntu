@@ -191,7 +191,10 @@ typedef enum{
 	PROIETTILENEMICO_RANA,
 	PROIETTILE_PROIETTILENEMICO,
 	NEMICO_RANA,
-	RANA_LAVA
+	RANA_LAVA,
+	RANA_COCCODRILLO_CATTIVO,
+	RANA_MARCIAPIEDE,
+	RANA_ARGINE
 }TipoCollisione;
 
 // enumerazione per il tipo di oggetto su schermo
@@ -452,6 +455,6 @@ bool isWin(GameData* gameData);
 
 /** @brief stampa a schermo il bordo dell gioco*/
 void stampaBox();
-bool isFrogMoveLecit(int newX, int newY);
+bool isFrogMoveLecit(int newX, int newY,RanaAbsPos ranaPos,PipeData pipeData);
 int generaRandom_r(int min, int max, unsigned int *seed);
 #endif // UTILITIES_H

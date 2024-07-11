@@ -100,7 +100,8 @@ void resetRana(GameData* gameData){
 void inizializzaPosRana(RanaAbsPos* ranaPos){
 	ranaPos->x=40;
 	ranaPos->y=MARCIAPIEDEROWSTART;
-	// per debug
-	ranaPos->y= ARGINEROWSTART +1;
+	ranaPos->on_coccodrillo=false;
+	ranaPos->id_coccodrillo=-1;
+	ranaPos->offset_on_coccodrillo=0;
 	return;
 }
