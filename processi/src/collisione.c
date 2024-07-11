@@ -138,6 +138,15 @@ Collisione detectCollisione(GameData *gameData)
                     collisione.hit_point_y = row;
                     return collisione;
                     break;
+                case PN_OBJ:
+                    collisione.tipoCollisione = PROIETTILE_PROIETTILENEMICO;
+                    collisione.id_oggetto_attivo = proiettileData.id;
+                    collisione.oggetto_attivo = P_OBJ;
+                    collisione.id_oggetto_passivo =schermo->screenMatrix[row][col].id;
+                    collisione.hit_point_x = col;
+                    collisione.hit_point_y = row;
+                    return collisione;
+                    break;
                 default:
                     break;
                 }
@@ -163,6 +172,16 @@ Collisione detectCollisione(GameData *gameData)
                     collisione.id_oggetto_attivo = proiettileData.id;
                     collisione.oggetto_attivo = PN_OBJ;
                     collisione.oggetto_passivo = RANA_OBJ;
+                    collisione.id_oggetto_passivo = schermo->screenMatrix[row][col].id;
+                    collisione.hit_point_x = col;
+                    collisione.hit_point_y = row;
+                    return collisione;
+                    break;
+                case P_OBJ:
+                    collisione.tipoCollisione = PROIETTILE_PROIETTILENEMICO;
+                    collisione.id_oggetto_attivo = proiettileData.id;
+                    collisione.oggetto_attivo = PN_OBJ;
+                    collisione.oggetto_passivo = P_OBJ;
                     collisione.id_oggetto_passivo = schermo->screenMatrix[row][col].id;
                     collisione.hit_point_x = col;
                     collisione.hit_point_y = row;
