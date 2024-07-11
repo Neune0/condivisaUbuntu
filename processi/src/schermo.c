@@ -360,7 +360,6 @@ void printPianta(GameData *gameData, PipeData *old_pos, TipoSprite tipoSprite)
 	}
 }
 
-
 void handleCoccodrilloMovement(GameData *gameData)
 {
 	CocodrileControl *controlloCoccodrillo = &(gameData->controlloCoccodrilli[gameData->pipeData.id]);
@@ -511,6 +510,19 @@ void handleCoccodrilloMovement(GameData *gameData)
 						gameData->ranaAbsPos.x = rana.x;
 						gameData->ranaAbsPos.y = rana.y;
 						stampaSpriteInMatrice(&(rana), &(gameData->sprites[S_RANA]), gameData);
+
+						// se la rana esce fuori dallo schermo allora muore
+						if (gameData->ranaAbsPos.x >= LASTGAMECOL - 1 || gameData->ranaAbsPos.x < FIRSTGAMECOL)
+						{
+							// uccido la rana
+							// tolgo una vita alla rana
+							gameData->gameInfo.vite--;
+							// faccio ripartire la rana
+							resetRana(gameData);
+							gameData->ranaAbsPos.on_coccodrillo = false;
+							gameData->ranaAbsPos.id_coccodrillo = -1;
+							aggiornaOggetto(gameData, &(gameData->oldPos.rana), S_RANA);
+						}
 					}
 				}
 				else
@@ -537,6 +549,19 @@ void handleCoccodrilloMovement(GameData *gameData)
 						gameData->ranaAbsPos.x = rana.x;
 						gameData->ranaAbsPos.y = rana.y;
 						stampaSpriteInMatrice(&(rana), &(gameData->sprites[S_RANA]), gameData);
+
+						// se la rana esce fuori dallo schermo allora muore
+						if (gameData->ranaAbsPos.x >= LASTGAMECOL - 1 || gameData->ranaAbsPos.x < FIRSTGAMECOL)
+						{
+							// uccido la rana
+							// tolgo una vita alla rana
+							gameData->gameInfo.vite--;
+							// faccio ripartire la rana
+							resetRana(gameData);
+							gameData->ranaAbsPos.on_coccodrillo = false;
+							gameData->ranaAbsPos.id_coccodrillo = -1;
+							aggiornaOggetto(gameData, &(gameData->oldPos.rana), S_RANA);
+						}
 					}
 				}
 				else
