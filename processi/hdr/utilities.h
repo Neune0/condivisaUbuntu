@@ -20,9 +20,9 @@
 #define SUPERFAST 20000 // la velocita di aggiornamento piu veloce
 
 // velocità flussi 
-#define FLUSSO_LENTO 80000
-#define FLUSSO_NORM 40000
-#define FLUSSO_VELOCE 20000
+#define FLUSSO_LENTO 160000
+#define FLUSSO_NORM 110000
+#define FLUSSO_VELOCE 90000
 
 // dimensioni totali schermo
 #define WIDTH 105 // larghezza massima dello schermo
