@@ -100,6 +100,15 @@ Collisione detectCollisione(GameData *gameData)
                     collisione.hit_point_y = row;
                     return collisione;
                     break;
+                case N_OBJ:
+                    collisione.tipoCollisione = NEMICO_RANA;
+                    collisione.id_oggetto_attivo = gameData->pipeData.id;
+                    collisione.oggetto_attivo = RANA_OBJ;
+                    collisione.id_oggetto_passivo = schermo->screenMatrix[row][col].id;
+                    collisione.oggetto_passivo = N_OBJ;
+                    collisione.hit_point_x = col;
+                    collisione.hit_point_y = row;
+                    return collisione;
                 default:
                     break;
                 }
@@ -195,8 +204,8 @@ Collisione detectCollisione(GameData *gameData)
 
         break;
     }
-    case 'C': // coccodrillo
-    case 'c':
+    case 'C': // coccodrillo a destra
+    case 'c': // coccodrillo a sinistra
     {
         PipeData coccodrilloData = gameData->pipeData;
 
@@ -226,6 +235,35 @@ Collisione detectCollisione(GameData *gameData)
             }
         }
 
+        break;
+    }
+    case 'n': // pianta
+    {
+        PipeData nemicoData = gameData->pipeData;
+
+            for (int row = nemicoData.y; row < nemicoData.y + PIANTA_H; row++)
+            {
+                for (int col = nemicooData.x; col < nemicoData.x + PIANTA_W; col++)
+                {
+
+                    switch (schermo->screenMatrix[row][col].tipo)
+                    {
+                    case RANA_OBJ:
+                        collisione.tipoCollisione = NEMICO_RANA;
+                        collisione.id_oggetto_attivo = namicoData.id;
+                        collisione.oggetto_attivo = N_OBJ;
+                        collisione.oggetto_passivo = RANA_OBJ;
+                        collisione.id_oggetto_passivo = schermo->screenMatrix[row][col].id;
+                        collisione.hit_point_x = col;
+                        collisione.hit_point_y = row;
+                        return collisione;
+                        break;
+                    default:
+                        break;
+                    }
+                }
+            }
+        
         break;
     }
     default:
