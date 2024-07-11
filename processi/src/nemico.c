@@ -29,6 +29,9 @@ void nemico(int *pipe_fd, int id)
 	nemico.id = id;
 	int initialX = 0;
 	nemico.y = ARGINEROWSTART + 1;
+
+	// Seme unico per ogni processo
+    unsigned int seed = time(NULL) ^ (getpid() << 16); 
 	// switch su id in modo da asseganre coordinate iniziali
 	switch (id)
 	{
@@ -50,6 +53,10 @@ void nemico(int *pipe_fd, int id)
 	}
 	nemico.x = initialX;
 	nemico.type = 'n';
+	// numero randomico tra min e max compresi
+        int randomico = generaRandom_r(600000 , 600000*25,&seed);
+        // piccola usleep
+        usleep(randomico);
 	write(pipe_fd[1], &nemico, sizeof(PipeData)); // prima scrittura
 
 
@@ -78,9 +85,19 @@ void nemico(int *pipe_fd, int id)
 	}
 }
 
-void killNemico(pid_t pid_nemico)
+
+void uccidiNemico(pid_t *array_pid_nemici, int id_nemico)
 {
-	kill(pid_nemico, SIGKILL);
-	waitpid(pid_nemico, NULL, 0);
-	return;
+	if ((id_nemico != -1) && (array_pid_nemici[id_nemico] != 0))
+	{
+		kill(array_pid_nemici[id_nemico], SIGKILL);
+
+		int err = waitpid(array_pid_nemici[id_nemico], NULL, 0);
+		if (err == -1)
+		{
+			perror("Errore nella waitpid");
+			exit(1);
+		}
+		array_pid_nemici[id_nemico] = 0;
+	}
 }

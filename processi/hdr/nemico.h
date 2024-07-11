@@ -3,6 +3,5 @@
 #include "./utilities.h"
 pid_t avviaNemico(int* pipe_fd,int id);
 void nemico(int *pipe_fd,int id);
-void killNemico(pid_t pid_nemico);
-
+void uccidiNemico(pid_t *array_pid_nemici, int id_nemico);
 #endif
