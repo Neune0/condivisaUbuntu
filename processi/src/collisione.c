@@ -118,8 +118,15 @@ Collisione detectCollisione(GameData *gameData)
                     collisione.oggetto_passivo = N_OBJ;
                     collisione.hit_point_x = col;
                     collisione.hit_point_y = row;
-
                     return collisione;
+                case COCCODRILLO_CATTIVO_OBJ:
+                     collisione.tipoCollisione = RANA_COCCODRILLO_CATTIVO;
+                    collisione.id_oggetto_attivo = gameData->pipeData.id;
+                    collisione.oggetto_attivo = RANA_OBJ;
+                    collisione.id_oggetto_passivo = schermo->screenMatrix[row][col].id;
+                    collisione.oggetto_passivo = COCCODRILLO_CATTIVO_OBJ;
+                    collisione.hit_point_x = col;
+                    collisione.hit_point_y = row;
                 default:
                     break;
                 }
@@ -640,6 +647,33 @@ void handleCollisione(GameData *gameData, Collisione collisione)
             // uccido la pianta ma non la rana
             // uccisione del nemico (pianta)
             uccidiNemico(gameData->pids.pidNemici, collisione.id_oggetto_attivo);
+        }
+        break;
+    }
+    case RANA_COCCODRILLO_CATTIVO:
+    {
+        if(collisione.oggetto_attivo==RANA_OBJ){
+            // stampo la rana sopra il coccodrillo
+        int newPosAbsRanaX = gameData->pipeData.x + gameData->ranaAbsPos.x;
+        int newPosAbsRanaY = gameData->pipeData.y + gameData->ranaAbsPos.y;
+        gameData->pipeData.x = newPosAbsRanaX;
+        gameData->pipeData.y = newPosAbsRanaY;
+        // normale aggiornamento
+        aggiornaOggetto(gameData, &(gameData->oldPos.rana), S_RANA);
+        gameData->ranaAbsPos.x = gameData->pipeData.x;
+        gameData->ranaAbsPos.y = gameData->pipeData.y;
+        stampaMatrice(gameData->schermo.screenMatrix); // stampa a video solo celle della matrice dinamica modificate rispetto al ciclo precedente
+        refresh();                                     // Aggiorna la finestra
+        usleep(500000);
+
+        
+        // tolgo una vita alla rana
+        gameData->gameInfo.vite--;
+        // faccio ripartire la rana
+        resetRana(gameData);
+        gameData->ranaAbsPos.on_coccodrillo = false;
+        gameData->ranaAbsPos.id_coccodrillo = -1;
+        aggiornaOggetto(gameData, &(gameData->oldPos.rana), S_RANA);
         }
         break;
     }

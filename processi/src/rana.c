@@ -100,7 +100,6 @@ void resetRana(GameData* gameData){
 void inizializzaPosRana(RanaAbsPos* ranaPos){
 	ranaPos->x=40;
 	ranaPos->y=MARCIAPIEDEROWSTART;
-	// per debug
-	ranaPos->y= ARGINEROWSTART +1;
+	
 	return;
 }
