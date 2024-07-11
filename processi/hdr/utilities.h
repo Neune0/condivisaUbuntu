@@ -19,6 +19,11 @@
 // velocità di aggiornamento
 #define SUPERFAST 20000 // la velocita di aggiornamento piu veloce
 
+// velocità flussi 
+#define FLUSSO_LENTO 80000
+#define FLUSSO_NORM 40000
+#define FLUSSO_VELOCE 20000
+
 // dimensioni totali schermo
 #define WIDTH 105 // larghezza massima dello schermo
 #define HEIGHT 40 // altezza massima dello schermo
@@ -369,6 +374,11 @@ typedef struct{
 	int passi_deep;
 }CocodrileControl;
 
+typedef struct{
+	int direction;
+	int vel;
+}Flusso;
+
 // struttura dati generale del gioco, contiene tutti i dati significativi per la gestione
 // - pipe : il file descriptor della pipe
 // - pipeData : per leggere la pipe
@@ -392,6 +402,7 @@ typedef struct{
 	GameInfo gameInfo; // informaizioni sul gioco lvl, manche score vite
 	OldPos oldPos; // dati oggetti al passo precedente
 	CocodrileControl controlloCoccodrilli[MAXNCOCCODRILLI]; // dati per oggetti coccodrilli
+	Flusso flussi[8];
 }GameData;
 
 

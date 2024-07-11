@@ -70,4 +70,6 @@ void inizializzaBox(GameData* gameData);
 
 /***/
 void inizializzaTempo(GameData* gameData);
+
+void inizializzaFlussi(GameData* gameData);
 #endif
