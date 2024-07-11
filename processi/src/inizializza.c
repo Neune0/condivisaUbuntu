@@ -4,6 +4,7 @@ void inizializza(GameData* gameData, int* pipe_fd){
 	gameData->pipe= pipe_fd;
 	inizializzaGameInfo(gameData);
 	inizializzaOggettiTane(gameData->tane);
+	inizializzaFlussi(gameData);
 	
 	inizializzaSprites(gameData->sprites);
 	
@@ -19,6 +20,14 @@ void inizializza(GameData* gameData, int* pipe_fd){
 	inizializzaContatori(gameData);
 	inizializzaControlloCoccodrilli(gameData);
 	return;
+}
+
+void inizializzaFlussi(GameData* gameData){
+	for(int i=0;i<8;i++){
+		gameData->flussi[i].direction = rand()%2==0 ? 1 : -1;
+		gameData->flussi[i].vel = rand()%3;
+	}
+	
 }
 
 void inizializzaControlloCoccodrilli(GameData* gameData){

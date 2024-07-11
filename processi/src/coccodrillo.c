@@ -1,6 +1,6 @@
 #include "../hdr/coccodrillo.h"
 
-pid_t avviaCoccodrillo(int *pipe_fd, PipeData* coccodrillo_init, int id)
+pid_t avviaCoccodrillo(int *pipe_fd, PipeData* coccodrillo_init, int id,int direction,int vel)
 {
 
     pid_t coccodrillo_pid = fork();
@@ -15,7 +15,7 @@ pid_t avviaCoccodrillo(int *pipe_fd, PipeData* coccodrillo_init, int id)
         // Processo coccodrillo
         close(pipe_fd[0]); // Chiudi l'estremità di lettura della pipe
         
-        coccodrillo(pipe_fd, coccodrillo_init, id);
+        coccodrillo(pipe_fd, coccodrillo_init, id,direction,vel);
         exit(0);
     }
     else
@@ -24,38 +24,29 @@ pid_t avviaCoccodrillo(int *pipe_fd, PipeData* coccodrillo_init, int id)
     }
 }
 
-void coccodrillo(int *pipe_fd, PipeData *coccodrillo_init, int id)
+void coccodrillo(int *pipe_fd, PipeData *coccodrillo_init, int id,int direction,int vel)
 {
     PipeData coccodrillo;
     coccodrillo.x = coccodrillo_init->x; // le coordinate iniziali del coccodrillo sono quelle dell' oggetto che ha sparato
     coccodrillo.y = coccodrillo_init->y;
     coccodrillo.type = coccodrillo_init->type;
     coccodrillo.id = id;
-    int dirX = 1;
+    int dirX = direction;
+    int velocity;
+    switch(vel){
+        case 0:
+        velocity = FLUSSO_LENTO;
+        break;
+        case 1:
+        velocity =FLUSSO_NORM;
+        break;
+        case 2:
+        velocity= FLUSSO_VELOCE;
+        break;
+    }
 
     // Seme unico per ogni processo
     unsigned int seed = time(NULL) ^ (getpid() << 16); 
-
-    // la direzione deve essere calcolata in base alla y iniziale
-    switch (coccodrillo_init->y)
-    {
-    case FILA_UNO:
-    case FILA_TRE:
-    case FILA_CINQUE:
-    case FILA_SETTE:
-        // il coccodrillo si muove verso destra percio' la direzione e' 1
-        dirX = 1;
-        break;
-    case FILA_DUE:
-    case FILA_QUATTRO:
-    case FILA_SEI:
-    case FILA_OTTO:
-        // il coccodrillo si muove verso sinistra percio' la direzione e' -1
-        dirX = -1;
-        break;
-    default:
-        break;
-    }
 
     // numero randomico tra min e max compresi
         int randomico = generaRandom_r(0 , 200000*15,&seed);
@@ -66,7 +57,7 @@ void coccodrillo(int *pipe_fd, PipeData *coccodrillo_init, int id)
     {
         coccodrillo.x += dirX;
         write(pipe_fd[1], &coccodrillo, sizeof(PipeData));
-        usleep(200000); // Aspetta un po' prima di generare nuove coordinate
+        usleep(velocity); // Aspetta un po' prima di generare nuove coordinate
     }
 }
 
