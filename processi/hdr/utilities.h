@@ -453,6 +453,6 @@ bool isWin(GameData* gameData);
 
 /** @brief stampa a schermo il bordo dell gioco*/
 void stampaBox();
-bool isFrogMoveLecit(int newX, int newY);
+bool isFrogMoveLecit(int newX, int newY,RanaAbsPos ranaPos,PipeData pipeData);
 int generaRandom_r(int min, int max, unsigned int *seed);
 #endif // UTILITIES_H

@@ -86,8 +86,15 @@ bool isWin(GameData *gameData)
     return gameData->gameInfo.manche == 3;
 }
 
-bool isFrogMoveLecit(int newX, int newY)
+bool isFrogMoveLecit(int newX, int newY,RanaAbsPos ranaPos,PipeData pipeData)
 {
+    if(ranaPos.on_coccodrillo && pipeData.x!=0){
+        // la rana è su un coccodrillo e sto cercando di muovermi lungo il coccodrillo
+        int new_offset = ranaPos.offset_on_coccodrillo + pipeData.x;
+        if(new_offset<=0 || new_offset>COCCODRILLO_W - RANA_W -1){
+            return false;
+        }
+    }
     return newX <= LASTGAMECOL - RANA_W + 1 && newX >= FIRSTGAMECOL && newY > FIRSTGAMEROW + RANA_H && newY < LASTGAMEROW;
 }
 
