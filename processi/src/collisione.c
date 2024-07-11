@@ -362,11 +362,33 @@ void handleCollisione(GameData *gameData, Collisione collisione)
         gameData->ranaAbsPos.on_coccodrillo = false;
         gameData->ranaAbsPos.id_coccodrillo = -1;
         aggiornaOggetto(gameData, &(gameData->oldPos.rana), S_RANA);
-        // aumento la manche 
-        
+
         // stampo tana chiusa
         stampaTanaChiusa(gameData->tane[collisione.id_oggetto_passivo],gameData);
         
+        break;
+    }
+    case RANA_TANA_CHIUSA: 
+    {
+         // stampo la rana sopra la tana chiusa
+        int newPosAbsRanaX = gameData->pipeData.x + gameData->ranaAbsPos.x;
+        int newPosAbsRanaY = gameData->pipeData.y + gameData->ranaAbsPos.y;
+        gameData->pipeData.x = newPosAbsRanaX;
+        gameData->pipeData.y = newPosAbsRanaY;
+        // normale aggiornamento
+        aggiornaOggetto(gameData, &(gameData->oldPos.rana), S_RANA);
+        gameData->ranaAbsPos.x = gameData->pipeData.x;
+        gameData->ranaAbsPos.y = gameData->pipeData.y;
+        stampaMatrice(gameData->schermo.screenMatrix); // stampa a video solo celle della matrice dinamica modificate rispetto al ciclo precedente
+        refresh();                                     // Aggiorna la finestra
+        usleep(500000);
+
+        // faccio ripartire la rana
+        resetRana(gameData);
+        gameData->ranaAbsPos.on_coccodrillo = false;
+        gameData->ranaAbsPos.id_coccodrillo = -1;
+        aggiornaOggetto(gameData, &(gameData->oldPos.rana), S_RANA);
+        gameData->gameInfo.vite--;
         break;
     }
     case PROIETTILE_COCCODRILLO_CATTIVO:
