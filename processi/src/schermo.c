@@ -175,8 +175,8 @@ void stampaTanaChiusa(Tana tana, GameData *gameData)
 
 	int startRow = y;
 	int startCol = x;
-	int maxRows = gameData->sprites[8].max_row;
-	int maxCols = gameData->sprites[8].max_col;
+	int maxRows = gameData->sprites[S_TANA_CHIUSA].max_row;
+	int maxCols = gameData->sprites[S_TANA_CHIUSA].max_col;
 	int row = 0, col = 0;
 
 	for (int i = 0; i < maxRows; i++)
@@ -187,14 +187,14 @@ void stampaTanaChiusa(Tana tana, GameData *gameData)
 			col = startCol + j;
 
 			gameData->schermo.screenMatrix[row][col].tipo = TANA_CLOSE_OBJ;
-			gameData->schermo.screenMatrix[row][col].ch = gameData->sprites[8].sprite[i][j];
-			gameData->schermo.screenMatrix[row][col].color = gameData->sprites[8].color;
+			gameData->schermo.screenMatrix[row][col].ch = gameData->sprites[S_TANA_CHIUSA].sprite[i][j];
+			gameData->schermo.screenMatrix[row][col].color = gameData->sprites[S_TANA_CHIUSA].color;
 			gameData->schermo.screenMatrix[row][col].is_changed = true;
 			gameData->schermo.screenMatrix[row][col].id = tana.info.id;
 
 			gameData->schermo.staticScreenMatrix[row][col].tipo = TANA_CLOSE_OBJ;
-			gameData->schermo.staticScreenMatrix[row][col].ch = gameData->sprites[8].sprite[i][j];
-			gameData->schermo.staticScreenMatrix[row][col].color = gameData->sprites[8].color;
+			gameData->schermo.staticScreenMatrix[row][col].ch = gameData->sprites[S_TANA_CHIUSA].sprite[i][j];
+			gameData->schermo.staticScreenMatrix[row][col].color = gameData->sprites[S_TANA_CHIUSA].color;
 
 			gameData->schermo.staticScreenMatrix[row][col].id = tana.info.id;
 		}

@@ -71,6 +71,7 @@ void drawProcess(int *pipe_fd)
 
 		aggiorna(gameData); // aggiorna stato del gioco
 		printVite(gameData);
+		printManche(gameData);
 
 		sec = gameData->gameInfo.secondi_di_gioco;
 
@@ -299,6 +300,8 @@ void drawProcess(int *pipe_fd)
 		mvprintw(36, 106, "tempo di gioco: %d secondi", sec);
 		mvprintw(37, 106, "                                            ");
 		mvprintw(37, 106, "contPari: %d contDispari: %d", contatore_pari, contatore_dispari);
+		mvprintw(38, 106, "                                            ");
+		mvprintw(38, 106, "livello: %d manche: %d", gameData->gameInfo.livello,gameData->gameInfo.manche);
 
 		// se il tempo di gioco supera il max per manche la rana muore e la manche riparte
 		// mi serve una funzione per lo start della manche
