@@ -78,7 +78,7 @@ void aggiornaOldPos(PipeData *old_pos, PipeData *pipeData)
 
 bool isGameOver(GameData *gameData)
 {
-    return gameData->gameInfo.vite == 0 || gameData->gameInfo.manche == 3;
+    return gameData->gameInfo.vite == 0 || gameData->gameInfo.manche == 4;
 }
 
 bool isWin(GameData *gameData)

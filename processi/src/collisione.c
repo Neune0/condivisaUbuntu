@@ -60,6 +60,16 @@ Collisione detectCollisione(GameData *gameData)
                     collisione.hit_point_y = row;
                     return collisione;
                     break;
+                case LAVA_OBJ:
+                    collisione.tipoCollisione = RANA_LAVA;
+                    collisione.id_oggetto_attivo = gameData->pipeData.id;
+                    collisione.oggetto_attivo = RANA_OBJ;
+                    collisione.oggetto_passivo = LAVA_OBJ;
+                    collisione.id_oggetto_passivo = 0;
+                    collisione.hit_point_x = col;
+                    collisione.hit_point_y = row;
+                    return collisione;
+                    break;
                 case TANA_OPEN_OBJ:
                     collisione.tipoCollisione = RANA_TANA_APERTA;
                     collisione.id_oggetto_attivo = gameData->pipeData.id;
@@ -108,7 +118,7 @@ Collisione detectCollisione(GameData *gameData)
                     collisione.oggetto_passivo = N_OBJ;
                     collisione.hit_point_x = col;
                     collisione.hit_point_y = row;
-                    
+
                     return collisione;
                 default:
                     break;
@@ -235,7 +245,6 @@ Collisione detectCollisione(GameData *gameData)
                 }
             }
         }
-
         break;
     }
     case 'n': // pianta
@@ -257,7 +266,7 @@ Collisione detectCollisione(GameData *gameData)
                     collisione.id_oggetto_passivo = schermo->screenMatrix[row][col].id;
                     collisione.hit_point_x = col;
                     collisione.hit_point_y = row;
-                   
+
                     return collisione;
                     break;
                 default:
@@ -305,6 +314,81 @@ void handleCollisione(GameData *gameData, Collisione collisione)
         gameData->ranaAbsPos.on_coccodrillo = false;
         gameData->ranaAbsPos.id_coccodrillo = -1;
         aggiornaOggetto(gameData, &(gameData->oldPos.rana), S_RANA);
+        break;
+    }
+    case RANA_LAVA:
+    {
+        // stampo la rana sopra la lava
+        int newPosAbsRanaX = gameData->pipeData.x + gameData->ranaAbsPos.x;
+        int newPosAbsRanaY = gameData->pipeData.y + gameData->ranaAbsPos.y;
+        gameData->pipeData.x = newPosAbsRanaX;
+        gameData->pipeData.y = newPosAbsRanaY;
+        // normale aggiornamento
+        aggiornaOggetto(gameData, &(gameData->oldPos.rana), S_RANA);
+        gameData->ranaAbsPos.x = gameData->pipeData.x;
+        gameData->ranaAbsPos.y = gameData->pipeData.y;
+        stampaMatrice(gameData->schermo.screenMatrix); // stampa a video solo celle della matrice dinamica modificate rispetto al ciclo precedente
+        refresh();                                     // Aggiorna la finestra
+        usleep(500000);
+
+        
+        // tolgo una vita alla rana
+        gameData->gameInfo.vite--;
+        
+        // faccio ripartire la rana
+        resetRana(gameData);
+        gameData->ranaAbsPos.on_coccodrillo = false;
+        gameData->ranaAbsPos.id_coccodrillo = -1;
+        aggiornaOggetto(gameData, &(gameData->oldPos.rana), S_RANA);
+        break;
+    }
+    case RANA_TANA_APERTA:
+    {   
+        // stampo la rana sopra la tana aperta
+        int newPosAbsRanaX = gameData->pipeData.x + gameData->ranaAbsPos.x;
+        int newPosAbsRanaY = gameData->pipeData.y + gameData->ranaAbsPos.y;
+        gameData->pipeData.x = newPosAbsRanaX;
+        gameData->pipeData.y = newPosAbsRanaY;
+        // normale aggiornamento
+        aggiornaOggetto(gameData, &(gameData->oldPos.rana), S_RANA);
+        gameData->ranaAbsPos.x = gameData->pipeData.x;
+        gameData->ranaAbsPos.y = gameData->pipeData.y;
+        stampaMatrice(gameData->schermo.screenMatrix); // stampa a video solo celle della matrice dinamica modificate rispetto al ciclo precedente
+        refresh();                                     // Aggiorna la finestra
+        usleep(500000);
+
+        // faccio ripartire la rana
+        resetRana(gameData);
+        gameData->ranaAbsPos.on_coccodrillo = false;
+        gameData->ranaAbsPos.id_coccodrillo = -1;
+        aggiornaOggetto(gameData, &(gameData->oldPos.rana), S_RANA);
+
+        // stampo tana chiusa
+        stampaTanaChiusa(gameData->tane[collisione.id_oggetto_passivo],gameData);
+        
+        break;
+    }
+    case RANA_TANA_CHIUSA: 
+    {
+         // stampo la rana sopra la tana chiusa
+        int newPosAbsRanaX = gameData->pipeData.x + gameData->ranaAbsPos.x;
+        int newPosAbsRanaY = gameData->pipeData.y + gameData->ranaAbsPos.y;
+        gameData->pipeData.x = newPosAbsRanaX;
+        gameData->pipeData.y = newPosAbsRanaY;
+        // normale aggiornamento
+        aggiornaOggetto(gameData, &(gameData->oldPos.rana), S_RANA);
+        gameData->ranaAbsPos.x = gameData->pipeData.x;
+        gameData->ranaAbsPos.y = gameData->pipeData.y;
+        stampaMatrice(gameData->schermo.screenMatrix); // stampa a video solo celle della matrice dinamica modificate rispetto al ciclo precedente
+        refresh();                                     // Aggiorna la finestra
+        usleep(500000);
+
+        // faccio ripartire la rana
+        resetRana(gameData);
+        gameData->ranaAbsPos.on_coccodrillo = false;
+        gameData->ranaAbsPos.id_coccodrillo = -1;
+        aggiornaOggetto(gameData, &(gameData->oldPos.rana), S_RANA);
+        gameData->gameInfo.vite--;
         break;
     }
     case PROIETTILE_COCCODRILLO_CATTIVO:
@@ -535,10 +619,9 @@ void handleCollisione(GameData *gameData, Collisione collisione)
             // la rana è l'oggetto attivo
             // uccido la rana
 
-
             // tolgo una vita alla rana
             gameData->gameInfo.vite--;
-         
+
             // faccio ripartire la rana
             resetRana(gameData);
             gameData->ranaAbsPos.on_coccodrillo = false;
@@ -547,16 +630,15 @@ void handleCollisione(GameData *gameData, Collisione collisione)
 
             // reprint del nemico
             stampaSpriteInMatrice(&(gameData->oldPos.nemici[collisione.id_oggetto_passivo]), &(gameData->sprites[S_PIANTA]), gameData);
-            
         }
         else
         {
 
             beep();
             // la pianta è l'oggetto attivo
-            
+
             // uccido la pianta ma non la rana
-             // uccisione del nemico (pianta)
+            // uccisione del nemico (pianta)
             uccidiNemico(gameData->pids.pidNemici, collisione.id_oggetto_attivo);
         }
         break;
