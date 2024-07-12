@@ -43,18 +43,26 @@ void moveProcess(int* pipe_fd) {
         // Muovi il personaggio in base all'input dell'utente
         switch (ch) {
         	case KEY_UP:
+			case 'w':
+			case 'W':
 				pipeData.y=-2;
             	change=true;
             break;
           case KEY_DOWN:
+		  case 's':
+		  case 'S':
             	pipeData.y=+2;
             	change=true;
             break;
           case KEY_LEFT:
+		  case 'a':
+		  case 'A':
             	pipeData.x=-1;
             	change=true;  
             break;
           case KEY_RIGHT:
+		  case 'd':
+		  case 'D':
             	pipeData.x=1;
             	change=true;
             break;

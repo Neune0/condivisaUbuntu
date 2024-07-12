@@ -36,7 +36,7 @@ $(FULL_EXECUTABLE): $(OBJECTS)
 $(OBJDIR)/main.o: $(SRCDIR)/main.c $(HDRDIR)/disegna.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(OBJDIR)/disegna.o: $(SRCDIR)/disegna.c $(HDRDIR)/rana.h $(HDRDIR)/logo.h $(HDRDIR)/menuIniziale.h $(HDRDIR)/inizializza.h $(HDRDIR)/proiettile.h $(HDRDIR)/hud.h $(HDRDIR)/schermo.h $(HDRDIR)/nemico.h $(HDRDIR)/proiettileNemico.h $(HDRDIR)/tempo.h
+$(OBJDIR)/disegna.o: $(SRCDIR)/disegna.c $(HDRDIR)/rana.h $(HDRDIR)/logo.h $(HDRDIR)/menuIniziale.h $(HDRDIR)/inizializza.h $(HDRDIR)/proiettile.h $(HDRDIR)/hud.h $(HDRDIR)/schermo.h $(HDRDIR)/nemico.h $(HDRDIR)/proiettileNemico.h $(HDRDIR)/tempo.h $(HDRDIR)/musica.h $(HDRDIR)/soundPlayer.h
 	$(CC) $(CFLAGS) -c $< -o $@
 	
 $(OBJDIR)/rana.o: $(SRCDIR)/rana.c $(HDRDIR)/rana.h
@@ -76,6 +76,12 @@ $(OBJDIR)/coccodrillo.o: $(SRCDIR)/coccodrillo.c $(HDRDIR)/utilities.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/tempo.o: $(SRCDIR)/tempo.c $(HDRDIR)/utilities.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJDIR)/musica.o: $(SRCDIR)/musica.c $(HDRDIR)/utilities.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJDIR)/soundPlayer.o: $(SRCDIR)/soundPlayer.c $(HDRDIR)/utilities.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJDIR)/utilities.o: $(SRCDIR)/utilities.c $(HDRDIR)/utilities.h $(HDRDIR)/sound.h

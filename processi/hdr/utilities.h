@@ -20,9 +20,9 @@
 #define SUPERFAST 20000 // la velocita di aggiornamento piu veloce
 
 // velocità flussi 
-#define FLUSSO_LENTO 220000
-#define FLUSSO_NORM 170000
-#define FLUSSO_VELOCE 140000
+#define FLUSSO_LENTO  600000
+#define FLUSSO_NORM   500000
+#define FLUSSO_VELOCE 400000
 
 // dimensioni totali schermo
 #define WIDTH 105 // larghezza massima dello schermo
@@ -136,7 +136,7 @@
 #define LAMPEGGIA 16 // colore coccodrillo quando lampeggia
 
 // massimo numero di oggetti per tipo
-#define MAXNCOCCODRILLI 30
+#define MAXNCOCCODRILLI 20
 #define MAXNPROIETTILI 3
 #define MAXNNEMICI 4
 #define MAXNPROIETTILINEMICI 4
@@ -150,7 +150,7 @@
 #define TEMPOLVL2 140 // numero di secondi per manche per il secondo livello
 #define TEMPOLVL3 200 // numero di secondi per manche per il terzo livello
 
-#define TEMPO_SPAWN_COCCODRILLI 3 // tempo di spawn dei coccodrilli
+#define TEMPO_SPAWN_COCCODRILLI 5 // tempo di spawn dei coccodrilli
 
 // distanze tra oggetti di gioco
 #define DISTTRATANE 22 // distanza tra una tana e l'altra
@@ -321,6 +321,8 @@ typedef struct {
 typedef struct{
 	pid_t pidRana;
 	pid_t pidTempo;
+	pid_t pidMusica;
+	pid_t soundPlayer;
 	pid_t pidProiettili[MAXNPROIETTILI];
 	pid_t pidProiettiliNemici[MAXNPROIETTILINEMICI];
 	pid_t pidNemici[MAXNNEMICI];
@@ -394,6 +396,7 @@ typedef struct{
 // - oldPos : contiene le posizioni al passo precedente di tutti gli oggetti in gioco
 typedef struct{
 	int* pipe; // la pipe
+	int* pipe_suoni; // la pipe per i suoni di gioco
 	PipeData pipeData; // struttura per leggere la pipe
 	RanaAbsPos ranaAbsPos; // struttura per posizione assoluta della rana
 	Sprite sprites[N_SPRITES]; // le sprite degli oggetti

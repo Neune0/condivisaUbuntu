@@ -349,7 +349,7 @@ void handleCollisione(GameData *gameData, Collisione collisione)
         gameData->ranaAbsPos.y = gameData->pipeData.y;
         stampaMatrice(gameData->schermo.screenMatrix); // stampa a video solo celle della matrice dinamica modificate rispetto al ciclo precedente
         refresh();                                     // Aggiorna la finestra
-        usleep(500000);
+        usleep(150000);
 
         // riproduco suono plof
         // tolgo una vita alla rana
@@ -375,7 +375,7 @@ void handleCollisione(GameData *gameData, Collisione collisione)
         gameData->ranaAbsPos.y = gameData->pipeData.y;
         stampaMatrice(gameData->schermo.screenMatrix); // stampa a video solo celle della matrice dinamica modificate rispetto al ciclo precedente
         refresh();                                     // Aggiorna la finestra
-        usleep(500000);
+        // usleep(500000);
 
         // tolgo una vita alla rana
         gameData->gameInfo.vite--;
@@ -400,7 +400,7 @@ void handleCollisione(GameData *gameData, Collisione collisione)
         gameData->ranaAbsPos.y = gameData->pipeData.y;
         stampaMatrice(gameData->schermo.screenMatrix); // stampa a video solo celle della matrice dinamica modificate rispetto al ciclo precedente
         refresh();                                     // Aggiorna la finestra
-        usleep(500000);
+        // usleep(500000);
 
         // faccio ripartire la rana
         resetRana(gameData);
@@ -426,7 +426,7 @@ void handleCollisione(GameData *gameData, Collisione collisione)
         gameData->ranaAbsPos.y = gameData->pipeData.y;
         stampaMatrice(gameData->schermo.screenMatrix); // stampa a video solo celle della matrice dinamica modificate rispetto al ciclo precedente
         refresh();                                     // Aggiorna la finestra
-        usleep(500000);
+        // usleep(500000);
 
         // faccio ripartire la rana
         resetRana(gameData);
@@ -579,7 +579,7 @@ void handleCollisione(GameData *gameData, Collisione collisione)
             gameData->ranaAbsPos.y = gameData->pipeData.y;
             stampaMatrice(gameData->schermo.screenMatrix); // stampa a video solo celle della matrice dinamica modificate rispetto al ciclo precedente
             refresh();                                     // Aggiorna la finestra
-            usleep(500000);
+            // usleep(500000);
 
             // riproduco suono plof
             // tolgo una vita alla rana
@@ -679,7 +679,7 @@ void handleCollisione(GameData *gameData, Collisione collisione)
         else
         {
 
-            beep();
+            
             // la pianta è l'oggetto attivo
 
             // uccido la pianta ma non la rana
@@ -703,7 +703,6 @@ void handleCollisione(GameData *gameData, Collisione collisione)
             gameData->ranaAbsPos.y = gameData->pipeData.y;
             stampaMatrice(gameData->schermo.screenMatrix); // stampa a video solo celle della matrice dinamica modificate rispetto al ciclo precedente
             refresh();                                     // Aggiorna la finestra
-            usleep(500000);
 
             // tolgo una vita alla rana
             gameData->gameInfo.vite--;
@@ -733,7 +732,7 @@ void handleCollisione(GameData *gameData, Collisione collisione)
         gameData->ranaAbsPos.x = gameData->pipeData.x;
         gameData->ranaAbsPos.y = gameData->pipeData.y;
         stampaMatrice(gameData->schermo.screenMatrix); // stampa a video solo celle della matrice dinamica modificate rispetto al ciclo precedente
-        refresh();
+       
         break;
     }
     case RANA_ARGINE:
@@ -754,7 +753,7 @@ void handleCollisione(GameData *gameData, Collisione collisione)
         gameData->ranaAbsPos.x = gameData->pipeData.x;
         gameData->ranaAbsPos.y = gameData->pipeData.y;
         stampaMatrice(gameData->schermo.screenMatrix); // stampa a video solo celle della matrice dinamica modificate rispetto al ciclo precedente
-        refresh();
+        
         break;
     }
     default:

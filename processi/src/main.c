@@ -7,9 +7,9 @@ int main()
                           
     inizializzaNcurses(); // inizializzazione della libreria ncurses + inizializzazione seme per random
 
-    // avviaLogo();   // visualizza il logo ed aspetta che l'utente prema un tasto qualsiasi
+    avviaLogo();   // visualizza il logo ed aspetta che l'utente prema un tasto qualsiasi
 
-    // int scelta = avviaMenuIniziale(); // fa partire il processo per il menu iniziale, aspetta che termini e poi prosegue
+    int scelta = avviaMenuIniziale(); // fa partire il processo per il menu iniziale, aspetta che termini e poi prosegue
 
     avviaDrawProcess(pipe_fd); // avvia il processo che gestisce la stampa a schermo
 
