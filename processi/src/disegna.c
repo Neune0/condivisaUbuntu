@@ -6,7 +6,14 @@ void drawProcess(int *pipe_fd)
 	GameData *gameData = (GameData *)malloc(sizeof(GameData));
 
 	avviaProcessiBase(pipe_fd, &(gameData->pids));
+	gameData->pids.pidMusica = avviaMusica();
 
+	int pipe_suoni_fd[2];       // Pipe file descriptors
+    creaPipe(pipe_suoni_fd);    // Crea la pipe
+
+	gameData->pipe_suoni = pipe_suoni_fd;
+
+	gameData->pids.soundPlayer = avvia_soundPlayer(gameData->pipe_suoni);
 	// inizializza i dati del gioco
 	inizializza(gameData, pipe_fd);
 
@@ -33,6 +40,9 @@ void drawProcess(int *pipe_fd)
 			mvprintw(8, 106, "Last T: sec: %d", gameData->pipeData.x);
 			break;
 		case 'X': // rana
+			PipeData dataSound;
+			dataSound.type='F';
+			write(gameData->pipe_suoni[1], &dataSound, sizeof(PipeData));
 			mvprintw(0, 106, "                                            ");
 			mvprintw(0, 106, "Last X: id: %d x: %d y: %d", gameData->pipeData.id, gameData->pipeData.x, gameData->pipeData.y);
 			break;
@@ -96,11 +106,11 @@ void drawProcess(int *pipe_fd)
 			if (id != -1)
 			{
 				PipeData coccodrillo_init;
-				coccodrillo_init.x = gameData->flussi[0].direction==1 ? FIRSTGAMECOL - 9 : LASTGAMECOL;
+				coccodrillo_init.x = gameData->flussi[0].direction == 1 ? FIRSTGAMECOL - 9 : LASTGAMECOL;
 				coccodrillo_init.y = FILA_UNO;
-				coccodrillo_init.type = gameData->flussi[0].direction==1 ? 'C' : 'c';
+				coccodrillo_init.type = gameData->flussi[0].direction == 1 ? 'C' : 'c';
 				coccodrillo_init.id = id;
-				int pid_coccodrillo = avviaCoccodrillo(gameData->pipe, &(coccodrillo_init), id, gameData->flussi[0].direction,gameData->flussi[0].vel);
+				int pid_coccodrillo = avviaCoccodrillo(gameData->pipe, &(coccodrillo_init), id, gameData->flussi[0].direction, gameData->flussi[0].vel);
 				gameData->pids.pidCoccodrilli[id] = pid_coccodrillo;
 				gameData->contatori.contCoccodrilli++;
 				gameData->controlloCoccodrilli[id].direction = gameData->flussi[0].direction;
@@ -121,11 +131,11 @@ void drawProcess(int *pipe_fd)
 			if (id != -1)
 			{
 				PipeData coccodrillo_init;
-				coccodrillo_init.x = gameData->flussi[1].direction==1 ? FIRSTGAMECOL - 9 : LASTGAMECOL;
+				coccodrillo_init.x = gameData->flussi[1].direction == 1 ? FIRSTGAMECOL - 9 : LASTGAMECOL;
 				coccodrillo_init.y = FILA_DUE;
-				coccodrillo_init.type = gameData->flussi[1].direction==1 ? 'C' : 'c';
+				coccodrillo_init.type = gameData->flussi[1].direction == 1 ? 'C' : 'c';
 				coccodrillo_init.id = id;
-				int pid_coccodrillo = avviaCoccodrillo(gameData->pipe, &(coccodrillo_init), id, gameData->flussi[1].direction,gameData->flussi[1].vel);
+				int pid_coccodrillo = avviaCoccodrillo(gameData->pipe, &(coccodrillo_init), id, gameData->flussi[1].direction, gameData->flussi[1].vel);
 				gameData->pids.pidCoccodrilli[id] = pid_coccodrillo;
 				gameData->contatori.contCoccodrilli++;
 				gameData->controlloCoccodrilli[id].direction = gameData->flussi[1].direction;
@@ -146,11 +156,11 @@ void drawProcess(int *pipe_fd)
 			if (id != -1)
 			{
 				PipeData coccodrillo_init;
-				coccodrillo_init.x = gameData->flussi[2].direction==1 ? FIRSTGAMECOL - 9 : LASTGAMECOL;
+				coccodrillo_init.x = gameData->flussi[2].direction == 1 ? FIRSTGAMECOL - 9 : LASTGAMECOL;
 				coccodrillo_init.y = FILA_TRE;
-				coccodrillo_init.type = gameData->flussi[2].direction==1 ? 'C' : 'c';
+				coccodrillo_init.type = gameData->flussi[2].direction == 1 ? 'C' : 'c';
 				coccodrillo_init.id = id;
-				int pid_coccodrillo = avviaCoccodrillo(gameData->pipe, &(coccodrillo_init), id, gameData->flussi[2].direction,gameData->flussi[2].vel);
+				int pid_coccodrillo = avviaCoccodrillo(gameData->pipe, &(coccodrillo_init), id, gameData->flussi[2].direction, gameData->flussi[2].vel);
 				gameData->pids.pidCoccodrilli[id] = pid_coccodrillo;
 				gameData->contatori.contCoccodrilli++;
 				gameData->controlloCoccodrilli[id].direction = gameData->flussi[2].direction;
@@ -171,11 +181,11 @@ void drawProcess(int *pipe_fd)
 			if (id != -1)
 			{
 				PipeData coccodrillo_init;
-				coccodrillo_init.x = gameData->flussi[4].direction==1 ? FIRSTGAMECOL - 9 : LASTGAMECOL;
+				coccodrillo_init.x = gameData->flussi[4].direction == 1 ? FIRSTGAMECOL - 9 : LASTGAMECOL;
 				coccodrillo_init.y = FILA_CINQUE;
-				coccodrillo_init.type = gameData->flussi[4].direction==1 ? 'C' : 'c';
+				coccodrillo_init.type = gameData->flussi[4].direction == 1 ? 'C' : 'c';
 				coccodrillo_init.id = id;
-				int pid_coccodrillo = avviaCoccodrillo(gameData->pipe, &(coccodrillo_init), id,gameData->flussi[4].direction,gameData->flussi[4].vel);
+				int pid_coccodrillo = avviaCoccodrillo(gameData->pipe, &(coccodrillo_init), id, gameData->flussi[4].direction, gameData->flussi[4].vel);
 				gameData->pids.pidCoccodrilli[id] = pid_coccodrillo;
 				gameData->contatori.contCoccodrilli++;
 				gameData->controlloCoccodrilli[id].direction = gameData->flussi[4].direction;
@@ -196,11 +206,11 @@ void drawProcess(int *pipe_fd)
 			if (id != -1)
 			{
 				PipeData coccodrillo_init;
-				coccodrillo_init.x = gameData->flussi[6].direction==1 ? FIRSTGAMECOL - 9 : LASTGAMECOL;
+				coccodrillo_init.x = gameData->flussi[6].direction == 1 ? FIRSTGAMECOL - 9 : LASTGAMECOL;
 				coccodrillo_init.y = FILA_SETTE;
-				coccodrillo_init.type = gameData->flussi[6].direction==1 ? 'C' : 'c';
+				coccodrillo_init.type = gameData->flussi[6].direction == 1 ? 'C' : 'c';
 				coccodrillo_init.id = id;
-				int pid_coccodrillo = avviaCoccodrillo(gameData->pipe, &(coccodrillo_init), id,gameData->flussi[6].direction,gameData->flussi[6].vel);
+				int pid_coccodrillo = avviaCoccodrillo(gameData->pipe, &(coccodrillo_init), id, gameData->flussi[6].direction, gameData->flussi[6].vel);
 				gameData->pids.pidCoccodrilli[id] = pid_coccodrillo;
 				gameData->contatori.contCoccodrilli++;
 				gameData->controlloCoccodrilli[id].direction = gameData->flussi[6].direction;
@@ -221,11 +231,11 @@ void drawProcess(int *pipe_fd)
 			if (id != -1)
 			{
 				PipeData coccodrillo_init;
-				coccodrillo_init.x = gameData->flussi[7].direction==1 ? FIRSTGAMECOL - 9 : LASTGAMECOL;
+				coccodrillo_init.x = gameData->flussi[7].direction == 1 ? FIRSTGAMECOL - 9 : LASTGAMECOL;
 				coccodrillo_init.y = FILA_OTTO;
-				coccodrillo_init.type =  gameData->flussi[7].direction==1 ? 'C' : 'c';
+				coccodrillo_init.type = gameData->flussi[7].direction == 1 ? 'C' : 'c';
 				coccodrillo_init.id = id;
-				int pid_coccodrillo = avviaCoccodrillo(gameData->pipe, &(coccodrillo_init), id,gameData->flussi[7].direction,gameData->flussi[7].vel);
+				int pid_coccodrillo = avviaCoccodrillo(gameData->pipe, &(coccodrillo_init), id, gameData->flussi[7].direction, gameData->flussi[7].vel);
 				gameData->pids.pidCoccodrilli[id] = pid_coccodrillo;
 				gameData->contatori.contCoccodrilli++;
 				gameData->controlloCoccodrilli[id].direction = gameData->flussi[7].direction;
@@ -246,11 +256,11 @@ void drawProcess(int *pipe_fd)
 			if (id != -1)
 			{
 				PipeData coccodrillo_init;
-				coccodrillo_init.x = gameData->flussi[5].direction==1 ? FIRSTGAMECOL - 9 : LASTGAMECOL;
+				coccodrillo_init.x = gameData->flussi[5].direction == 1 ? FIRSTGAMECOL - 9 : LASTGAMECOL;
 				coccodrillo_init.y = FILA_SEI;
-				coccodrillo_init.type = gameData->flussi[5].direction==1 ? 'C' : 'c';
+				coccodrillo_init.type = gameData->flussi[5].direction == 1 ? 'C' : 'c';
 				coccodrillo_init.id = id;
-				int pid_coccodrillo = avviaCoccodrillo(gameData->pipe, &(coccodrillo_init), id,gameData->flussi[5].direction,gameData->flussi[5].vel);
+				int pid_coccodrillo = avviaCoccodrillo(gameData->pipe, &(coccodrillo_init), id, gameData->flussi[5].direction, gameData->flussi[5].vel);
 				gameData->pids.pidCoccodrilli[id] = pid_coccodrillo;
 				gameData->contatori.contCoccodrilli++;
 				gameData->controlloCoccodrilli[id].direction = gameData->flussi[5].direction;
@@ -271,11 +281,11 @@ void drawProcess(int *pipe_fd)
 			if (id != -1)
 			{
 				PipeData coccodrillo_init;
-				coccodrillo_init.x = gameData->flussi[3].direction==1 ? FIRSTGAMECOL - 9 : LASTGAMECOL;
+				coccodrillo_init.x = gameData->flussi[3].direction == 1 ? FIRSTGAMECOL - 9 : LASTGAMECOL;
 				coccodrillo_init.y = FILA_QUATTRO;
-				coccodrillo_init.type = gameData->flussi[3].direction==1 ? 'C' : 'c';
+				coccodrillo_init.type = gameData->flussi[3].direction == 1 ? 'C' : 'c';
 				coccodrillo_init.id = id;
-				int pid_coccodrillo = avviaCoccodrillo(gameData->pipe, &(coccodrillo_init), id,gameData->flussi[3].direction,gameData->flussi[3].vel);
+				int pid_coccodrillo = avviaCoccodrillo(gameData->pipe, &(coccodrillo_init), id, gameData->flussi[3].direction, gameData->flussi[3].vel);
 				gameData->pids.pidCoccodrilli[id] = pid_coccodrillo;
 				gameData->contatori.contCoccodrilli++;
 				gameData->controlloCoccodrilli[id].direction = gameData->flussi[3].direction;
@@ -289,12 +299,13 @@ void drawProcess(int *pipe_fd)
 		}
 
 		avviaNemici(gameData);
-		for(int i=0;i<8;i++){
-			mvprintw(20+i,106,"                            ");
-			mvprintw(20+i,106,"flusso %d D:%d V:%d",i,gameData->flussi[i].direction,gameData->flussi[i].vel);
+		for (int i = 0; i < 8; i++)
+		{
+			mvprintw(20 + i, 106, "                            ");
+			mvprintw(20 + i, 106, "flusso %d D:%d V:%d", i, gameData->flussi[i].direction, gameData->flussi[i].vel);
 		}
-		mvprintw(33,106,"                                         ");
-		mvprintw(33,106,"old pos nemici[1]: x:%d y:%d id:%d ",gameData->oldPos.nemici[1].x,gameData->oldPos.nemici[1].y,gameData->oldPos.nemici[1].id);
+		mvprintw(33, 106, "                                         ");
+		mvprintw(33, 106, "old pos nemici[1]: x:%d y:%d id:%d ", gameData->oldPos.nemici[1].x, gameData->oldPos.nemici[1].y, gameData->oldPos.nemici[1].id);
 		// per debug
 		mvprintw(34, 106, "                                            ");
 		mvprintw(34, 106, "Rana x: %d y: %d idC: %d offC: %d", gameData->ranaAbsPos.x, gameData->ranaAbsPos.y, gameData->ranaAbsPos.id_coccodrillo, gameData->ranaAbsPos.offset_on_coccodrillo);
@@ -306,7 +317,7 @@ void drawProcess(int *pipe_fd)
 		mvprintw(37, 106, "                                            ");
 		mvprintw(37, 106, "contPari: %d contDispari: %d", contatore_pari, contatore_dispari);
 		mvprintw(38, 106, "                                            ");
-		mvprintw(38, 106, "livello: %d manche: %d", gameData->gameInfo.livello,gameData->gameInfo.manche);
+		mvprintw(38, 106, "livello: %d manche: %d", gameData->gameInfo.livello, gameData->gameInfo.manche);
 
 		// se il tempo di gioco supera il max per manche la rana muore e la manche riparte
 		// mi serve una funzione per lo start della manche
@@ -321,7 +332,7 @@ void drawProcess(int *pipe_fd)
 
 			// termino e faccio ripartire il processo che gestisce il tempo
 			resetTempo(gameData);
-			gameData->gameInfo.secondi_di_gioco=0;
+			gameData->gameInfo.secondi_di_gioco = 0;
 			// reinizializzo l'hud del tempo
 			printInitTempo(gameData);
 		}
@@ -338,8 +349,74 @@ void drawProcess(int *pipe_fd)
 	{
 		stampaGameOver();
 	}
-
+	// terminare tutti i processi
+	// rana
+	// tutti i coccodrilli
+	// tutte le piante
+	// tutti i proiettili amici
+	// tutti i proiettili nemici
+	// processo tempo
+	terminaTuttiProcessi(gameData);
 	free(gameData);
+	return;
+}
+
+void terminaTuttiProcessi(GameData *gameData)
+{
+	// terminazione rana
+	kill(gameData->pids.pidRana, SIGKILL);
+	waitpid(gameData->pids.pidRana, NULL, 0);
+
+	// terminazione di tutti i coccodrilii
+	for (int i = 0; i < MAXNCOCCODRILLI; i++)
+	{
+		if (gameData->pids.pidCoccodrilli[i] != 0 && gameData->pids.pidCoccodrilli[i] != -1)
+		{
+			kill(gameData->pids.pidCoccodrilli[i], SIGKILL);
+			waitpid(gameData->pids.pidCoccodrilli[i], NULL, 0);
+		}
+	}
+
+	// terminazione di tutti i nemici
+	for (int i = 0; i < MAXNNEMICI; i++)
+	{
+		if (gameData->pids.pidNemici[i] != 0 && gameData->pids.pidNemici[i] != -1)
+		{
+			kill(gameData->pids.pidNemici[i], SIGKILL);
+			waitpid(gameData->pids.pidNemici[i], NULL, 0);
+		}
+	}
+
+	// terminazione di tutti i proiettili amici
+	for (int i = 0; i < MAXNPROIETTILI; i++)
+	{
+		if (gameData->pids.pidProiettili[i] != 0 && gameData->pids.pidProiettili[i] != -1)
+		{
+			kill(gameData->pids.pidProiettili[i], SIGKILL);
+			waitpid(gameData->pids.pidProiettili[i], NULL, 0);
+		}
+	}
+
+	// terminazione di tutti i proiettili nemici
+	for (int i = 0; i < MAXNPROIETTILINEMICI; i++)
+	{
+		if (gameData->pids.pidProiettiliNemici[i] != 0 && gameData->pids.pidProiettiliNemici[i] != -1)
+		{
+			kill(gameData->pids.pidProiettiliNemici[i], SIGKILL);
+			waitpid(gameData->pids.pidProiettiliNemici[i], NULL, 0);
+		}
+	}
+
+	// terminazione processo tempo
+	kill(gameData->pids.pidTempo, SIGKILL);
+	waitpid(gameData->pids.pidTempo, NULL, 0);
+
+	// terminazione processo musica
+	spegniMusica(gameData);
+
+	// terminazione processo suoni 
+	termina_soundPlayer(gameData);
+
 	return;
 }
 
@@ -376,7 +453,7 @@ void stampaGameOver()
 	stampaBox();
 	stampaLogoMenu(STARTROWLOGOMENU, STARTCOLLOGOMENU);
 	mvprintw(15, 80, "Game Over!");
-	mvprintw(17,80,"premi un tasto per continuare");
+	mvprintw(17, 80, "premi un tasto per continuare");
 	refresh();
 	nodelay(stdscr, FALSE);
 	getch();
@@ -425,34 +502,34 @@ bool thereIsSpaceForCoccodrilloOnFila(GameData *gameData, int fila)
 			break;
 		case 2:
 			begin_row = FILA_DUE;
-			
+
 			break;
 		case 3:
 			begin_row = FILA_TRE;
 			break;
 		case 4:
 			begin_row = FILA_QUATTRO;
-			
+
 			break;
 		case 5:
 			begin_row = FILA_CINQUE;
 			break;
 		case 6:
 			begin_row = FILA_SEI;
-			
+
 			break;
 		case 7:
 			begin_row = FILA_SETTE;
 			break;
 		case 8:
 			begin_row = FILA_OTTO;
-			
+
 			break;
 		default:
 			break;
 		}
 
-		begin_col = gameData->flussi[fila-1].direction==1 ? FIRSTGAMECOL :  INITCOCCODRILLOSXCOL;
+		begin_col = gameData->flussi[fila - 1].direction == 1 ? FIRSTGAMECOL : INITCOCCODRILLOSXCOL;
 
 		for (int i = begin_row; i < begin_row + COCCODRILLO_H; i++)
 		{
@@ -468,9 +545,11 @@ bool thereIsSpaceForCoccodrilloOnFila(GameData *gameData, int fila)
 	return space;
 }
 
-void avviaNemici(GameData* gameData){
-	int id = id_disponibile(gameData->pids.pidNemici,MAXNNEMICI);
-	if(id!=-1){
-		gameData->pids.pidNemici[id]=avviaNemico(gameData->pipe,id);
+void avviaNemici(GameData *gameData)
+{
+	int id = id_disponibile(gameData->pids.pidNemici, MAXNNEMICI);
+	if (id != -1)
+	{
+		gameData->pids.pidNemici[id] = avviaNemico(gameData->pipe, id);
 	}
 }

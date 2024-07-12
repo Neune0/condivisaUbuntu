@@ -8,6 +8,8 @@
 #include "./proiettile.h"
 #include "./hud.h"
 #include "./schermo.h"
+#include "./musica.h"
+#include "./soundPlayer.h"
 
 /** @brief avvia il processo disegna
  * @param pipe_fd : la pipe (array di int di dimensione 2)
@@ -34,4 +36,5 @@ void stampaGameOver();
 void printRana(PipeData* datiRana, Sprite* sprite,GameData* gameData);
 bool thereIsSpaceForCoccodrilloOnFila(GameData *gameData, int fila);
 void avviaNemici(GameData* gameData);
+void terminaTuttiProcessi(GameData* gameData);
 #endif

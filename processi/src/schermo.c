@@ -128,7 +128,7 @@ void stampaMatrice(ScreenCell (*screenMatrix)[WIDTH])
 			}
 		}
 	}
-	refresh();
+	// refresh();
 
 	return;
 }
@@ -147,7 +147,7 @@ void stampaRefreshMatrice(ScreenCell (*screenMatrix)[WIDTH])
 			screenMatrix[i][j].is_changed = false; // una volta stampato, il flag viene resettato per la prossima modifica
 		}
 	}
-	refresh();
+	// refresh();
 	return;
 }
 
