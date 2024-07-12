@@ -88,8 +88,9 @@ void drawProcess(int *pipe_fd)
 
 		// questa parte va chiusa dentro una funzione a parte
 
-		if (thereIsSpaceForCoccodrilloOnFila(gameData, 1) && sec % 7 == 0 && contatore_dispari == 1)
+		if (thereIsSpaceForCoccodrilloOnFila(gameData, 1) && sec % TEMPO_SPAWN_COCCODRILLI == 0 && contatore_dispari == 1)
 		{
+			beep();
 			// avvia coccodrillo
 			int id = id_disponibile(gameData->pids.pidCoccodrilli, MAXNCOCCODRILLI);
 			if (id != -1)
@@ -112,7 +113,7 @@ void drawProcess(int *pipe_fd)
 			}
 		}
 
-		if (thereIsSpaceForCoccodrilloOnFila(gameData, 2) && sec % 7 == 0 && contatore_dispari == 1)
+		if (thereIsSpaceForCoccodrilloOnFila(gameData, 2) && sec % TEMPO_SPAWN_COCCODRILLI == 0 && contatore_dispari == 1)
 		{
 
 			// avvia coccodrillo
@@ -137,7 +138,7 @@ void drawProcess(int *pipe_fd)
 			}
 		}
 
-		if (thereIsSpaceForCoccodrilloOnFila(gameData, 3) && sec % 7 == 0 && contatore_dispari == 1)
+		if (thereIsSpaceForCoccodrilloOnFila(gameData, 3) && sec % TEMPO_SPAWN_COCCODRILLI == 0 && contatore_dispari == 1)
 		{
 
 			// avvia coccodrillo
@@ -162,7 +163,7 @@ void drawProcess(int *pipe_fd)
 			}
 		}
 
-		if (thereIsSpaceForCoccodrilloOnFila(gameData, 5) && sec % 7 == 0 && contatore_dispari == 1)
+		if (thereIsSpaceForCoccodrilloOnFila(gameData, 5) && sec % TEMPO_SPAWN_COCCODRILLI == 0 && contatore_dispari == 1)
 		{
 
 			// avvia coccodrillo
@@ -187,7 +188,7 @@ void drawProcess(int *pipe_fd)
 			}
 		}
 
-		if (thereIsSpaceForCoccodrilloOnFila(gameData, 7) && sec % 7 == 0 && contatore_dispari == 1)
+		if (thereIsSpaceForCoccodrilloOnFila(gameData, 7) && sec % TEMPO_SPAWN_COCCODRILLI == 0 && contatore_dispari == 1)
 		{
 
 			// avvia coccodrillo
@@ -212,7 +213,7 @@ void drawProcess(int *pipe_fd)
 			}
 		}
 
-		if (thereIsSpaceForCoccodrilloOnFila(gameData, 8) && sec % 7 == 0 && contatore_dispari == 1)
+		if (thereIsSpaceForCoccodrilloOnFila(gameData, 8) && sec % TEMPO_SPAWN_COCCODRILLI == 0 && contatore_dispari == 1)
 		{
 
 			// avvia coccodrillo
@@ -237,7 +238,7 @@ void drawProcess(int *pipe_fd)
 			}
 		}
 
-		if (thereIsSpaceForCoccodrilloOnFila(gameData, 6) && sec % 7 == 0 && contatore_dispari == 1)
+		if (thereIsSpaceForCoccodrilloOnFila(gameData, 6) && sec % TEMPO_SPAWN_COCCODRILLI == 0 && contatore_dispari == 1)
 		{
 
 			// avvia coccodrillo
@@ -262,7 +263,7 @@ void drawProcess(int *pipe_fd)
 			}
 		}
 
-		if (thereIsSpaceForCoccodrilloOnFila(gameData, 4) && sec % 7 == 0 && contatore_dispari == 1)
+		if (thereIsSpaceForCoccodrilloOnFila(gameData, 4) && sec % TEMPO_SPAWN_COCCODRILLI == 0 && contatore_dispari == 1)
 		{
 
 			// avvia coccodrillo
@@ -375,8 +376,10 @@ void stampaGameOver()
 	stampaBox();
 	stampaLogoMenu(STARTROWLOGOMENU, STARTCOLLOGOMENU);
 	mvprintw(15, 80, "Game Over!");
+	mvprintw(17,80,"premi un tasto per continuare");
 	refresh();
-	usleep(30000000);
+	nodelay(stdscr, FALSE);
+	getch();
 	return;
 }
 
