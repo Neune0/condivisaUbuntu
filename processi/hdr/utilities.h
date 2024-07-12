@@ -20,9 +20,9 @@
 #define SUPERFAST 20000 // la velocita di aggiornamento piu veloce
 
 // velocità flussi 
-#define FLUSSO_LENTO 160000
-#define FLUSSO_NORM 110000
-#define FLUSSO_VELOCE 90000
+#define FLUSSO_LENTO 220000
+#define FLUSSO_NORM 170000
+#define FLUSSO_VELOCE 140000
 
 // dimensioni totali schermo
 #define WIDTH 105 // larghezza massima dello schermo
@@ -136,7 +136,7 @@
 #define LAMPEGGIA 16 // colore coccodrillo quando lampeggia
 
 // massimo numero di oggetti per tipo
-#define MAXNCOCCODRILLI 24
+#define MAXNCOCCODRILLI 30
 #define MAXNPROIETTILI 3
 #define MAXNNEMICI 4
 #define MAXNPROIETTILINEMICI 4
@@ -146,9 +146,11 @@
 #define N_SPRITES 13
 
 // tempo
-#define TEMPOLVL1 60 // numero di secondi per manche per il primo livello
-#define TEMPOLVL2 90 // numero di secondi per manche per il secondo livello
-#define TEMPOLVL3 120 // numero di secondi per manche per il terzo livello
+#define TEMPOLVL1 100 // numero di secondi per manche per il primo livello
+#define TEMPOLVL2 140 // numero di secondi per manche per il secondo livello
+#define TEMPOLVL3 200 // numero di secondi per manche per il terzo livello
+
+#define TEMPO_SPAWN_COCCODRILLI 3 // tempo di spawn dei coccodrilli
 
 // distanze tra oggetti di gioco
 #define DISTTRATANE 22 // distanza tra una tana e l'altra

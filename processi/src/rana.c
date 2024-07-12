@@ -79,10 +79,6 @@ void moveProcess(int* pipe_fd) {
 			pipeData.y=0;
 			pipeData.type='X';
 		}
-		
-        
-        // Aspetta un po' prima di generare nuove coordinate forse andrebbe diminuito
-        //usleep(1000);
          
     }
     return;
