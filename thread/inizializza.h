@@ -3,18 +3,16 @@
 #include "utilities.h"
 #include "rana.h"
 #include "hud.h"
-
-/** @brief inizializza la struttura dati del gioco
- * @param gameData : la struttura dati del gioco
-*/
-void inizializza(GameData* gameData);
-
-/** @brief Inizializza valori per i TCB
-*/
-void inizializzaTCB(AllTCB *tcbs);
+#include "nemico.h"
+#include "tempo.h"
 
 /***/
 void inizializzaGameInfo(GameData* gamedata);
+
+
+void inizializzaControlloCoccodrilli(GameData* gameData);
+
+void inizializzaFlussi(GameData* gameData);
 
 /***/
 void inizializzaContatori(GameData* gameData);
@@ -60,12 +58,37 @@ void inizializzaOggettiTane(Tana* tane);
 /***/
 void inizializzaSprites(Sprite* sprites);
 
-Sprite inizializzaSprite(int rows, int cols, char sprite[rows][cols], int color, TipoObj tipo_oggetto);
+/** @brief inizializza la struttura dati del gioco
+ * @param gameData : la struttura dati del gioco
+ * @param pipe_fd : il file descriptor della pipe
+*/
+void inizializza(GameData* gameData, int* pipe_fd);
+
+/** @brief avvia i processi base del gioco
+ * @param pipe_fd : la pipe
+ * @param pids : puntatore a struttura dati che contiene i pid dei processi
+*/
+void avviaProcessiBase(int* pipe_fd,Pids* pids);
+
+
+/** @brief avvia il thread Rana
+ * @param pids : puntatore a struttura dati che contiene i pid dei processi
+ * @param param_general: passa al thread i puntatori principali (semafori,buffer,ecc..)
+*/
+pthread_t avviaThreadBase(Pids* pids, Params *param_general);
+
+
+/***/
+Sprite inizializzaSprite(int rows, int cols, char **sprite, int color, TipoObj tipoObj);
 
 /***/
 void inizializzaBox(GameData* gameData);
 
 /***/
 void inizializzaTempo(GameData* gameData);
+
+/** @brief Inizializza valori per i TCB
+*/
+void inizializzaTCB(AllTCB *array_tcb);
 
 #endif

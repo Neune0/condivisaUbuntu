@@ -1,13 +1,9 @@
 #include "inizializza.h"
-// ultimo tocco 19/02/2024 16:45
-
-void inizializza(GameData* gameData){
-
-	inizializzaTCB(&(gameData->allTCB));
-
+void inizializza(GameData* gameData, int* pipe_fd){
+	gameData->pipe= pipe_fd;
 	inizializzaGameInfo(gameData);
-
 	inizializzaOggettiTane(gameData->tane);
+	inizializzaFlussi(gameData);
 	
 	inizializzaSprites(gameData->sprites);
 	
@@ -18,180 +14,97 @@ void inizializza(GameData* gameData){
 	gameData->oldPos.rana.x=gameData->ranaAbsPos.x;
 	gameData->oldPos.rana.y=gameData->ranaAbsPos.y;
 
-	inizializzaContatori(gameData);
-
 	inizializzaSchermo(gameData); 
 	
+	inizializzaContatori(gameData);
 	inizializzaTempo(gameData);
-	
+	inizializzaTCB(gameData->allTCB);
+	inizializzaControlloCoccodrilli(gameData);
 	return;
 }
 
-void inizializzaTCB(AllTCB* tcbs){
-	// disegna
-	tcbs->tcb_disegna.thread_id = pthread_self();
-	tcbs->tcb_disegna.is_target = false;
-	tcbs->tcb_disegna.is_terminated = false;
+void inizializzaFlussi(GameData* gameData){
+	for(int i=0;i<8;i++){
+		gameData->flussi[i].direction = rand()%2==0 ? 1 : -1;
+		gameData->flussi[i].vel = rand()%3;
+		gameData->flussi[i].n_coccodrilli_attivi=0;
+	}
 	
-	// rana
-	tcbs->tcb_rana.thread_id = 0;
-	tcbs->tcb_rana.is_target = false;
-	tcbs->tcb_rana.is_terminated = false;
-	
-	// proiettili
-	for(int i=0; i<MAXNPROIETTILI; i++){	
-		tcbs->tcb_proiettili[i].thread_id = 0;
-		tcbs->tcb_proiettili[i].is_target = false;
-		tcbs->tcb_proiettili[i].is_terminated = false;
-	}
+}
 
-	// coccodrilli
-	for(int i=0; i<MAXNCOCCODRILLI; i++){
-		tcbs->tcb_coccodrilli[i].thread_id = 0;
-		tcbs->tcb_coccodrilli[i].is_target = false;
-		tcbs->tcb_coccodrilli[i].is_terminated = false;
-	}
-
-	// nemici
-	for(int i=0; i<MAXNNEMICI; i++){
-		tcbs->tcb_piante[i].thread_id = 0;
-		tcbs->tcb_piante[i].is_target = false;
-		tcbs->tcb_piante[i].is_terminated = false;
-	}
-
-	// proiettili nemici
-	for(int i=0; i<MAXNPROIETTILINEMICI; i++){
-		tcbs->tcb_proiettili_nemici[i].thread_id = 0;
-		tcbs->tcb_proiettili_nemici[i].is_target = false;
-		tcbs->tcb_proiettili_nemici[i].is_terminated = false;
+void inizializzaControlloCoccodrilli(GameData* gameData){
+	for(int i=0;i<MAXNCOCCODRILLI;i++){
+		gameData->controlloCoccodrilli[i].id=-1;
+		gameData->controlloCoccodrilli[i].direction=0;
+		gameData->controlloCoccodrilli[i].offset_deep=0;
+		gameData->controlloCoccodrilli[i].is_buono=false;
+		gameData->controlloCoccodrilli[i].is_going_deep=false;
+		gameData->controlloCoccodrilli[i].is_going_up=false;
+		gameData->controlloCoccodrilli[i].passi=0;
+		gameData->controlloCoccodrilli[i].passi_in_immersione=0;
+		gameData->controlloCoccodrilli[i].is_fase_pre_immersione=false;
+		gameData->controlloCoccodrilli[i].is_fase_immersione=false;
+		gameData->controlloCoccodrilli[i].passi_in_pre_immersione=0;
+		gameData->controlloCoccodrilli[i].passi_deep=0;
+		gameData->controlloCoccodrilli[i].rana_on=false;
+		gameData->controlloCoccodrilli[i].offset_rana=0;
+		gameData->controlloCoccodrilli[i].fila=0;
 	}
 	return;
 }
 
-void inizializzaGameInfo(GameData* gamedata){
-	gamedata->gameInfo.tempo.secondi = 0;
-	gamedata->gameInfo.vite=3;
-	gamedata->gameInfo.punteggio=0;
-	gamedata->gameInfo.livello= 1;
-	gamedata->gameInfo.manche=1;
-	return;
-}
 
-void inizializzaOggettiTane(Tana* tane){
-	for(int i = 0; i < MAXNTANE; i++){
-		tane[i].info.y = TANAROWSTART;
-		tane[i].info.x = (i * DISTTRATANE) + FIRSTGAMECOL;
-		tane[i].info.id = i;
-		tane[i].status = TANA_OPENED;
-	}
-	return;
-}
 
-void inizializzaSprites(Sprite* sprites){
+void inizializzaTCB(AllTCB *array_tcb){
+	//ThreadControlBlock *rana = &(array_tcb->tcb_rana);
+	ThreadControlBlock *rana = array_tcb->tcb_rana;
+	ThreadControlBlock *proiettili = array_tcb->tcb_proiettili;
+	ThreadControlBlock *piante = array_tcb->tcb_piante;
+	ThreadControlBlock *coccodrilli = array_tcb->tcb_coccodrilli;
+	ThreadControlBlock *proiettili_nemici = array_tcb->tcb_proiettili_nemici;
+	ThreadControlBlock standard = {0,false,false};
 	
-	// definizione sprite utili
-	char sprite_rana[RANA_H][RANA_W] = {{'\\','.','/'},{'/','-','\\'}};
-	char sprite_proiettile[PROIETTILE_H][PROIETTILE_W] = {{'^'},{'|'}};
-	char sprite_tana_open[TANA_H][TANA_W] = {{' ',' ',' ',' ',' ',' ',' ',' ',' '},{' ',' ',' ',' ',' ',' ',' ',' ',' '},{' ',' ',' ',' ',' ',' ',' ',' ',' '},{' ',' ',' ',' ',' ',' ',' ',' ',' '}};
-	char sprite_tana_closed[TANA_H][TANA_W] = {{'H',' ',' ',' ',' ',' ',' ',' ','H'},{'H',' ',' ',' ',' ',' ',' ',' ','H'},{'H',' ',' ',' ',' ',' ',' ',' ','H'},{'H','H','H','H','H','H','H','H','H'}};
-	char sprite_pianta[PIANTA_H][PIANTA_W] = {{'\\','.','/'},{' ','|',' '}};
-	char sprite_proiettile_nemico[PROIETTILE_H][PROIETTILE_W] = {{'|'},{'v'}};
-	char sprite_coccodrillo_sx[COCCODRILLO_H][COCCODRILLO_W] = {{'>','*','^','^','^','^','^','^','-'},{' ',' ','I',' ',' ',' ','I',' ',' '}};
-	char sprite_coccodrillo_dx[COCCODRILLO_H][COCCODRILLO_W] = {{'-','^','^','^','^','^','^','*','<'},{' ',' ','I',' ',' ',' ','I',' ',' '}};
-
-	sprites[S_RANA] = inizializzaSprite(RANA_H, RANA_W,sprite_rana, RANA_COL,RANA_OBJ);
-  	sprites[S_PROIETTILE] = inizializzaSprite(PROIETTILE_H, PROIETTILE_W, sprite_proiettile, PROIETTILE_COL,P_OBJ);
-	sprites[S_TANA_APERTA] = inizializzaSprite(TANA_H, TANA_W, sprite_tana_open, TANE_COL,TANA_OPEN_OBJ);
-	sprites[S_TANA_CHIUSA] = inizializzaSprite(TANA_H, TANA_W, sprite_tana_closed, TANE_COL,TANA_CLOSE_OBJ);
-	sprites[S_PIANTA] = inizializzaSprite(PIANTA_H,PIANTA_W,sprite_pianta,PIANTA_COL,N_OBJ);
-	sprites[S_PROIETTILE_NEMICO] = inizializzaSprite(PROIETTILE_H,PROIETTILE_W,sprite_proiettile_nemico,PROIETTILE_COL,PN_OBJ);
-	sprites[S_COCCODRILLO_SX] = inizializzaSprite(COCCODRILLO_H,COCCODRILLO_W,sprite_coccodrillo_sx,COCCODRILLOBUONO_COL,COCCODRILLO_BUONO_OBJ);
-	sprites[S_COCCODRILLO_DX] = inizializzaSprite(COCCODRILLO_H,COCCODRILLO_W,sprite_coccodrillo_dx,COCCODRILLOBUONO_COL,COCCODRILLO_BUONO_OBJ);
+	/*	RANA	*/
+	*(rana) = standard;
 	
+	for(int i=0; i<MAXNPROIETTILI; i++){	// PROIETTILI
+		proiettili[i] = standard;
+	}
+
+	for(int i=0; i<MAXNCOCCODRILLI; i++){	// COCCODRILLI
+		coccodrilli[i] = standard;
+	}
+
+	for(int i=0; i<MAXNNEMICI; i++){		// PIANTE-NEMICI
+		piante[i] = standard;
+	}
+
+	for(int i=0; i<MAXNPROIETTILINEMICI; i++){	// PROIETTILI NEMICI
+		proiettili_nemici[i] = standard;
+	}
+
+}
+
+
+
+void inizializzaContatori(GameData* gameData){
+	Cont* contatori = &(gameData->contatori);
+	contatori->contProiettili=0;
+	contatori->contProiettiliN=0;
+	contatori->contNemici=0;
+	contatori->contCoccodrilli=0;
 	return;
-}
-
-Sprite inizializzaSprite(int rows, int cols, char sprite[rows][cols], int color, TipoObj tipo_oggetto) {
-    Sprite spriteObj;
-    spriteObj.max_row = rows;
-    spriteObj.max_col = cols;
-	spriteObj.tipo=tipo_oggetto;
-    // Alloca memoria per la matrice di sprite e copia i dati
-    spriteObj.sprite = malloc(rows * sizeof(char *));
-    if (spriteObj.sprite == NULL) {
-        fprintf(stderr, "Errore nell'allocazione della matrice di sprite\n");
-        exit(EXIT_FAILURE);
-    }
-
-    for (int i = 0; i < rows; i++) {
-        spriteObj.sprite[i] = malloc(cols * sizeof(char));
-        if (spriteObj.sprite[i] == NULL) {
-            fprintf(stderr, "Errore nell'allocazione della riga %d della matrice di sprite\n", i);
-            exit(EXIT_FAILURE);
-        }
-        for (int j = 0; j < cols; j++) {
-            spriteObj.sprite[i][j] = sprite[i][j];
-        }
-    }
-    spriteObj.color = color;
-    return spriteObj;
-}
-
-void inizializzaOldPos(OldPos* old_pos){
-	
-	// coccodrilli
-	for(int i=0; i<MAXNCOCCODRILLI;i++){
-		old_pos->coccodrilli[i].x=-1;
-		old_pos->coccodrilli[i].y=-1;
-		old_pos->coccodrilli[i].type='C';
-		old_pos->coccodrilli[i].id=i;
-		old_pos->coccodrilli[i].thread_id=0;
-
-	}
-
-	// nemici
-	for(int i=0; i<MAXNNEMICI;i++){
-		old_pos->nemici[i].x=-1;
-		old_pos->nemici[i].y=-1;
-		old_pos->nemici[i].type=' ';
-		old_pos->nemici[i].id=i;
-		old_pos->nemici[i].thread_id=0;
-
-	}
-
-	// proiettili
-	for(int i=0;i<MAXNPROIETTILI;i++){
-			old_pos->proiettili[i].x=-1;
-			old_pos->proiettili[i].y=-1;
-			old_pos->proiettili[i].type='P';
-			old_pos->proiettili[i].id=i;
-			old_pos->proiettili[i].thread_id=0;
-	}
-
-	// proiettili nemici
-	for(int i=0;i<MAXNPROIETTILINEMICI;i++){
-			old_pos->proiettiliNemici[i].x=-1;
-			old_pos->proiettiliNemici[i].y=-1;
-			old_pos->proiettiliNemici[i].type='p';
-			old_pos->proiettiliNemici[i].id=i;
-			old_pos->proiettiliNemici[i].thread_id=0;
-
-	}
-   	return;
 }
 
 // Imposta la posizione iniziale della Rana nella matrice Schermo
 void inizializzaPosRana(RanaAbsPos* ranaPos){
-	ranaPos->x=40;
+	ranaPos->x=WIDTH/2;
 	ranaPos->y=MARCIAPIEDEROWSTART;
-	return;
-}
-
-void inizializzaContatori(GameData* gameData){
-	gameData->contatori.contCoccodrilli = 0;
-	gameData->contatori.contProiettili=0;
-	gameData->contatori.contProiettiliN=0;
-	gameData->contatori.contNemici=0;
+	//ranaPos->y=ARGINEROWSTART;
+	
+	ranaPos->on_coccodrillo = false;
+	ranaPos->id_coccodrillo = -1;		// inizializzo a valore non valido
+	ranaPos->offset_on_coccodrillo = -1;
 	return;
 }
 
@@ -206,6 +119,65 @@ void inizializzaSchermo(GameData* gameData){
 	
 	copiaMatrice(gameData->schermo.screenMatrix, gameData->schermo.staticScreenMatrix ); //copia la matrice dinamica in quella statica
 	return;
+}
+
+void avviaProcessiBase(int* pipe_fd,Pids* pids){
+	// avvia il processo che gestisce il movimento della rana
+	pids->pidRana = avviaRana(pipe_fd); 
+	return;
+}
+
+pthread_t avviaThreadBase(Pids* pids, Params *param_general){
+	// avvia il processo che gestisce il movimento della rana
+	pids->pidRana = avviaRanaThread(param_general); 
+	return pids->pidRana;
+}
+
+
+void inizializzaOldPos(OldPos* old_pos){
+	for(int i=0; i<MAXNCOCCODRILLI;i++){
+		old_pos->coccodrilli[i].x=-1;
+		old_pos->coccodrilli[i].y=-1;
+		old_pos->coccodrilli[i].type=' ';
+		old_pos->coccodrilli[i].id=i;
+		old_pos->coccodrilli[i].thread_id=0;	// nuovo
+
+	}
+
+	for(int i=0; i<MAXNNEMICI;i++){
+		old_pos->nemici[i].x=-1;
+		old_pos->nemici[i].y=-1;
+		old_pos->nemici[i].type=' ';
+		old_pos->nemici[i].id=i;
+		old_pos->nemici[i].thread_id=0;			// nuovo
+
+	}
+	
+	for(int i=0;i<MAXNPROIETTILI;i++){
+			old_pos->proiettili[i].x=-1;
+			old_pos->proiettili[i].y=-1;
+			old_pos->proiettili[i].type='P';
+			old_pos->proiettili[i].id=i;
+			old_pos->proiettili[i].thread_id=0;		
+	}
+	for(int i=0;i<MAXNPROIETTILINEMICI;i++){
+			old_pos->proiettiliNemici[i].x=-1;
+			old_pos->proiettiliNemici[i].y=-1;
+			old_pos->proiettiliNemici[i].type='p';
+			old_pos->proiettiliNemici[i].id=i;
+			old_pos->proiettiliNemici[i].thread_id=0;		
+
+	}
+   	return;
+}
+
+void inizializzaGameInfo(GameData* gamedata){
+	GameInfo* gameInfo = &(gamedata->gameInfo);
+	gameInfo->tempo.secondi=0;
+	gameInfo->vite=3;
+	gameInfo->punteggio=0;
+	gameInfo->livello= 1;
+	gameInfo->manche=0;
 }
 
 void inizializzaHUD(GameData* gameData){
@@ -239,7 +211,16 @@ void inizializzaHUD(GameData* gameData){
 	printInitTempo(gameData);
 	return;
 }
-
+//------------------------------------------------------------------------------------------------------------------------------
+void inizializzaOggettiTane(Tana* tane){
+		for(int i = 0; i < MAXNTANE; i++){
+		tane[i].info.y = TANAROWSTART;
+		tane[i].info.x = (i * DISTTRATANE) + FIRSTGAMECOL;
+		tane[i].info.id = i;
+		tane[i].status = TANA_OPENED;
+		}
+		return;
+}
 void inizializzaTane(GameData* gameData){
 
 	// disegno degli oggetti tana
@@ -255,7 +236,7 @@ void inizializzaTane(GameData* gameData){
 			for(int col = start_col; col < TANA_W + start_col; col++){
 				// generazione random dello sprite della tana
 				int r=rand()%1000;
-				gameData->schermo.screenMatrix[row][col].ch = (r%3==0) ? '`' : ';';
+				gameData->schermo.screenMatrix[row][col].ch = (r%2==0) ? '`' : ';';
 				gameData->schermo.screenMatrix[row][col].color = TANE_COL;
 				gameData->schermo.screenMatrix[row][col].tipo = TANA_OPEN_OBJ;
 				gameData->schermo.screenMatrix[row][col].id=id;
@@ -285,7 +266,8 @@ void inizializzaTane(GameData* gameData){
 			for(int j=start_col;j<end_col;j++){
 				//disegno solo se non sforo la larghezza dello schermo
 				if(j <= LASTGAMECOL){
-					gameData->schermo.screenMatrix[i][j].ch = ' ';
+					int r=rand()%1000;
+					gameData->schermo.screenMatrix[i][j].ch = (r%5==0) ? '~' : ' ';
 					gameData->schermo.screenMatrix[i][j].color = LAVA_COL;
 					gameData->schermo.screenMatrix[i][j].tipo = LAVA_OBJ;
 					gameData->schermo.screenMatrix[i][j].id=0;
@@ -300,7 +282,11 @@ void inizializzaArgine(ScreenCell (*screenMatrix)[WIDTH]){
 	char carattere=' ';
 	for(int i = ARGINEROWSTART; i <= ARGINEROWEND; i++){
 		for(int j = FIRSTGAMECOL; j <= LASTGAMECOL; j++){
-			screenMatrix[i][j].ch = carattere;
+			
+			int n_rand=rand()%1000;	// genera numero random
+			screenMatrix[i][j].ch = (n_rand%7==0) ? ';': ' ';
+
+			//screenMatrix[i][j].ch = carattere;
 			screenMatrix[i][j].color = ARGINE_COL;
 			screenMatrix[i][j].tipo = ARGINE_OBJ;
 			screenMatrix[i][j].id = 0;
@@ -352,6 +338,68 @@ void copiaMatrice(ScreenCell (*screenMatrix)[WIDTH], ScreenCell (*staticScreenMa
 	}
 	return;
 }
+
+void inizializzaSprites(Sprite* sprites){
+	// definizione sprite utili
+	
+	char *sprite_rana[RANA_H] = {"\\./","/-\\"};
+	char *sprite_proiettile[PROIETTILE_H]={"^","|"};
+	char *sprite_tana_open[TANA_H] = {"         ", "         ", "         ", "         "};
+	char *sprite_tana_closed[TANA_H] = {"H       H","H       H", "H       H", "HHHHHHHHH"};
+    char *sprite_pianta[PIANTA_H] = {"\\./"," | "};
+	char *sprite_proiettile_nemico[PROIETTILE_H]={"|","v"};
+	char *sprite_coccodrillo_sx[COCCODRILLO_H] ={">*^^^^^^-","  I   I  "};
+	char *sprite_coccodrillo_dx[COCCODRILLO_H] ={"-^^^^^^*<","  I   I  "};
+	char *sprite_coccodrillo_sx_c[COCCODRILLO_H] = {">*^^^^^^-","  I   I  "};
+	char *sprite_coccodrillo_dx_c[COCCODRILLO_H] = {"-^^^^^^*<","  I   I  "};
+
+	//char sprite_coccodrillo_sx_c[COCCODRILLO_H][COCCODRILLO_W] = {{'>','*','^','^','^','^','^','^','-'},{' ',' ','I',' ',' ',' ','I',' ',' '}};
+	//char sprite_coccodrillo_dx_c[COCCODRILLO_H][COCCODRILLO_W] = {{'-','^','^','^','^','^','^','*','<'},{' ',' ','I',' ',' ',' ','I',' ',' '}};
+
+	sprites[S_RANA] = inizializzaSprite(RANA_H, RANA_W, sprite_rana, RANA_COL, RANA_OBJ);
+  	sprites[S_PROIETTILE] = inizializzaSprite(PROIETTILE_H, PROIETTILE_W, sprite_proiettile, PROIETTILE_COL, PROIETTILE_OBJ);
+	sprites[S_TANA_APERTA] = inizializzaSprite(TANA_H, TANA_W, sprite_tana_open, TANE_COL, TANA_OPEN_OBJ);
+	sprites[S_TANA_CHIUSA] = inizializzaSprite(TANA_H, TANA_W, sprite_tana_closed, TANE_COL, TANA_CLOSE_OBJ);
+	sprites[S_PIANTA] = inizializzaSprite(PIANTA_H,PIANTA_W,sprite_pianta, PIANTA_COL, NEMICO_OBJ);
+	sprites[S_PROIETTILE_NEMICO] = inizializzaSprite(PROIETTILE_H,PROIETTILE_W,sprite_proiettile_nemico, PROIETTILE_COL, PROIETTILE_NEMICO_OBJ);
+	sprites[S_COCCODRILLO_SX] = inizializzaSprite(COCCODRILLO_H,COCCODRILLO_W,sprite_coccodrillo_sx, COCCODRILLOBUONO_COL, COCCODRILLO_BUONO_OBJ);
+	sprites[S_COCCODRILLO_DX] = inizializzaSprite(COCCODRILLO_H,COCCODRILLO_W,sprite_coccodrillo_dx, COCCODRILLOBUONO_COL, COCCODRILLO_BUONO_OBJ);
+	sprites[S_COCCODRILLO_SX_C] = inizializzaSprite(COCCODRILLO_H,COCCODRILLO_W,sprite_coccodrillo_sx_c,COCCODRILLOCATTIVO_COL,COCCODRILLO_CATTIVO_OBJ);
+	sprites[S_COCCODRILLO_DX_C] = inizializzaSprite(COCCODRILLO_H,COCCODRILLO_W,sprite_coccodrillo_dx_c,COCCODRILLOCATTIVO_COL,COCCODRILLO_CATTIVO_OBJ);
+	sprites[S_COCCODRILLO_SX_L] = inizializzaSprite(COCCODRILLO_H,COCCODRILLO_W,sprite_coccodrillo_sx_c,LAMPEGGIA,COCCODRILLO_BUONO_OBJ);
+	sprites[S_COCCODRILLO_DX_L] = inizializzaSprite(COCCODRILLO_H,COCCODRILLO_W,sprite_coccodrillo_dx_c,LAMPEGGIA,COCCODRILLO_BUONO_OBJ);
+	
+	return;
+}
+/**/
+
+Sprite inizializzaSprite(int rows, int cols, char **sprite, int color, TipoObj tipoObj)  {
+    Sprite spriteObj;
+    spriteObj.max_row = rows;
+    spriteObj.max_col = cols;
+	spriteObj.tipo = tipoObj;
+
+    // Alloca memoria per la matrice di sprite e copia i dati
+    spriteObj.sprite = (char **)malloc(rows * sizeof(char *));
+    if (spriteObj.sprite == NULL) {
+        fprintf(stderr, "Errore nell'allocazione della matrice di sprite\n");
+        exit(EXIT_FAILURE);
+    }
+
+    for (int i = 0; i < rows; i++) {
+        //spriteObj.sprite[i] = (char *)malloc((cols) * sizeof(char));				// correzione sulle cols da allocare
+        spriteObj.sprite[i] = (char *)malloc((cols + 1) * sizeof(char));
+        if (spriteObj.sprite[i] == NULL) {
+            fprintf(stderr, "Errore nell'allocazione della riga %d della matrice di sprite\n", i);
+            exit(EXIT_FAILURE);
+        }
+        strcpy(spriteObj.sprite[i], sprite[i]);
+    }
+    //spriteObj.sprite = sprite;
+    spriteObj.color = color;
+    return spriteObj;
+}
+/**/
 
 void inizializzaBox(GameData* gameData){
 	Schermo* schermo = &(gameData->schermo);

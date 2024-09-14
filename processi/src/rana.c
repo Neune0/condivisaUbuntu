@@ -57,13 +57,13 @@ void moveProcess(int* pipe_fd) {
           case KEY_LEFT:
 		  case 'a':
 		  case 'A':
-            	pipeData.x=-1;
+            	pipeData.x=-2;
             	change=true;  
             break;
           case KEY_RIGHT:
 		  case 'd':
 		  case 'D':
-            	pipeData.x=1;
+            	pipeData.x=2;
             	change=true;
             break;
           case 32: // KEY_SPACE 
@@ -86,6 +86,7 @@ void moveProcess(int* pipe_fd) {
 			pipeData.x=0;
 			pipeData.y=0;
 			pipeData.type='X';
+			usleep(20000);
 		}
          
     }
@@ -103,9 +104,10 @@ void resetRana(GameData* gameData){
 
 void inizializzaPosRana(RanaAbsPos* ranaPos){
 	ranaPos->x=40;
-	ranaPos->y=MARCIAPIEDEROWSTART;
+	//ranaPos->y=MARCIAPIEDEROWSTART;
+	ranaPos->y=ARGINEROWSTART;
 	ranaPos->on_coccodrillo=false;
-	ranaPos->id_coccodrillo=-1;
+	ranaPos->id_coccodrillo=NOID;
 	ranaPos->offset_on_coccodrillo=0;
 	return;
 }

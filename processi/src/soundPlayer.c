@@ -47,7 +47,12 @@ void soundPlayer(int *pipe_fd)
 
 void termina_soundPlayer(GameData *gameData)
 {
-    kill(gameData->pids.soundPlayer, SIGKILL);
-    waitpid(gameData->pids.soundPlayer, NULL, 0);
+    if (gameData->pids.soundPlayer != -1)
+    {
+        kill(gameData->pids.soundPlayer, SIGKILL);
+        waitpid(gameData->pids.soundPlayer, NULL, 0);
+        gameData->pids.soundPlayer=-1;
+    }
+
     return;
 }

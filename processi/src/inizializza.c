@@ -1,7 +1,7 @@
 #include "../hdr/inizializza.h"
 
 void inizializza(GameData* gameData, int* pipe_fd){
-	gameData->pipe= pipe_fd;
+	
 	inizializzaGameInfo(gameData);
 	inizializzaOggettiTane(gameData->tane);
 	inizializzaFlussi(gameData);
@@ -22,17 +22,52 @@ void inizializza(GameData* gameData, int* pipe_fd){
 	return;
 }
 
+// inizializza i pid di tutti i processi
+void inizializzaPid(GameData* gameData){
+	// pid dei nemici
+	for(int i=0;i<MAXNNEMICI;i++){
+		gameData->pids.pidNemici[i]=NOPID;
+	}
+
+	// coccodrilli
+	for(int i=0;i<MAXNCOCCODRILLI;i++){
+		gameData->pids.pidCoccodrilli[i]=NOPID;
+	}
+
+	// proiettili
+	for(int i=0;i<MAXNPROIETTILI;i++){
+		gameData->pids.pidProiettili[i]=NOPID;
+	}
+
+	// proiettili nemici
+	for(int i=0;i<MAXNPROIETTILINEMICI;i++){
+		gameData->pids.pidProiettiliNemici[i]=NOPID;
+	}
+
+	// rana
+	gameData->pids.pidRana=NOPID;
+
+	// tempo
+	gameData->pids.pidTempo = NOPID;
+
+	// musica
+	gameData->pids.pidMusica= NOPID;
+
+	// pid sound player
+	gameData->pids.soundPlayer=NOPID;
+}
+
 void inizializzaFlussi(GameData* gameData){
 	for(int i=0;i<8;i++){
 		gameData->flussi[i].direction = rand()%2==0 ? 1 : -1;
 		gameData->flussi[i].vel = rand()%3;
+		gameData->flussi[i].n_coccodrilli_attivi=0;
 	}
-	
 }
 
 void inizializzaControlloCoccodrilli(GameData* gameData){
 	for(int i=0;i<MAXNCOCCODRILLI;i++){
-		gameData->controlloCoccodrilli[i].id=-1;
+		gameData->controlloCoccodrilli[i].id=NOID;
 		gameData->controlloCoccodrilli[i].direction=0;
 		gameData->controlloCoccodrilli[i].offset_deep=0;
 		gameData->controlloCoccodrilli[i].is_buono=false;
@@ -44,6 +79,7 @@ void inizializzaControlloCoccodrilli(GameData* gameData){
 		gameData->controlloCoccodrilli[i].is_fase_immersione=false;
 		gameData->controlloCoccodrilli[i].passi_in_pre_immersione=0;
 		gameData->controlloCoccodrilli[i].passi_deep=0;
+		gameData->controlloCoccodrilli[i].fila=0;
 	}
 	return;
 }
@@ -65,45 +101,34 @@ void inizializzaSchermo(GameData* gameData){
 	inizializzaFiume(gameData->schermo.screenMatrix); // inizializza la parte dello schermo dedicata al fiume
 	inizializzaArgine(gameData->schermo.screenMatrix); // inizializza la parte dello schermo dedicata al prato
 	inizializzaMarciapiede(gameData->schermo.screenMatrix); // inizializza la parte dello schermo dedicata al marciapiede
-	
 	copiaMatrice(gameData->schermo.screenMatrix, gameData->schermo.staticScreenMatrix ); //copia la matrice dinamica in quella statica
 	return;
 }
 
-void avviaProcessiBase(int* pipe_fd,Pids* pids){
+void avviaProcessiBase(int* pipe_fd,GameData* gameData){
 	// avvia il processo che gestisce il movimento della rana
-	pids->pidRana = avviaRana(pipe_fd);
+	gameData->pids.pidRana = avviaRana(pipe_fd);
 	// avvia il processo che tiene il tempo di gioco
-	pids->pidTempo = avviaTempo(pipe_fd);
+	gameData->pids.pidTempo = avviaTempo(pipe_fd);
+	gameData->pids.soundPlayer = avvia_soundPlayer(gameData->pipe_suoni);
+	gameData->pids.pidMusica = avviaMusica();
 	return;
 }
 
 void inizializzaOldPos(OldPos* old_pos){
 	for(int i=0; i<MAXNCOCCODRILLI;i++){
-		old_pos->coccodrilli[i].x=-1;
-		old_pos->coccodrilli[i].y=-1;
-		old_pos->coccodrilli[i].type='C';
-		old_pos->coccodrilli[i].id=i;
+		setPipeData(&(old_pos->coccodrilli[i]),'C',NOID,NOPOS,NOPOS);
 	}
 
 	for(int i=0; i<MAXNNEMICI;i++){
-		old_pos->nemici[i].x=-1;
-		old_pos->nemici[i].y=-1;
-		old_pos->nemici[i].type=' ';
-		old_pos->nemici[i].id=i;
+		setPipeData(&(old_pos->nemici[i]),' ',NOID,NOPOS,NOPOS);
 	}
 	
 	for(int i=0;i<MAXNPROIETTILI;i++){
-			old_pos->proiettili[i].x=-1;
-			old_pos->proiettili[i].y=-1;
-			old_pos->proiettili[i].type='P';
-			old_pos->proiettili[i].id=i;
+		setPipeData(&(old_pos->proiettili[i]),'P',NOID,NOPOS,NOPOS);
 	}
 	for(int i=0;i<MAXNPROIETTILINEMICI;i++){
-			old_pos->proiettiliNemici[i].x=-1;
-			old_pos->proiettiliNemici[i].y=-1;
-			old_pos->proiettiliNemici[i].type='p';
-			old_pos->proiettiliNemici[i].id=i;
+		setPipeData(&(old_pos->proiettiliNemici[i]),'p',NOID,NOPOS,NOPOS);
 	}
    	return;
 }
@@ -115,6 +140,8 @@ void inizializzaGameInfo(GameData* gamedata){
 	gameInfo->punteggio=0;
 	gameInfo->livello= 1;
 	gameInfo->manche=1;
+	gameInfo->ranaIsDead= false;
+	gameInfo->mancheWin = false;
 }
 
 void inizializzaHUD(GameData* gameData){
@@ -123,10 +150,7 @@ void inizializzaHUD(GameData* gameData){
 	// pulizia parte superiore hud
 	for(int row=HUDSUPROWSTART;row<=HUDSUPROWEND;row++){
 		for(int col=FIRSTGAMECOL;col<=LASTGAMECOL;col++){
-			schermo->screenMatrix[row][col].ch = ' ';
-			schermo->screenMatrix[row][col].color = SFONDO_COL;
-			schermo->screenMatrix[row][col].id = 0;
-			schermo->screenMatrix[row][col].tipo = HUD_OBJ;
+			setScreenCell(&(schermo->screenMatrix[row][col]),HUD_OBJ,' ',0,SFONDO_COL,true);
 		}
 	}
 
@@ -138,10 +162,7 @@ void inizializzaHUD(GameData* gameData){
 	// pulizia sezione bottom
 	for(int row=HUDINFROWSTART;row<=HUDINFROWEND;row++){
 		for(int col=FIRSTGAMECOL;col<=LASTGAMECOL;col++){
-			schermo->screenMatrix[row][col].ch = ' ';
-			schermo->screenMatrix[row][col].color = SFONDO_COL;
-			schermo->screenMatrix[row][col].id = 0;
-			schermo->screenMatrix[row][col].tipo = HUD_OBJ;
+			setScreenCell(&(schermo->screenMatrix[row][col]),HUD_OBJ,' ',0,SFONDO_COL,true);
 		}
 	}
 	printVite(gameData);
@@ -172,11 +193,8 @@ void inizializzaTane(GameData* gameData){
 		for(int row = start_row; row <= TANAROWEND; row++){
 			for(int col = start_col; col < TANA_W + start_col; col++){
 				// generazione random dello sprite della tana
-				int r=rand()%1000;
-				gameData->schermo.screenMatrix[row][col].ch = (r%3==0) ? '`' : ';';
-				gameData->schermo.screenMatrix[row][col].color = TANE_COL;
-				gameData->schermo.screenMatrix[row][col].tipo = TANA_OPEN_OBJ;
-				gameData->schermo.screenMatrix[row][col].id=id;
+				char ch= ((rand()%1000)%3==0) ? '`' : ';';
+				setScreenCell(&(gameData->schermo.screenMatrix[row][col]),TANA_OPEN_OBJ,ch,id,TANE_COL,true);
 			}
 		}
 	}
@@ -184,10 +202,7 @@ void inizializzaTane(GameData* gameData){
 	// disegno della parte superiore
 	for(int i=FULLTANAROWSTART;i<=FULLTANAROWEND;i++){
 		for(int j=FIRSTGAMECOL;j<=LASTGAMECOL;j++){
-			gameData->schermo.screenMatrix[i][j].ch = ' ';
-			gameData->schermo.screenMatrix[i][j].color = TANE_COL;
-			gameData->schermo.screenMatrix[i][j].tipo = SFONDO_OBJ;
-			gameData->schermo.screenMatrix[i][j].id=0;
+			setScreenCell(&(gameData->schermo.screenMatrix[i][j]),SFONDO_OBJ,' ',0,TANE_COL,true);
 		}
 	}
 	
@@ -203,10 +218,7 @@ void inizializzaTane(GameData* gameData){
 			for(int j=start_col;j<end_col;j++){
 				//disegno solo se non sforo la larghezza dello schermo
 				if(j <= LASTGAMECOL){
-					gameData->schermo.screenMatrix[i][j].ch = ' ';
-					gameData->schermo.screenMatrix[i][j].color = LAVA_COL;
-					gameData->schermo.screenMatrix[i][j].tipo = LAVA_OBJ;
-					gameData->schermo.screenMatrix[i][j].id=0;
+					setScreenCell(&(gameData->schermo.screenMatrix[i][j]),LAVA_OBJ,' ',0,LAVA_COL,true);
 				}
 			}
 		}
@@ -215,13 +227,9 @@ void inizializzaTane(GameData* gameData){
 }
 //------------------------------------------------------------------------------------------------------------------------------
 void inizializzaArgine(ScreenCell (*screenMatrix)[WIDTH]){
-	char carattere=' ';
 	for(int i = ARGINEROWSTART; i <= ARGINEROWEND; i++){
 		for(int j = FIRSTGAMECOL; j <= LASTGAMECOL; j++){
-			screenMatrix[i][j].ch = carattere;
-			screenMatrix[i][j].color = ARGINE_COL;
-			screenMatrix[i][j].tipo = ARGINE_OBJ;
-			screenMatrix[i][j].id = 0;
+			setScreenCell(&(screenMatrix[i][j]),ARGINE_OBJ,' ',0,ARGINE_COL,true);
 		}
 	}
 	return;
@@ -230,12 +238,8 @@ void inizializzaArgine(ScreenCell (*screenMatrix)[WIDTH]){
 void inizializzaFiume(ScreenCell (*screenMatrix)[WIDTH]){
 	for(int i = FIUMEROWSTART;i <= FIUMEROWEND; i++){
 		for(int j = FIRSTGAMECOL; j <= LASTGAMECOL; j++){
-			
-			int n_rand=rand()%1000;	// genera numero random
-			screenMatrix[i][j].ch = (n_rand%3==0) ? '~': ' ';
-			screenMatrix[i][j].color = FIUME_COL;
-			screenMatrix[i][j].tipo = FIUME_OBJ;
-			screenMatrix[i][j].id = 0;
+			char ch = ((rand()%1000)%3==0) ? '~': ' ';
+			setScreenCell(&(screenMatrix[i][j]),FIUME_OBJ,ch,0,FIUME_COL,true);
 		}
 	}
 	return;
@@ -244,10 +248,7 @@ void inizializzaFiume(ScreenCell (*screenMatrix)[WIDTH]){
 void inizializzaMarciapiede(ScreenCell (*screenMatrix)[WIDTH]){
 	for(int i = MARCIAPIEDEROWSTART; i <= MARCIAPIEDEROWEND; i++){
 		for(int j = FIRSTGAMECOL; j <= LASTGAMECOL;j++){
-			screenMatrix[i][j].ch = ' ';
-			screenMatrix[i][j].color = MARCIAPIEDE_COL; 
-			screenMatrix[i][j].tipo = MARCIAPIEDE_OBJ;
-			screenMatrix[i][j].id = 0;
+			setScreenCell(&(screenMatrix[i][j]),MARCIAPIEDE_OBJ,' ',0,MARCIAPIEDE_COL,true);
 		}
 	}
 	return;
@@ -323,33 +324,7 @@ Sprite inizializzaSprite(int rows, int cols, char sprite[rows][cols], int color,
     spriteObj.color = color;
     return spriteObj;
 }
-/**
- 
-Sprite inizializzaSprite(int rows, int cols, char **sprite, int color) {
-    Sprite spriteObj;
-    spriteObj.max_row = rows;
-    spriteObj.max_col = cols;
-    // Alloca memoria per la matrice di sprite e copia i dati
-    spriteObj.sprite = (char **)malloc(rows * sizeof(char *));
-    if (spriteObj.sprite == NULL) {
-        fprintf(stderr, "Errore nell'allocazione della matrice di sprite\n");
-        exit(EXIT_FAILURE);
-    }
 
-    for (int i = 0; i < rows; i++) {
-        spriteObj.sprite[i] = (char *)malloc((cols + 1) * sizeof(char));
-        if (spriteObj.sprite[i] == NULL) {
-            fprintf(stderr, "Errore nell'allocazione della riga %d della matrice di sprite\n", i);
-            exit(EXIT_FAILURE);
-        }
-        strcpy(spriteObj.sprite[i], sprite[i]);
-    }
-    //spriteObj.sprite = sprite;
-    spriteObj.color = color;
-    return spriteObj;
-}
-* 
-*/
 
 void inizializzaBox(GameData* gameData){
 	Schermo* schermo = &(gameData->schermo);
@@ -357,28 +332,16 @@ void inizializzaBox(GameData* gameData){
     // stampa il bordo superiore e inferiore
     for(int col = BORDERCOLSX; col <= BORDERCOLDX; col++){
 		// parte superiore
-		schermo->screenMatrix[BORDERROWSUP][col].ch = '=';
-		schermo->screenMatrix[BORDERROWSUP][col].color = BORDER_COL;
-		schermo->screenMatrix[BORDERROWSUP][col].tipo = SFONDO_OBJ;
-		schermo->screenMatrix[BORDERROWSUP][col].id = 0;
+		setScreenCell(&(schermo->screenMatrix[BORDERROWSUP][col]),SFONDO_OBJ,'=',0,BORDER_COL,true);
 		// parte inferiore
-		schermo->screenMatrix[BORDERROWINF][col].ch = '=';
-		schermo->screenMatrix[BORDERROWINF][col].color = BORDER_COL;
-		schermo->screenMatrix[BORDERROWINF][col].tipo = SFONDO_OBJ;
-		schermo->screenMatrix[BORDERROWINF][col].id = 0;
+		setScreenCell(&(schermo->screenMatrix[BORDERROWINF][col]),SFONDO_OBJ,'=',0,BORDER_COL,true);
     }
     // stampa il bordo destro e sinistro
     for(int row = BORDERROWSUP + 1; row<= BORDERROWINF - 1; row++){
 		// parte sinistra
-		schermo->screenMatrix[row][BORDERCOLSX].ch = '|';
-		schermo->screenMatrix[row][BORDERCOLSX].color = BORDER_COL;
-		schermo->screenMatrix[row][BORDERCOLSX].tipo = SFONDO_OBJ;
-		schermo->screenMatrix[row][BORDERCOLSX].id = 0;
+		setScreenCell(&(schermo->screenMatrix[row][BORDERCOLSX]),SFONDO_OBJ,'|',0,BORDER_COL,true);
 		// parte destra
-		schermo->screenMatrix[row][BORDERCOLDX].ch = '|';
-		schermo->screenMatrix[row][BORDERCOLDX].color = BORDER_COL;
-		schermo->screenMatrix[row][BORDERCOLDX].tipo = SFONDO_OBJ;
-		schermo->screenMatrix[row][BORDERCOLDX].id = 0;
+		setScreenCell(&(schermo->screenMatrix[row][BORDERCOLDX]),SFONDO_OBJ,'|',0,BORDER_COL,true);
     }
     return;
 }

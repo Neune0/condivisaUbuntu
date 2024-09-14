@@ -2,29 +2,19 @@
 
 void aggiorna(GameData *gameData)
 {
+	Collisione collisione = detectCollisione(gameData); // individuazione della possibile collisione
 
-	// individuazione della possibile collisione
-	Collisione collisione = detectCollisione(gameData);
-	if (collisione.tipoCollisione != NO_COLLISIONE)
-	{
-		mvprintw(32, 106, "                                            ");
-		mvprintw(33, 106, "                                            ");
-		mvprintw(32, 106, "hit data: tipo: %d oA: %d %d oP: %d %d", collisione.tipoCollisione, collisione.oggetto_attivo, collisione.id_oggetto_attivo, collisione.oggetto_passivo, collisione.id_oggetto_passivo);
-		mvprintw(33, 106, "hit point x: %d y: %d", collisione.hit_point_x, collisione.hit_point_y);
-	}
+	debugPrintCollision(gameData, collisione);
 
 	if (collisione.tipoCollisione == NO_COLLISIONE)
 	{
-		// aggiornamento normale se no collisione
-		normalUpdate(gameData);
+		normalUpdate(gameData); // aggiornamento normale se no collisione
 	}
 	else
 	{
-		mvprintw(31, 106, "                               ");
-		// se collisione aggiornamento particolareggiato
-		handleCollisione(gameData, collisione);
+		mvprintw(31, 106, "                               "); // debug
+		handleCollisione(gameData, collisione);				  // se collisione aggiornamento particolareggiato
 	}
-
 	return;
 }
 //--------------------------------------------AGGIORNAMENTO OGGETTI IN MATRICE--------------------------------
@@ -66,11 +56,7 @@ void stampaSpriteInMatrice(PipeData *datiNuovi, Sprite *sprite, GameData *gameDa
 			// controllo che col non sfori
 			if (col <= LASTGAMECOL && col >= FIRSTGAMECOL)
 			{
-				schermo->screenMatrix[row][col].ch = sprite->sprite[i][j];
-				schermo->screenMatrix[row][col].color = sprite->color;
-				schermo->screenMatrix[row][col].is_changed = true;
-				schermo->screenMatrix[row][col].id = pipeData->id;
-				schermo->screenMatrix[row][col].tipo = sprite->tipo;
+				setScreenCell(&(schermo->screenMatrix[row][col]), sprite->tipo, sprite->sprite[i][j], pipeData->id, sprite->color, true);
 			}
 		}
 	}
@@ -98,11 +84,8 @@ void pulisciSpriteInMatrice(PipeData *datiVecchi, Sprite *sprite, GameData *game
 				// controllo che j non sfori
 				if (j <= LASTGAMECOL && j >= FIRSTGAMECOL)
 				{
-					schermo->screenMatrix[i][j].is_changed = true;
-					schermo->screenMatrix[i][j].ch = schermo->staticScreenMatrix[i][j].ch;
-					schermo->screenMatrix[i][j].color = schermo->staticScreenMatrix[i][j].color;
-					schermo->screenMatrix[i][j].tipo = schermo->staticScreenMatrix[i][j].tipo;
-					schermo->screenMatrix[i][j].id = schermo->staticScreenMatrix[i][j].id;
+					ScreenCell staticCell = schermo->staticScreenMatrix[i][j];
+					setScreenCell(&(schermo->screenMatrix[i][j]), staticCell.tipo, staticCell.ch, staticCell.id, staticCell.color, true);
 				}
 			}
 		}
@@ -112,7 +95,6 @@ void pulisciSpriteInMatrice(PipeData *datiVecchi, Sprite *sprite, GameData *game
 //--------------------------------------------Stampa Puntuale----------------------------------------------------------------------
 void stampaMatrice(ScreenCell (*screenMatrix)[WIDTH])
 {
-	int contatore = 0;
 	for (int i = 0; i < HEIGHT; i++)
 	{
 		for (int j = 0; j < WIDTH; j++)
@@ -124,18 +106,16 @@ void stampaMatrice(ScreenCell (*screenMatrix)[WIDTH])
 				mvaddch(i, j, screenMatrix[i][j].ch);
 				attroff(COLOR_PAIR(screenMatrix[i][j].color));
 				screenMatrix[i][j].is_changed = false; // una volta stampato, il flag viene resettato per la prossima modifica
-				contatore++;
 			}
 		}
 	}
-	// refresh();
-
 	return;
 }
 
 void stampaRefreshMatrice(ScreenCell (*screenMatrix)[WIDTH])
 {
 	clear();
+	usleep(20000);
 	for (int i = 0; i < HEIGHT; i++)
 	{
 		for (int j = 0; j < WIDTH; j++)
@@ -147,7 +127,8 @@ void stampaRefreshMatrice(ScreenCell (*screenMatrix)[WIDTH])
 			screenMatrix[i][j].is_changed = false; // una volta stampato, il flag viene resettato per la prossima modifica
 		}
 	}
-	// refresh();
+	refresh();
+	usleep(2000);
 	return;
 }
 
@@ -160,9 +141,7 @@ void cancellaOggetto(GameData *gameData, PipeData *old_pos, TipoSprite tipoSprit
 	{
 		pulisciSpriteInMatrice(datiVecchi, &(gameData->sprites[tipoSprite]), gameData);
 		stampaMatrice(gameData->schermo.screenMatrix);
-		datiVecchi->type = ' ';
-		datiVecchi->x = 0;
-		datiVecchi->y = 0;
+		setPipeData(datiVecchi, ' ', NOID, NOPOS, NOPOS);
 	}
 	return;
 }
@@ -172,11 +151,12 @@ void stampaTanaChiusa(Tana tana, GameData *gameData)
 	int y = tana.info.y;
 	int x = tana.info.x;
 	// sprite da disegnare
+	Sprite sprite = gameData->sprites[S_TANA_CHIUSA];
 
 	int startRow = y;
 	int startCol = x;
-	int maxRows = gameData->sprites[S_TANA_CHIUSA].max_row;
-	int maxCols = gameData->sprites[S_TANA_CHIUSA].max_col;
+	int maxRows = sprite.max_row;
+	int maxCols = sprite.max_col;
 	int row = 0, col = 0;
 
 	for (int i = 0; i < maxRows; i++)
@@ -185,18 +165,8 @@ void stampaTanaChiusa(Tana tana, GameData *gameData)
 		{
 			row = startRow + i;
 			col = startCol + j;
-
-			gameData->schermo.screenMatrix[row][col].tipo = TANA_CLOSE_OBJ;
-			gameData->schermo.screenMatrix[row][col].ch = gameData->sprites[S_TANA_CHIUSA].sprite[i][j];
-			gameData->schermo.screenMatrix[row][col].color = gameData->sprites[S_TANA_CHIUSA].color;
-			gameData->schermo.screenMatrix[row][col].is_changed = true;
-			gameData->schermo.screenMatrix[row][col].id = tana.info.id;
-
-			gameData->schermo.staticScreenMatrix[row][col].tipo = TANA_CLOSE_OBJ;
-			gameData->schermo.staticScreenMatrix[row][col].ch = gameData->sprites[S_TANA_CHIUSA].sprite[i][j];
-			gameData->schermo.staticScreenMatrix[row][col].color = gameData->sprites[S_TANA_CHIUSA].color;
-
-			gameData->schermo.staticScreenMatrix[row][col].id = tana.info.id;
+			setScreenCell(&(gameData->schermo.screenMatrix[row][col]), TANA_CLOSE_OBJ, sprite.sprite[i][j], tana.info.id, sprite.color, true);
+			setScreenCell(&(gameData->schermo.staticScreenMatrix[row][col]), TANA_CLOSE_OBJ, sprite.sprite[i][j], tana.info.id, sprite.color, false);
 		}
 	}
 	gameData->gameInfo.manche++;
@@ -214,12 +184,11 @@ void normalUpdate(GameData *gameData)
 		// se lo spostamento è lecito
 		if (isFrogMoveLecit(newPosAbsRanaX, newPosAbsRanaY, gameData->ranaAbsPos, gameData->pipeData))
 		{
-			if (gameData->ranaAbsPos.id_coccodrillo != -1 && gameData->pipeData.x!=0)
+			if (gameData->ranaAbsPos.id_coccodrillo != NOID && gameData->pipeData.x != 0)
 			{
 				// sono su un coccodrillo e mi sto muovendo lungo la x
-				beep();
 				// mofico solo l'offest?
-				gameData->ranaAbsPos.offset_on_coccodrillo+=gameData->pipeData.x;
+				gameData->ranaAbsPos.offset_on_coccodrillo += gameData->pipeData.x;
 				// forse meglio ristampare il coccodrillo con sopra la rana?
 			}
 			else
@@ -233,7 +202,6 @@ void normalUpdate(GameData *gameData)
 				gameData->ranaAbsPos.y = gameData->pipeData.y;
 			}
 		}
-
 		break;
 	}
 	case 'S': // sparo proiettile da rana
@@ -243,11 +211,11 @@ void normalUpdate(GameData *gameData)
 		{
 			// incremento contatore e faccio partire il processo proiettile, salvo il pid del processo
 			int id = id_disponibile(gameData->pids.pidProiettili, MAXNPROIETTILI);
-			if (id != -1)
+			if (id != NOID)
 			{
 				gameData->pids.pidProiettili[id] = avviaProiettile(gameData->pipe, &(gameData->ranaAbsPos), id);
-
 				gameData->contatori.contProiettili++;
+				gameData->oldPos.proiettili[id].id = id;
 			}
 		}
 		break;
@@ -259,11 +227,11 @@ void normalUpdate(GameData *gameData)
 		{
 			// incremento contatore e faccio partire il processo proiettile, salvo il pid del processo
 			int id = id_disponibile(gameData->pids.pidProiettiliNemici, MAXNPROIETTILINEMICI);
-			if (id != -1)
+			if (id != NOID)
 			{
 				gameData->pids.pidProiettiliNemici[id] = avviaProiettileNemico(gameData->pipe, &(gameData->pipeData), id);
-
 				gameData->contatori.contProiettiliN++;
+				gameData->oldPos.proiettiliNemici[id].id = id;
 			}
 		}
 
@@ -305,6 +273,7 @@ void normalUpdate(GameData *gameData)
 		// prima print del nemico
 		printPianta(gameData, gameData->oldPos.nemici, S_PIANTA);
 		gameData->contatori.contNemici++;
+		gameData->oldPos.nemici[gameData->pipeData.id].id = gameData->pipeData.id;
 		break;
 	}
 	case 'C': // movimento coccodrillo verso destra
@@ -318,6 +287,8 @@ void normalUpdate(GameData *gameData)
 			gameData->controlloCoccodrilli[gameData->pipeData.id].passi = 0;
 			gameData->controlloCoccodrilli[gameData->pipeData.id].passi_in_immersione = 0;
 			gameData->contatori.contCoccodrilli--;
+			int fila = gameData->controlloCoccodrilli[gameData->pipeData.id].fila;
+			gameData->flussi[fila - 1].n_coccodrilli_attivi--;
 		}
 		else
 		{
@@ -336,6 +307,8 @@ void normalUpdate(GameData *gameData)
 			gameData->controlloCoccodrilli[gameData->pipeData.id].passi = 0;
 			gameData->controlloCoccodrilli[gameData->pipeData.id].passi_in_immersione = 0;
 			gameData->contatori.contCoccodrilli--;
+			int fila = gameData->controlloCoccodrilli[gameData->pipeData.id].fila;
+			gameData->flussi[fila - 1].n_coccodrilli_attivi--;
 		}
 		else
 		{
@@ -369,33 +342,85 @@ void printPianta(GameData *gameData, PipeData *old_pos, TipoSprite tipoSprite)
 		stampaSpriteInMatrice(datiNuovi, &(gameData->sprites[tipoSprite]), gameData);
 		stampaMatrice(gameData->schermo.screenMatrix);
 		aggiornaOldPos(datiVecchi, datiNuovi);
+		gameData->oldPos.nemici[gameData->pipeData.id].id = gameData->pipeData.id;
 	}
 }
 
 void handleCoccodrilloMovement(GameData *gameData)
 {
 	CocodrileControl *controlloCoccodrillo = &(gameData->controlloCoccodrilli[gameData->pipeData.id]);
-	// capire in che fase si trova il coccodrillo
+	
 	if (controlloCoccodrillo->is_fase_immersione)
 	{
-		// questione fase immersione
-		// 3 casi:
-		// 1. il coccodrillo si sta immergendo
-		// 2. il coccodrillo è interamente sotto l'acqua
-		// 3. il coccodrillo sta riemergendo
 		if (controlloCoccodrillo->is_going_deep)
 		{
 			if (controlloCoccodrillo->direction == 1)
 			{
 				// il coccodrillo va verso destra
-				// cancellare lo posso lasciare come prima
-				// invece disegnare lo devo modificare
 				aggiornaOggettoCoccodrillo(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_DX_C, controlloCoccodrillo);
+				
+				if (gameData->ranaAbsPos.id_coccodrillo == gameData->pipeData.id)
+				{
+					// se sommando i due ottengo 7 devo uccidere la rana
+					if (gameData->ranaAbsPos.offset_on_coccodrillo + gameData->controlloCoccodrilli[gameData->ranaAbsPos.id_coccodrillo].offset_deep >= 7)
+					{
+						// imposto rana is dead a true
+        				gameData->gameInfo.ranaIsDead= true;
+					}
+					else
+					{
+						// ci stampo sopra la rana
+						PipeData rana;
+						rana.x = gameData->oldPos.coccodrilli[gameData->pipeData.id].x + gameData->ranaAbsPos.offset_on_coccodrillo;
+						rana.y = gameData->oldPos.coccodrilli[gameData->pipeData.id].y;
+						rana.id = 0;
+						rana.type = 'X';
+						// aggiorno rana abs pos
+						gameData->ranaAbsPos.x = rana.x;
+						gameData->ranaAbsPos.y = rana.y;
+						stampaSpriteInMatrice(&(rana), &(gameData->sprites[S_RANA]), gameData);
+
+						// se la rana esce fuori dallo schermo allora muore
+						if (gameData->ranaAbsPos.x >= LASTGAMECOL - 1 || gameData->ranaAbsPos.x < FIRSTGAMECOL)
+						{
+							// imposto rana is dead a true
+        					gameData->gameInfo.ranaIsDead= true;
+						}
+					}
+				}
 			}
 			else
 			{
 				// il coccodrillo va verso sinistra
 				aggiornaOggettoCoccodrillo(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_SX_C, controlloCoccodrillo);
+				if (gameData->ranaAbsPos.id_coccodrillo == gameData->pipeData.id)
+				{
+					if (gameData->controlloCoccodrilli[gameData->pipeData.id].offset_deep - gameData->ranaAbsPos.offset_on_coccodrillo >= 1)
+					{
+						// imposto rana is dead a true
+        				gameData->gameInfo.ranaIsDead= true;
+					}
+					else
+					{
+						// ci stampo sopra la rana
+						PipeData rana;
+						rana.x = gameData->oldPos.coccodrilli[gameData->pipeData.id].x + gameData->ranaAbsPos.offset_on_coccodrillo;
+						rana.y = gameData->oldPos.coccodrilli[gameData->pipeData.id].y;
+						rana.id = 0;
+						rana.type = 'X';
+						// aggiorno rana abs pos
+						gameData->ranaAbsPos.x = rana.x;
+						gameData->ranaAbsPos.y = rana.y;
+						stampaSpriteInMatrice(&(rana), &(gameData->sprites[S_RANA]), gameData);
+
+						// se la rana esce fuori dallo schermo allora muore
+						if (gameData->ranaAbsPos.x >= LASTGAMECOL - 1 || gameData->ranaAbsPos.x < FIRSTGAMECOL)
+						{
+							// imposto rana is dead a true
+        					gameData->gameInfo.ranaIsDead= true;
+						}
+					}
+				}
 			}
 			// incremento offset per disegno
 			controlloCoccodrillo->offset_deep++;
@@ -417,11 +442,51 @@ void handleCoccodrilloMovement(GameData *gameData)
 					// cancellare lo posso lasciare come prima
 					// invece disegnare lo devo modificare
 					aggiornaOggettoCoccodrillo(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_DX_C, controlloCoccodrillo);
+					if (gameData->ranaAbsPos.id_coccodrillo == gameData->pipeData.id)
+					{
+						// ci stampo sopra la rana
+						PipeData rana;
+						rana.x = gameData->oldPos.coccodrilli[gameData->pipeData.id].x + gameData->ranaAbsPos.offset_on_coccodrillo;
+						rana.y = gameData->oldPos.coccodrilli[gameData->pipeData.id].y;
+						rana.id = 0;
+						rana.type = 'X';
+						// aggiorno rana abs pos
+						gameData->ranaAbsPos.x = rana.x;
+						gameData->ranaAbsPos.y = rana.y;
+						stampaSpriteInMatrice(&(rana), &(gameData->sprites[S_RANA]), gameData);
+
+						// se la rana esce fuori dallo schermo allora muore
+						if (gameData->ranaAbsPos.x >= LASTGAMECOL - 1 || gameData->ranaAbsPos.x < FIRSTGAMECOL)
+						{
+							// uccido la rana
+        					gameData->gameInfo.ranaIsDead= true;
+						}
+					}
 				}
 				else
 				{
 					// il coccodrillo va verso sinistra
 					aggiornaOggettoCoccodrillo(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_SX_C, controlloCoccodrillo);
+					if (gameData->ranaAbsPos.id_coccodrillo == gameData->pipeData.id)
+					{
+						// ci stampo sopra la rana
+						PipeData rana;
+						rana.x = gameData->oldPos.coccodrilli[gameData->pipeData.id].x + gameData->ranaAbsPos.offset_on_coccodrillo;
+						rana.y = gameData->oldPos.coccodrilli[gameData->pipeData.id].y;
+						rana.id = 0;
+						rana.type = 'X';
+						// aggiorno rana abs pos
+						gameData->ranaAbsPos.x = rana.x;
+						gameData->ranaAbsPos.y = rana.y;
+						stampaSpriteInMatrice(&(rana), &(gameData->sprites[S_RANA]), gameData);
+
+						// se la rana esce fuori dallo schermo allora muore
+						if (gameData->ranaAbsPos.x >= LASTGAMECOL - 1 || gameData->ranaAbsPos.x < FIRSTGAMECOL)
+						{
+							// imposto rana is dead a true
+        					gameData->gameInfo.ranaIsDead= true;
+						}
+					}
 				}
 				// sta riemergendo
 				controlloCoccodrillo->offset_deep--;
@@ -455,7 +520,6 @@ void handleCoccodrilloMovement(GameData *gameData)
 		if (controlloCoccodrillo->is_fase_pre_immersione)
 		{
 			// questione lampeggio e passaggio a fase immersione
-			// come posso fare test?
 			// dopo fase pre immersione lo faccio andare di nuovo in fase normale
 			if (controlloCoccodrillo->passi % 2 == 0)
 			{
@@ -472,10 +536,51 @@ void handleCoccodrilloMovement(GameData *gameData)
 				if (gameData->pipeData.type == 'C')
 				{
 					aggiornaOggetto(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_DX_L);
+
+					if (gameData->ranaAbsPos.id_coccodrillo == gameData->pipeData.id)
+					{
+						// ci stampo sopra la rana
+						PipeData rana;
+						rana.x = gameData->oldPos.coccodrilli[gameData->pipeData.id].x + gameData->ranaAbsPos.offset_on_coccodrillo;
+						rana.y = gameData->oldPos.coccodrilli[gameData->pipeData.id].y;
+						rana.id = 0;
+						rana.type = 'X';
+						// aggiorno rana abs pos
+						gameData->ranaAbsPos.x = rana.x;
+						gameData->ranaAbsPos.y = rana.y;
+						stampaSpriteInMatrice(&(rana), &(gameData->sprites[S_RANA]), gameData);
+
+						// se la rana esce fuori dallo schermo allora muore
+						if (gameData->ranaAbsPos.x >= LASTGAMECOL - 1 || gameData->ranaAbsPos.x < FIRSTGAMECOL)
+						{
+							// imposto rana is dead a true
+        					gameData->gameInfo.ranaIsDead= true;
+						}
+					}
 				}
 				if (gameData->pipeData.type == 'c')
 				{
 					aggiornaOggetto(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_SX_L);
+					if (gameData->ranaAbsPos.id_coccodrillo == gameData->pipeData.id)
+					{
+						// ci stampo sopra la rana
+						PipeData rana;
+						rana.x = gameData->oldPos.coccodrilli[gameData->pipeData.id].x + gameData->ranaAbsPos.offset_on_coccodrillo;
+						rana.y = gameData->oldPos.coccodrilli[gameData->pipeData.id].y;
+						rana.id = 0;
+						rana.type = 'X';
+						// aggiorno rana abs pos
+						gameData->ranaAbsPos.x = rana.x;
+						gameData->ranaAbsPos.y = rana.y;
+						stampaSpriteInMatrice(&(rana), &(gameData->sprites[S_RANA]), gameData);
+
+						// se la rana esce fuori dallo schermo allora muore
+						if (gameData->ranaAbsPos.x >= LASTGAMECOL - 1 || gameData->ranaAbsPos.x < FIRSTGAMECOL)
+						{
+							// imposto rana is dead a true
+        					gameData->gameInfo.ranaIsDead= true;
+						}
+					}
 				}
 			}
 			else
@@ -484,10 +589,50 @@ void handleCoccodrilloMovement(GameData *gameData)
 				if (gameData->pipeData.type == 'C')
 				{
 					aggiornaOggetto(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_DX_C);
+					if (gameData->ranaAbsPos.id_coccodrillo == gameData->pipeData.id)
+					{
+						// ci stampo sopra la rana
+						PipeData rana;
+						rana.x = gameData->oldPos.coccodrilli[gameData->pipeData.id].x + gameData->ranaAbsPos.offset_on_coccodrillo;
+						rana.y = gameData->oldPos.coccodrilli[gameData->pipeData.id].y;
+						rana.id = 0;
+						rana.type = 'X';
+						// aggiorno rana abs pos
+						gameData->ranaAbsPos.x = rana.x;
+						gameData->ranaAbsPos.y = rana.y;
+						stampaSpriteInMatrice(&(rana), &(gameData->sprites[S_RANA]), gameData);
+
+						// se la rana esce fuori dallo schermo allora muore
+						if (gameData->ranaAbsPos.x >= LASTGAMECOL - 1 || gameData->ranaAbsPos.x < FIRSTGAMECOL)
+						{
+							// imposto rana is dead a true
+        					gameData->gameInfo.ranaIsDead= true;
+						}
+					}
 				}
 				if (gameData->pipeData.type == 'c')
 				{
 					aggiornaOggetto(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_SX_C);
+					if (gameData->ranaAbsPos.id_coccodrillo == gameData->pipeData.id)
+					{
+						// ci stampo sopra la rana
+						PipeData rana;
+						rana.x = gameData->oldPos.coccodrilli[gameData->pipeData.id].x + gameData->ranaAbsPos.offset_on_coccodrillo;
+						rana.y = gameData->oldPos.coccodrilli[gameData->pipeData.id].y;
+						rana.id = 0;
+						rana.type = 'X';
+						// aggiorno rana abs pos
+						gameData->ranaAbsPos.x = rana.x;
+						gameData->ranaAbsPos.y = rana.y;
+						stampaSpriteInMatrice(&(rana), &(gameData->sprites[S_RANA]), gameData);
+
+						// se la rana esce fuori dallo schermo allora muore
+						if (gameData->ranaAbsPos.x >= LASTGAMECOL - 1 || gameData->ranaAbsPos.x < FIRSTGAMECOL)
+						{
+							// imposto rana is dead a true
+        					gameData->gameInfo.ranaIsDead= true;
+						}
+					}
 				}
 			}
 			gameData->controlloCoccodrilli[gameData->pipeData.id].passi++;
@@ -526,20 +671,34 @@ void handleCoccodrilloMovement(GameData *gameData)
 						// se la rana esce fuori dallo schermo allora muore
 						if (gameData->ranaAbsPos.x >= LASTGAMECOL - 1 || gameData->ranaAbsPos.x < FIRSTGAMECOL)
 						{
-							// uccido la rana
-							// tolgo una vita alla rana
-							gameData->gameInfo.vite--;
-							// faccio ripartire la rana
-							resetRana(gameData);
-							gameData->ranaAbsPos.on_coccodrillo = false;
-							gameData->ranaAbsPos.id_coccodrillo = -1;
-							aggiornaOggetto(gameData, &(gameData->oldPos.rana), S_RANA);
+							// imposto rana is dead a true
+        					gameData->gameInfo.ranaIsDead= true;
 						}
 					}
 				}
 				else
 				{
 					aggiornaOggetto(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_DX_C);
+					if (gameData->ranaAbsPos.id_coccodrillo == gameData->pipeData.id)
+					{
+						// ci stampo sopra la rana
+						PipeData rana;
+						rana.x = gameData->oldPos.coccodrilli[gameData->pipeData.id].x + gameData->ranaAbsPos.offset_on_coccodrillo;
+						rana.y = gameData->oldPos.coccodrilli[gameData->pipeData.id].y;
+						rana.id = 0;
+						rana.type = 'X';
+						// aggiorno rana abs pos
+						gameData->ranaAbsPos.x = rana.x;
+						gameData->ranaAbsPos.y = rana.y;
+						stampaSpriteInMatrice(&(rana), &(gameData->sprites[S_RANA]), gameData);
+
+						// se la rana esce fuori dallo schermo allora muore
+						if (gameData->ranaAbsPos.x >= LASTGAMECOL - 1 || gameData->ranaAbsPos.x < FIRSTGAMECOL)
+						{
+							// imposto rana is dead a true
+        					gameData->gameInfo.ranaIsDead= true;
+						}
+					}
 				}
 			}
 
@@ -565,20 +724,34 @@ void handleCoccodrilloMovement(GameData *gameData)
 						// se la rana esce fuori dallo schermo allora muore
 						if (gameData->ranaAbsPos.x >= LASTGAMECOL - 1 || gameData->ranaAbsPos.x < FIRSTGAMECOL)
 						{
-							// uccido la rana
-							// tolgo una vita alla rana
-							gameData->gameInfo.vite--;
-							// faccio ripartire la rana
-							resetRana(gameData);
-							gameData->ranaAbsPos.on_coccodrillo = false;
-							gameData->ranaAbsPos.id_coccodrillo = -1;
-							aggiornaOggetto(gameData, &(gameData->oldPos.rana), S_RANA);
+							// imposto rana is dead a true
+        					gameData->gameInfo.ranaIsDead= true;
 						}
 					}
 				}
 				else
 				{
 					aggiornaOggetto(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_SX_C);
+					if (gameData->ranaAbsPos.id_coccodrillo == gameData->pipeData.id)
+					{
+						// ci stampo sopra la rana
+						PipeData rana;
+						rana.x = gameData->oldPos.coccodrilli[gameData->pipeData.id].x + gameData->ranaAbsPos.offset_on_coccodrillo;
+						rana.y = gameData->oldPos.coccodrilli[gameData->pipeData.id].y;
+						rana.id = 0;
+						rana.type = 'X';
+						// aggiorno rana abs pos
+						gameData->ranaAbsPos.x = rana.x;
+						gameData->ranaAbsPos.y = rana.y;
+						stampaSpriteInMatrice(&(rana), &(gameData->sprites[S_RANA]), gameData);
+
+						// se la rana esce fuori dallo schermo allora muore
+						if (gameData->ranaAbsPos.x >= LASTGAMECOL - 1 || gameData->ranaAbsPos.x < FIRSTGAMECOL)
+						{
+							// imposto rana is dead a true
+        					gameData->gameInfo.ranaIsDead= true;
+						}
+					}
 				}
 			}
 			if (!(controlloCoccodrillo->is_buono))
@@ -604,7 +777,6 @@ void aggiornaOggettoCoccodrillo(GameData *gameData, PipeData *old_pos, TipoSprit
 	// se le coordinate sono cambiate, pulisci l'area vecchia e stampa il nuovo sprite
 	if (datiNuovi->x != datiVecchi->x || datiNuovi->y != datiVecchi->y)
 	{
-
 		pulisciSpriteInMatrice(datiVecchi, &(gameData->sprites[tipoSprite]), gameData);
 		stampaMatrice(gameData->schermo.screenMatrix);
 		stampaCoccodrilloInMatrice(datiNuovi, &(gameData->sprites[tipoSprite]), gameData, controlloCoccodrillo);
@@ -642,11 +814,7 @@ void stampaCoccodrilloInMatrice(PipeData *datiNuovi, Sprite *sprite, GameData *g
 					// controllo che col non sfori
 					if (col <= LASTGAMECOL && col >= FIRSTGAMECOL)
 					{
-						schermo->screenMatrix[row][col].ch = sprite->sprite[i][j];
-						schermo->screenMatrix[row][col].color = sprite->color;
-						schermo->screenMatrix[row][col].is_changed = true;
-						schermo->screenMatrix[row][col].id = pipeData->id;
-						schermo->screenMatrix[row][col].tipo = sprite->tipo;
+						setScreenCell(&(schermo->screenMatrix[row][col]), sprite->tipo, sprite->sprite[i][j], pipeData->id, sprite->color, true);
 					}
 				}
 			}
@@ -660,11 +828,7 @@ void stampaCoccodrilloInMatrice(PipeData *datiNuovi, Sprite *sprite, GameData *g
 					// controllo che col non sfori
 					if (col <= LASTGAMECOL && col >= FIRSTGAMECOL)
 					{
-						schermo->screenMatrix[row][col].ch = sprite->sprite[i][j];
-						schermo->screenMatrix[row][col].color = sprite->color;
-						schermo->screenMatrix[row][col].is_changed = true;
-						schermo->screenMatrix[row][col].id = pipeData->id;
-						schermo->screenMatrix[row][col].tipo = sprite->tipo;
+						setScreenCell(&(schermo->screenMatrix[row][col]), sprite->tipo, sprite->sprite[i][j], pipeData->id, sprite->color, true);
 					}
 				}
 			}
@@ -684,11 +848,7 @@ void stampaCoccodrilloInMatrice(PipeData *datiNuovi, Sprite *sprite, GameData *g
 					// controllo che col non sfori
 					if (col <= LASTGAMECOL && col >= FIRSTGAMECOL)
 					{
-						schermo->screenMatrix[row][col].ch = sprite->sprite[i][j];
-						schermo->screenMatrix[row][col].color = sprite->color;
-						schermo->screenMatrix[row][col].is_changed = true;
-						schermo->screenMatrix[row][col].id = pipeData->id;
-						schermo->screenMatrix[row][col].tipo = sprite->tipo;
+						setScreenCell(&(schermo->screenMatrix[row][col]), sprite->tipo, sprite->sprite[i][j], pipeData->id, sprite->color, true);
 					}
 				}
 			}
@@ -702,11 +862,7 @@ void stampaCoccodrilloInMatrice(PipeData *datiNuovi, Sprite *sprite, GameData *g
 					// controllo che col non sfori
 					if (col <= LASTGAMECOL && col >= FIRSTGAMECOL)
 					{
-						schermo->screenMatrix[row][col].ch = sprite->sprite[i][j];
-						schermo->screenMatrix[row][col].color = sprite->color;
-						schermo->screenMatrix[row][col].is_changed = true;
-						schermo->screenMatrix[row][col].id = pipeData->id;
-						schermo->screenMatrix[row][col].tipo = sprite->tipo;
+						setScreenCell(&(schermo->screenMatrix[row][col]), sprite->tipo, sprite->sprite[i][j], pipeData->id, sprite->color, true);
 					}
 				}
 			}
@@ -724,8 +880,6 @@ void stampaCoccodrilloInMatrice(PipeData *datiNuovi, Sprite *sprite, GameData *g
 */
 void cancellaOggettoDaMatrice(GameData *gameData, PipeData oggetto, PipeData *old_pos, TipoSprite tipoSprite)
 {
-	// int id = gameData->pipeData.id;
-
 	int id = oggetto.id;
 
 	PipeData *datiVecchi = &(old_pos[id]); // dati al passo precedente
@@ -733,11 +887,8 @@ void cancellaOggettoDaMatrice(GameData *gameData, PipeData oggetto, PipeData *ol
 	if (id >= 0) // se l'id è un indice di array valido
 	{
 		pulisciSpriteInMatrice(datiVecchi, &(gameData->sprites[tipoSprite]), gameData);
-
 		stampaMatrice(gameData->schermo.screenMatrix);
-		datiVecchi->type = ' ';
-		datiVecchi->x = 0;
-		datiVecchi->y = 0;
+		setPipeData(datiVecchi, ' ', NOID, NOPOS, NOPOS);
 	}
 	return;
 }

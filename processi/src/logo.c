@@ -1,7 +1,7 @@
 #include "../hdr/logo.h"
 void logo(){
 	
-	nodelay(stdscr, FALSE); // riabilita l'input non bloccante
+	nodelay(stdscr, FALSE); // riabilita l'input bloccante
 	
 	clear(); // pulisce lo schermo
 	

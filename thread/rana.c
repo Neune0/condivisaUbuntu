@@ -1,64 +1,175 @@
 #include "rana.h"
 
-pthread_t avviaRanaThread(ParamsOggetti *thread_args){
+// funzione che si occupa di avviare il processo rana e restituirne il pid
+pid_t avviaRana(int* pipe_fd){
+	pid_t move_pid = fork(); // pid che contiente il pid della rana
+    
+  if (move_pid < 0) {
+  	perror("Fork failed");
+    exit(1);
+  } else if (move_pid == 0) {
+  		// Processo "muovi"
+      close(pipe_fd[0]); // Chiudi l'estremità di lettura della pipe
+      moveProcess(pipe_fd);
+      exit(0);
+  }
+	return move_pid;
+}
+
+// il main del processo rana
+void moveProcess(int* pipe_fd) {
+	
+	// inizializzazione pipeData per comunicazione
+	PipeData pipeData;
+	// coordinate relative iniziali nulle
+	pipeData.x=0;
+	pipeData.y=0;
+	pipeData.type='X';
+	pipeData.id=0;
+	
+		
+	// Invia le coordinate iniziali attraverso la pipe
+    write(pipe_fd[1], &pipeData, sizeof(PipeData));
+    
+	noecho();
+	int ch='D';
+    bool change=false; // flag tasto premuto/non premuto
+	// loop principale del processo rana
+	while (1) {
+    	change=false; // reset flag tasto premuto
+    	pipeData.type='X'; // resetta il normale carattere della rana
+       	
+        ch = getch(); // Leggi il carattere dall'input
+        
+        // Muovi il personaggio in base all'input dell'utente
+        switch (ch) {
+        	case KEY_UP:
+				pipeData.y=-2;
+            	change=true;
+            break;
+          case KEY_DOWN:
+            	pipeData.y=+2;
+            	change=true;
+            break;
+          case KEY_LEFT:
+            	pipeData.x=-1;
+            	change=true;  
+            break;
+          case KEY_RIGHT:
+            	pipeData.x=1;
+            	change=true;
+            break;
+          case 32: // KEY_SPACE 
+          	pipeData.type='S'; //cambia carattere per dire a processoDisegna che  rana sta sparando
+          	change=true;
+            break;
+          case 'p': // tasto p  PAUSA
+          case 'P':
+          	pipeData.type = 'Z';
+          	change=true; 
+            break;
+          default:
+          	break;
+        }
+		
+		if(change){
+			// Invia le coordinate attraverso la pipe
+        	write(pipe_fd[1], &pipeData, sizeof(PipeData));
+			// reset coordinate e tipo
+			pipeData.x=0;
+			pipeData.y=0;
+			pipeData.type='X';
+		}
+        
+        // Aspetta un po' prima di generare nuove coordinate forse andrebbe diminuito
+        usleep(1000);
+         
+    }
+    return;
+}
+
+// per riavviare il processo rana
+void resetRana(GameData* gameData){
+	kill(gameData->pids.pidRana, SIGKILL);
+	waitpid(gameData->pids.pidRana, NULL,0);
+	gameData->pids.pidRana = avviaRana(gameData->pipe);
+	inizializzaPosRana(&(gameData->ranaAbsPos));
+	return;
+}
+
+//-------	VERSIONE THREADS ----------------
+
+pthread_t avviaRanaThread(Params *thread_args){
+	
 	pthread_t tid_rana;
 	
 	if( pthread_create(&tid_rana, NULL, &moveRanaThread, thread_args) != 0){
 		perror("ERR: Avvio Rana Fallito!");
 		_exit(2); 
 	}
-	else{
-		return tid_rana;
-	}
 	return tid_rana;
 }
 
 void *moveRanaThread(void *param){
-	ParamsOggetti *p = (ParamsOggetti*) param;
+	Params *p=(Params*)param;
+	ThreadControlBlock new_tcb = {pthread_self(),false,false};
 	
-	// ThreadControlBlock interno del thread Rana preso direttamente da gamedata e collegato ad esso
-	ThreadControlBlock *my_tcb = p->thread_tcb;
-	my_tcb->thread_id = pthread_self(); // ci salvo il suo thread_id
+	// Copia i valori iniziali nel TCB della RANA
+	copiaTCB(p->gameData->allTCB->tcb_rana, new_tcb, &p->semafori->tcb_mutex);
+	
+	ThreadControlBlock *my_tcb = p->gameData->allTCB->tcb_rana; // ThreadControlBlock Rana 
 	
 	// inizializzazione pipeData per comunicazione
 	PipeData new_pos;
 	// coordinate relative iniziali nulle
-	new_pos.x=p->init->x;
-	new_pos.y=p->init->y;
-	new_pos.type=p->init->type;
-	new_pos.id=p->init->id;
-	new_pos.thread_id = pthread_self();
+	new_pos.x=0;
+	new_pos.y=0;
+	new_pos.type='X';
+	new_pos.id=0;
+	new_pos.thread_id = pthread_self(); 
+	
 	
 	noecho();
+	cbreak();
+	nodelay(stdscr,TRUE);
+    wtimeout(stdscr,0);
+
 	int ch='D';
     bool change=false; // flag tasto premuto/non premuto
-
 	// loop principale del processo rana
 	while (1) {
     	change=false; // reset flag tasto premuto
     	new_pos.type='X'; // resetta il normale carattere della rana
        	
-		if(my_tcb->is_target){
+		if(isThreadTarget(my_tcb,&p->semafori->tcb_mutex)){
 			break;
 		}
-        
+        sem_wait(&p->semafori->window_mutex);
         ch = getch(); // Leggi il carattere dall'input
-		
+		sem_post(&p->semafori->window_mutex);
         // Muovi il personaggio in base all'input dell'utente
         switch (ch) {
         	case KEY_UP:
+			case 'w':
+			case 'W':
 				new_pos.y=-2;
             	change=true;
             break;
           case KEY_DOWN:
+		  case 's':
+		  case 'S':
             	new_pos.y=+2;
             	change=true;
             break;
           case KEY_LEFT:
+		  case 'a':
+		  case 'A':
             	new_pos.x=-1;
             	change=true;  
             break;
           case KEY_RIGHT:
+		  case 'd':
+		  case 'D':
             	new_pos.x=1;
             	change=true;
             break;
@@ -88,10 +199,42 @@ void *moveRanaThread(void *param){
         // Aspetta un po' prima di generare nuove coordinate forse andrebbe diminuito
         usleep(1000);
     }
-	new_pos.type='x'; // carattere di fine rana
 	scriviSuBuffer(p, new_pos, my_tcb, true);	// ultima scrittura sul buffer, segna su TCB che ha terminato
 
     pthread_exit(NULL);
 	return NULL;
 
+}// fine moveRanaThread
+
+int resetRanaThread(Params* thread_args){
+	pthread_t newRana = 0;
+	inizializzaPosRana(&(thread_args->gameData->ranaAbsPos));
+	newRana = avviaRanaThread(thread_args);
+	if(newRana != 0){
+		thread_args->gameData->pids.pidRana = newRana;
+		return 0;
+	}
+	return -1;
 }
+
+/* Imposta il thread Rana a target
+	decrementa vite e manche
+	imposta ranaIsDead a TRUE 
+*/
+void uccidiRana(Params* thread_args){
+	GameData* gameData = thread_args->gameData;
+	sem_t* semaforoTCB = &(thread_args->semafori->tcb_mutex);
+	ThreadControlBlock* tcb_rana = gameData->allTCB->tcb_rana;
+
+	if(isThreadTarget(tcb_rana, semaforoTCB)){ return;}
+	impostaThreadTarget(tcb_rana, semaforoTCB);
+	gameData->gameInfo.vite--;
+	gameData->gameInfo.manche--;
+	gameData->gameInfo.viteIsChanged = true;
+	gameData->gameInfo.mancheIsChanged = true;
+	gameData->gameInfo.ranaIsDead=true;
+}
+
+
+
+

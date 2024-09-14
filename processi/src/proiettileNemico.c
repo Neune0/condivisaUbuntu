@@ -33,17 +33,15 @@ void proiettileNemico(int *pipe_fd, PipeData *shooter, int id)
 
 	while (1)
 	{
-
 		proiettileNemico.y = proiettileNemico.y + dirY;
 		write(pipe_fd[1], &proiettileNemico, sizeof(PipeData));
-
 		usleep(200000); // Aspetta un po' prima di generare nuove coordinate
 	}
 }
 
 void uccidiProiettileNemico(pid_t *array_pid_proiettili, int id_proiettile)
 {
-	if ((id_proiettile != -1) && (array_pid_proiettili[id_proiettile] != 0))
+	if ((id_proiettile != -1) && (array_pid_proiettili[id_proiettile] != NOPID))
 	{
 		kill(array_pid_proiettili[id_proiettile], SIGKILL);
 		int err = waitpid(array_pid_proiettili[id_proiettile], NULL, 0);
@@ -52,6 +50,6 @@ void uccidiProiettileNemico(pid_t *array_pid_proiettili, int id_proiettile)
 			perror("Errore nella waitpid");
 			exit(1);
 		}
-		array_pid_proiettili[id_proiettile] = 0;
+		array_pid_proiettili[id_proiettile] = NOPID;
 	}
 }

@@ -13,6 +13,14 @@
 #include <fcntl.h>
 #include "./sound.h"
 
+// macro aggiuntive
+#define NOPID 0 // indica che non esiste un pid associato
+#define NOID -1 // indica che non esiste un id associato
+#define NOPOS -1 // indica che non esiste una posizione assegnata
+#define NO_OBJ -1 // indica che non esiste un oggetto associato
+
+#define DEBUGINITCOLUMN 106
+
 // colori aggiuntivi
 #define COLOR_GRAY 8
 
@@ -21,8 +29,8 @@
 
 // velocità flussi 
 #define FLUSSO_LENTO  600000
-#define FLUSSO_NORM   500000
-#define FLUSSO_VELOCE 400000
+#define FLUSSO_NORM   600000
+#define FLUSSO_VELOCE 200000
 
 // dimensioni totali schermo
 #define WIDTH 105 // larghezza massima dello schermo
@@ -44,6 +52,7 @@
 #define CIFRA_H 5 // altezza di una cifra
 #define TEMPO_H 2 // altezza hud per il tempo
 #define PIANTA_H 2 // altezza della pianta
+#define HUDVITEMENO_H 8
 
 // larghezze oggetti di gioco
 #define RANA_W 3 // larghezza della rana
@@ -58,6 +67,7 @@
 #define VITE_W 11 // larghezza massima hud vite
 #define TEMPO_W LASTGAMECOL - TEMPOSTARTCOL // larghezza hud per il tempo
 #define PIANTA_W 3 // larghezza della pianta
+#define HUDVITEMENO_W 27
 
 // righe start e end degli elementi di gioco
 #define BORDERROWSUP 0 // riga superiore di bordo
@@ -94,6 +104,8 @@
 
 #define TEMPOROWSTART HUDINFROWSTART + 1 // prima riga dell'hud dell' tempo
 
+#define VITEMENOROWSTART 12
+
 // colonne sx e dx massime degli elementi di gioco
 #define BORDERCOLSX 0 // posizione colonna sinistra del bordo
 #define BORDERCOLDX 104 // posizione colonna destra del bordo
@@ -117,6 +129,8 @@
 #define PLANT3STARTCOL PLANT2STARTCOL + DISTRAPIANTE // prima colonna della quarta pianta
 #define INITCOCCODRILLOSXCOL LASTGAMECOL - COCCODRILLO_W // colonna di partenza per i coccodrilli che si muovono verso sinistra
 
+#define VITEMENOCOLSTART 20
+
 // colori
 #define SFONDO_COL 0 // colore sfondo
 #define RANA_COL 1 // colore rana
@@ -136,21 +150,24 @@
 #define LAMPEGGIA 16 // colore coccodrillo quando lampeggia
 
 // massimo numero di oggetti per tipo
-#define MAXNCOCCODRILLI 20
+#define MAXNCOCCODRILLI 28
 #define MAXNPROIETTILI 3
 #define MAXNNEMICI 4
 #define MAXNPROIETTILINEMICI 4
 #define MAXNTANE 5
+#define MAXCOCCODRILLIXFLUSSO 4
+#define NUMFLUSSI 8
 
 // quantita oggetti
 #define N_SPRITES 13
+#define NUM_CIFRE 10
 
 // tempo
-#define TEMPOLVL1 100 // numero di secondi per manche per il primo livello
-#define TEMPOLVL2 140 // numero di secondi per manche per il secondo livello
-#define TEMPOLVL3 200 // numero di secondi per manche per il terzo livello
+#define TEMPOLVL1 240 // numero di secondi per manche per il primo livello
+#define TEMPOLVL2 340 // numero di secondi per manche per il secondo livello
+#define TEMPOLVL3 440 // numero di secondi per manche per il terzo livello
 
-#define TEMPO_SPAWN_COCCODRILLI 5 // tempo di spawn dei coccodrilli
+#define TEMPO_SPAWN_COCCODRILLI 7 // tempo di spawn dei coccodrilli
 
 // distanze tra oggetti di gioco
 #define DISTTRATANE 22 // distanza tra una tana e l'altra
@@ -201,7 +218,8 @@ typedef enum{
 	RANA_LAVA,
 	RANA_COCCODRILLO_CATTIVO,
 	RANA_MARCIAPIEDE,
-	RANA_ARGINE
+	RANA_ARGINE,
+	PROIETTILE_COCCODRILLO_BUONO,
 }TipoCollisione;
 
 // enumerazione per il tipo di oggetto su schermo
@@ -310,6 +328,8 @@ typedef struct {
 	bool livelloIsChanged;
 	int manche;
 	bool mancheIsChanged;
+	bool ranaIsDead;
+	bool mancheWin;
 } GameInfo;		
 
 // struttura che contiene tutti i pid dei processi usati
@@ -352,6 +372,9 @@ typedef struct{
 // struttura per la posizione assouluta della rana all'interno della matrice schermo
 // - x : coordinata x
 // - y : coordinata y
+// - on_coccodrillo : booleano indica se la rana e su un coccodrillo
+// - id_coccodrillo : l'id del coccodrillo sul quale è la rana
+// - offset_on_coccodrillo : offeset posizione rana sul coccodrillo
 typedef struct{
 	int x;
 	int y;
@@ -376,11 +399,13 @@ typedef struct{
 	int passi_in_immersione;
 	int passi_in_pre_immersione;
 	int passi_deep;
+	int fila;
 }CocodrileControl;
 
 typedef struct{
 	int direction;
 	int vel;
+	int n_coccodrilli_attivi;
 }Flusso;
 
 // struttura dati generale del gioco, contiene tutti i dati significativi per la gestione
@@ -407,7 +432,7 @@ typedef struct{
 	GameInfo gameInfo; // informaizioni sul gioco lvl, manche score vite
 	OldPos oldPos; // dati oggetti al passo precedente
 	CocodrileControl controlloCoccodrilli[MAXNCOCCODRILLI]; // dati per oggetti coccodrilli
-	Flusso flussi[8];
+	Flusso flussi[NUMFLUSSI];
 }GameData;
 
 
@@ -473,4 +498,19 @@ bool isWin(GameData* gameData);
 void stampaBox();
 bool isFrogMoveLecit(int newX, int newY,RanaAbsPos ranaPos,PipeData pipeData);
 int generaRandom_r(int min, int max, unsigned int *seed);
+void debugPrintContatori(int fila,GameData* gameData);
+void debugPrintPidNemici(int fila,GameData* gameData);
+void debugPrintLastPipeData(GameData* gameData);
+void debugPrintCollision(GameData* gameData,Collisione collisione);
+int fromFilaToRow(int fila);
+void setScreenCell(ScreenCell* screenCell,TipoObj tipo,char ch,int id,int color,bool changed);
+void setPipeData(PipeData* pipeData, char type, int id, int x,int y);
+void debugPrintOldPosNemici(int fila,GameData* gameData);
+void debugPrintOldPosCoccodrilli(int fila, GameData* gameData);
+void debugPrintFlussi(int fila,GameData* gameData);
+void debugPrintControlloCoccodrilli(int fila,GameData* gameData);
+void debugPrintAllPids(GameData* gameData,int fila);
+void debugBlock();
+void clearPortionScreen(int startRow,int startCol,int altezza,int larghezza);
+void debugPrintOldPosCoccodrilli2(int fila,GameData* gameData);
 #endif // UTILITIES_H
