@@ -164,13 +164,13 @@ void *moveRanaThread(void *param){
           case KEY_LEFT:
 		  case 'a':
 		  case 'A':
-            	new_pos.x=-1;
+            	new_pos.x=-2;
             	change=true;  
             break;
           case KEY_RIGHT:
 		  case 'd':
 		  case 'D':
-            	new_pos.x=1;
+            	new_pos.x=2;
             	change=true;
             break;
           case 32: // KEY_SPACE 

@@ -3,37 +3,19 @@
 void aggiorna(Params *thread_arg, GameData *gameData)
 {
 	// individuazione della possibile collisione
-
 	Collisione collisione = detectCollisione(gameData);
 
 	if (collisione.tipoCollisione == NO_COLLISIONE)
 	{	
-
-		//if(gameData->pipeData.thread_id == gameData->allTCB->tcb_proiettili->thread_id){}
 		// aggiornamento normale se no collisione
 		normalUpdate(thread_arg, gameData);
 	}
 	else
 	{
-		mvprintw(13, 146, "                     ");
-		mvprintw(14, 146, "                     ");
-		mvprintw(15, 146, "                      ");
-		mvprintw(16, 146, "                       ");
-		mvprintw(17, 146, "                       ");
-		mvprintw(18, 146, "                        ");
-
-		mvprintw(13, 146, "last collisione");
-		mvprintw(14, 146, "id oggetto attivo: %d", collisione.id_oggetto_attivo);
-		mvprintw(15, 146, "id oggetto passivo: %d", collisione.id_oggetto_passivo);
-		mvprintw(16, 146, "tipo oggetto attivo: %d", collisione.oggetto_attivo);
-		mvprintw(17, 146, "tipo oggetto passivo: %d", collisione.oggetto_passivo);
-		mvprintw(18, 146, "tipo collisione: %d", collisione.tipoCollisione);
-
 		// se collisione aggiornamento particolareggiato
 		handleCollisione(thread_arg, gameData, collisione);
-		// beep();  OK
 	}
-	// qui aggiornamento del tempo(calcolo)
+	
 	aggiornaTempo(gameData);
 
 	return;
@@ -251,14 +233,23 @@ void normalUpdate(Params *thread_arg, GameData *gameData)
 		int newPosAbsRanaX = gameData->pipeData.x + gameData->ranaAbsPos.x;
 		int newPosAbsRanaY = gameData->pipeData.y + gameData->ranaAbsPos.y;
 		// se lo spostamento è lecito
-		if (isFrogMoveLecit(newPosAbsRanaX, newPosAbsRanaY))
-		{
-			gameData->pipeData.x = newPosAbsRanaX;
-			gameData->pipeData.y = newPosAbsRanaY;
-			// normale aggiornamento
-			aggiornaOggetto(gameData, &(gameData->oldPos.rana), S_RANA);
-			gameData->ranaAbsPos.x = gameData->pipeData.x;
-			gameData->ranaAbsPos.y = gameData->pipeData.y;
+		if (isFrogMoveLecit(newPosAbsRanaX, newPosAbsRanaY,gameData->ranaAbsPos,gameData->pipeData))
+		{	
+			if (gameData->ranaAbsPos.id_coccodrillo != NOID && gameData->pipeData.x != 0)
+			{
+				// sono su un coccodrillo e mi sto muovendo lungo la x
+				gameData->ranaAbsPos.offset_on_coccodrillo += gameData->pipeData.x;
+			}
+			else
+			{
+				// normale aggiornamento
+				gameData->pipeData.x = newPosAbsRanaX;
+				gameData->pipeData.y = newPosAbsRanaY;
+
+				aggiornaOggetto(gameData, &(gameData->oldPos.rana), S_RANA);
+				gameData->ranaAbsPos.x = gameData->pipeData.x;
+				gameData->ranaAbsPos.y = gameData->pipeData.y;
+			}
 		}
 		break;
 	}
@@ -461,7 +452,7 @@ void normalUpdate(Params *thread_arg, GameData *gameData)
 			// todo reset del controlloCoccodrilli, da finire
 			gameData->controlloCoccodrilli[gameData->pipeData.id].passi = 0;
 			gameData->controlloCoccodrilli[gameData->pipeData.id].passi_in_immersione = 0;
-			//gameData->contatori.contCoccodrilli--;
+	
 		}
 		else
 		{
@@ -488,7 +479,7 @@ void normalUpdate(Params *thread_arg, GameData *gameData)
 			// todo reset del controlloCoccodrilli, da finire
 			gameData->controlloCoccodrilli[gameData->pipeData.id].passi = 0;
 			gameData->controlloCoccodrilli[gameData->pipeData.id].passi_in_immersione = 0;
-			//gameData->contatori.contCoccodrilli--;
+			
 		}
 		else
 		{
@@ -575,18 +566,11 @@ void handleCoccodrilloMovement(Params* thread_arg, GameData *gameData)
 	// capire in che fase si trova il coccodrillo
 	if (controlloCoccodrillo->is_fase_immersione)
 	{
-		// questione fase immersione
-		// 3 casi:
-		// 1. il coccodrillo si sta immergendo
-		// 2. il coccodrillo è interamente sotto l'acqua
-		// 3. il coccodrillo sta riemergendo
 		if (controlloCoccodrillo->is_going_deep)
 		{
 			if (controlloCoccodrillo->direction == 1)
 			{
 				// il coccodrillo va verso destra
-				// cancellare lo posso lasciare come prima
-				// invece disegnare lo devo modificare
 				aggiornaOggettoCoccodrillo(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_DX_C, controlloCoccodrillo);
 				
 			}
@@ -888,41 +872,18 @@ void handleCoccodrilloMovement(Params* thread_arg, GameData *gameData)
 			// se la Rana cade in acqua
 			if (gameData->ranaAbsPos.offset_on_coccodrillo + gameData->controlloCoccodrilli[gameData->ranaAbsPos.id_coccodrillo].offset_deep >= 7)
 			{
-				/* Uccidi Rana */
-				/*
-				sem_t* semaforoTCB = &(thread_arg->semafori->tcb_mutex);
-				ThreadControlBlock *tcb_rana = (gameData->allTCB->tcb_rana);
-				if(isThreadTarget(tcb_rana, semaforoTCB)){ return; }
-				impostaThreadTarget(tcb_rana, semaforoTCB);
-				gameData->gameInfo.vite--;
-				gameData->gameInfo.manche--;
-				gameData->gameInfo.mancheIsChanged = true;
-				gameData->gameInfo.viteIsChanged = true;
-				/**/
+				// Uccidi Rana
 				uccidiRana(thread_arg);
 			}
 		}else	// coccodrillo da dx a sx
 		{
 			if (gameData->controlloCoccodrilli[gameData->pipeData.id].offset_deep - gameData->ranaAbsPos.offset_on_coccodrillo >= 1)
 			{
-				/* Uccidi Rana */
-				/*
-				sem_t* semaforoTCB = &(thread_arg->semafori->tcb_mutex);
-				ThreadControlBlock *tcb_rana = (gameData->allTCB->tcb_rana);
-				if(isThreadTarget(tcb_rana, semaforoTCB)){ return; }
-				impostaThreadTarget(tcb_rana, semaforoTCB);
-				gameData->gameInfo.vite--;
-				gameData->gameInfo.manche--;
-				gameData->gameInfo.mancheIsChanged = true;
-				gameData->gameInfo.viteIsChanged = true;
-				/**/
+				// Uccidi Rana
 				uccidiRana(thread_arg);
 			}
 
 		}
-
-
-
 		// se la rana esce fuori dallo schermo allora muore
 		if (gameData->ranaAbsPos.x >= LASTGAMECOL - 1 || gameData->ranaAbsPos.x < FIRSTGAMECOL)
 		{
@@ -932,7 +893,6 @@ void handleCoccodrilloMovement(Params* thread_arg, GameData *gameData)
 			gameData->gameInfo.viteIsChanged = true;
 
 			// faccio ripartire la rana
-			//resetRana(gameData);
 			gameData->ranaAbsPos.on_coccodrillo = false;
 			gameData->ranaAbsPos.id_coccodrillo = -1;
 

@@ -773,7 +773,7 @@ bool isWin(GameData* gameData);
 
 /** @brief stampa a schermo il bordo dell gioco*/
 void stampaBox();
-bool isFrogMoveLecit(int newX, int newY);
+bool isFrogMoveLecit(int newX, int newY, RanaAbsPos ranaPos, PipeData pipeData);
 
 /** Chiude i thread attivi per resettare la manche */
 void resetManche(Params *p);
