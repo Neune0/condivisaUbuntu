@@ -193,19 +193,137 @@ void aggiornaHud(GameData *gameData)
     return;
 }
 
-void printViteMinus()
+void printSchermataWin()
 {
-
     clear(); // pulisco schermo
     refresh();
 
     // stampa box
-    stampaBox();
+    stampaBox(0);
 
-    //stampaLogoMenu(STARTROWLOGOMENU, STARTCOLLOGOMENU);
+    printTitolo(5, (LASTGAMECOL - DIMTITOLOCOLS) / 2);
 
+    // stampa logo
+    printLogo(13, (LASTGAMECOL - DIMLOGOCOLS) / 2);
 
-    char titoloMatrix[6][46] = {
+    printWin(26, (LASTGAMECOL - DIMWINCOLS) / 2);
+
+    nodelay(stdscr, FALSE); // riabilita l'input bloccante
+
+    // stampa la scritta premi un tasto per continuare
+    mvprintw(35, (LASTGAMECOL - 33) / 2, "Premi un tasto per continuare...");
+    getch();
+    refresh();
+    nodelay(stdscr, TRUE); // riabilita l'input non bloccante
+    clear();
+    refresh();
+}
+
+void printSchermataGameOver()
+{
+    clear(); // pulisco schermo
+    refresh();
+
+    // stampa box
+    stampaBox(0);
+
+    printTitolo(5, (LASTGAMECOL - DIMTITOLOCOLS) / 2);
+
+    // stampa logo
+    printLogo(13, (LASTGAMECOL - DIMLOGOCOLS) / 2);
+
+    printGameOver(26, (LASTGAMECOL - DIMGAMEOVERCOLS) / 2);
+
+    nodelay(stdscr, FALSE); // riabilita l'input bloccante
+
+    // stampa la scritta premi un tasto per continuare
+    mvprintw(35, (LASTGAMECOL - 33) / 2, "Premi un tasto per continuare...");
+    getch();
+    refresh();
+    nodelay(stdscr, TRUE); // riabilita l'input non bloccante
+    clear();
+    refresh();
+}
+
+void printSchermataManche()
+{
+    clear(); // pulisco schermo
+    refresh();
+
+    // stampa box
+    stampaBox(0);
+
+    printTitolo(5, (LASTGAMECOL - DIMTITOLOCOLS) / 2);
+
+    // stampa logo
+    printLogo(13, (LASTGAMECOL - DIMLOGOCOLS) / 2);
+
+    printMancheWin(26, (LASTGAMECOL - DIMMANCHECOLS) / 2);
+
+    nodelay(stdscr, FALSE); // riabilita l'input bloccante
+
+    // stampa la scritta premi un tasto per continuare
+    mvprintw(35, (LASTGAMECOL - 33) / 2, "Premi un tasto per continuare...");
+    getch();
+    refresh();
+    nodelay(stdscr, TRUE); // riabilita l'input non bloccante
+    clear();
+    refresh();
+}
+
+void printViteMinus()
+{
+    clear(); // pulisco schermo
+    refresh();
+
+    // stampa box
+    stampaBox(0);
+
+    printTitolo(5, (LASTGAMECOL - DIMTITOLOCOLS) / 2);
+
+    // stampa logo
+    printLogo(13, (LASTGAMECOL - DIMLOGOCOLS) / 2);
+
+    printLose(26, (LASTGAMECOL - DIMLOSECOLS) / 2);
+
+    nodelay(stdscr, FALSE); // riabilita l'input bloccante
+
+    // stampa la scritta premi un tasto per continuare
+    mvprintw(35, (LASTGAMECOL - 33) / 2, "Premi un tasto per continuare...");
+    getch();
+    refresh();
+    nodelay(stdscr, TRUE); // riabilita l'input non bloccante
+    clear();
+    refresh();
+}
+
+void printLogo(int start_row, int start_col)
+{
+    char logoImg[DIMLOGOROWS][DIMLOGOCOLS] = {
+        {' ', ' ', ' ', ' ', ' ', ' ', ' ', '_', ' ', ' ', ' ', '_', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
+        {' ', ' ', ' ', ' ', ' ', ' ', '(', '.', ')', '_', '(', '.', ')', ' ', ' ', ' ', ' ', ' ', ' '},
+        {' ', ' ', ' ', '_', ' ', '(', ' ', ' ', ' ', '_', ' ', ' ', ' ', ')', ' ', '_', ' ', ' ', ' '},
+        {' ', ' ', '/', ' ', '\\', '/', '\'', '-', '-', '-', '-', '-', '\'', '\\', '/', ' ', '\\', ' ', ' '},
+        {'_', '_', '\\', ' ', '(', ' ', '(', ' ', ' ', ' ', ' ', ' ', ')', ' ', ')', ' ', '/', '_', '_'},
+        {')', ' ', ' ', ' ', '/', '\\', ' ', '\\', '.', '_', '.', '/', ' ', '/', '\\', ' ', ' ', ' ', '('},
+        {' ', ')', '_', '/', ' ', '/', '|', '\\', ' ', ' ', ' ', '/', '|', '\\', ' ', '\\', '_', '(', ' '}};
+
+    // stampa logo
+    for (int row = start_row; row < start_row + DIMLOGOROWS; row++)
+    {
+        for (int col = start_col; col < start_col + DIMLOGOCOLS; col++)
+        {
+            attron(COLOR_PAIR(RANA_COL));
+            mvaddch(row, col, logoImg[row - start_row][col - start_col]);
+            attroff(COLOR_PAIR(RANA_COL));
+        }
+    }
+    return;
+}
+
+void printTitolo(int start_row, int start_col)
+{
+    char titoloMatrix[DIMTITOLOROWS][DIMTITOLOCOLS] = {
         " _____                   _____                ",
         "|  ___| __ ___   __ _   |  ___| __ ___   __ _ ",
         "| |_ | '__/ _ \\ / _` |  | |_ | '__/ _ \\ / _` |",
@@ -213,52 +331,102 @@ void printViteMinus()
         "|_|  |_|  \\___/ \\__,  | |_|  |_|  \\___/ \\__, |",
         "                |___/                   |___/ "};
 
-    for (int row = 4; row < 4 + 6; row++)
+    // stampa titolo
+    for (int row = start_row; row < start_row + DIMTITOLOROWS; row++)
     {
-        for (int col = 20; col < 20 + 46; col++)
+        for (int col = start_col; col < start_col + DIMTITOLOCOLS; col++)
         {
             attron(COLOR_PAIR(RANA_COL));
-            mvaddch(row, col, titoloMatrix[row - 4][col - 20]);
+            mvaddch(row, col, titoloMatrix[row - start_row][col - start_col]);
             attroff(COLOR_PAIR(RANA_COL));
         }
     }
+    return;
+}
 
-    // char defViteMinus[HUDVITEMENO_H][HUDVITEMENO_W] = {
-    //     {'@', '@', ' ', ' ', '@', '@', ' ', '@', '@', ' ', '@', '@', '@', '@', '@', '@', ' ', '@', '@', '@', '@', '@', '@', ' ', ' ', ' ', ' '},
-    //     {'@', '@', ' ', ' ', '@', '@', ' ', '@', '@', ' ', '@', '@', '@', '@', '@', '@', ' ', '@', '@', '@', '@', '@', '@', ' ', ' ', ' ', ' '},
-    //     {'@', '@', ' ', ' ', '@', '@', ' ', ' ', ' ', ' ', ' ', ' ', '@', '@', ' ', ' ', ' ', '@', '@', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
-    //     {'@', '@', ' ', ' ', '@', '@', ' ', ' ', ' ', ' ', ' ', ' ', '@', '@', ' ', ' ', ' ', '@', '@', '@', '@', ' ', ' ', ' ', '@', '@', '@'},
-    //     {'@', '@', ' ', ' ', '@', '@', ' ', '@', '@', ' ', ' ', ' ', '@', '@', ' ', ' ', ' ', '@', '@', '@', '@', ' ', ' ', ' ', '@', '@', '@'},
-    //     {'@', '@', ' ', ' ', '@', '@', ' ', '@', '@', ' ', ' ', ' ', '@', '@', ' ', ' ', ' ', '@', '@', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
-    //     {' ', '@', '@', '@', '@', ' ', ' ', '@', '@', ' ', ' ', ' ', '@', '@', ' ', ' ', ' ', '@', '@', '@', '@', '@', '@', ' ', ' ', ' ', ' '},
-    //     {' ', '@', '@', '@', '@', ' ', ' ', '@', '@', ' ', ' ', ' ', '@', '@', ' ', ' ', ' ', '@', '@', '@', '@', '@', '@', ' ', ' ', ' ', ' '}};
+void printLose(int start_row, int start_col)
+{
+    char titoloLose[DIMLOSEROWS][DIMLOSECOLS] = {
+        " __   __            _                   ",
+        " \\ \\ / /__  _   _  | |    ___  ___  ___ ",
+        "  \\ V / _ \\| | | | | |   / _ \\/ __|/ _ \\",
+        "   | | (_) | |_| | | |__| (_) \\__ \\  __/",
+        "   |_|\\___/ \\__,_| |_____\\___/|___/\\___|",
+        "                                        "};
 
-    nodelay(stdscr, FALSE); // riabilita l'input bloccante
+    // stampa loose
+    for (int row = start_row; row < start_row + DIMLOSEROWS; row++)
+    {
+        for (int col = start_col; col < start_col + DIMLOSECOLS; col++)
+        {
+            attron(COLOR_PAIR(RANA_COL));
+            mvaddch(row, col, titoloLose[row - start_row][col - start_col]);
+            attroff(COLOR_PAIR(RANA_COL));
+        }
+    }
+}
 
-    // // print di vite--
-    // int row = 0, col = 0;
-    // for (int rel_row = 0; rel_row < HUDVITEMENO_H; rel_row++)
-    // {
-    //     row = rel_row + VITEMENOROWSTART;
-    //     for (int rel_col = 0; rel_col < HUDVITEMENO_W; rel_col++)
-    //     {
-    //         col = rel_col + VITEMENOCOLSTART;
+void printWin(int start_row, int start_col)
+{
 
-    //         if (defViteMinus[rel_row][rel_col] == '@')
-    //         {
-    //             attron(COLOR_PAIR(LAVA_COL));
-    //             mvaddch(row, col, ' ');
-    //             attroff(COLOR_PAIR(LAVA_COL));
-    //         }
-    //     }
-    // }
-    // stampa la scritta premi un tasto per continuare
-    mvprintw(31, 36, "Premi un tasto per continuare...");
-    getch();
-    refresh();
-    nodelay(stdscr, TRUE); // riabilita l'input non bloccante
-    clear();
-    refresh();
+    char titoloWin[DIMWINROWS][DIMWINCOLS] = {
+        " __   __           __        ___       ",
+        " \\ \\ / /__  _   _  \\ \\      / (_)_ __  ",
+        "  \\ V / _ \\| | | |  \\ \\ /\\ / /| | '_ \\ ",
+        "   | | (_) | |_| |   \\ V  V / | | | | |",
+        "   |_|\\___/ \\__,_|    \\_/\\_/  |_|_| |_|",
+    };
+
+    for (int row = start_row; row < start_row + DIMWINROWS; row++)
+    {
+        for (int col = start_col; col < start_col + DIMWINCOLS; col++)
+        {
+            attron(COLOR_PAIR(RANA_COL));
+            mvaddch(row, col, titoloWin[row - start_row][col - start_col]);
+            attroff(COLOR_PAIR(RANA_COL));
+        }
+    }
+    return;
+}
+
+void printMancheWin(int start_row, int start_col)
+{
+    char titoloMancheWin[DIMMANCHEROWS][DIMMANCHECOLS] = {
+        "  __  __                  _           __        _____       ",
+        " |  \\/  | __ _ _ __   ___| |__   ___  \\ \\      / /_ _|_ __  ",
+        " | |\\/| |/ _` | '_ \\ / __| '_ \\ / _ \\  \\ \\ /\\ / / | || '_ \\ ",
+        " | |  | | (_| | | | | (__| | | |  __/   \\ V  V /  | || | | |",
+        " |_|  |_|\\__,_|_| |_|\\___|_| |_|\\___|    \\_/\\_/  |___|_| |_|"};
+    for (int row = start_row; row < start_row + DIMMANCHEROWS; row++)
+    {
+        for (int col = start_col; col < start_col + DIMMANCHECOLS; col++)
+        {
+            attron(COLOR_PAIR(RANA_COL));
+            mvaddch(row, col, titoloMancheWin[row - start_row][col - start_col]);
+            attroff(COLOR_PAIR(RANA_COL));
+        }
+    }
+    return;
+}
+
+void printGameOver(int start_row, int start_col)
+{
+    char titoloGameOver[DIMGAMEOVERROWS][DIMGAMEOVERCOLS] = {
+        "   ____                         ___                 ",
+        "  / ___| __ _ _ __ ___   ___   / _ \\__   _____ _ __ ",
+        " | |  _ / _` | '_ ` _ \\ / _ \\ | | | \\ \\ / / _ \\ '__|",
+        " | |_| | (_| | | | | | |  __/ | |_| |\\ V /  __/ |   ",
+        "  \\____|\\__,_|_| |_| |_|\\___|  \\___/  \\_/ \\___|_|   "};
+    for (int row = start_row; row < start_row + DIMGAMEOVERROWS; row++)
+    {
+        for (int col = start_col; col < start_col + DIMGAMEOVERCOLS; col++)
+        {
+            attron(COLOR_PAIR(RANA_COL));
+            mvaddch(row, col, titoloGameOver[row - start_row][col - start_col]);
+            attroff(COLOR_PAIR(RANA_COL));
+        }
+    }
+    return;
 }
 
 void printDigit(Schermo *schermo, char digit[CIFRA_H][CIFRA_W], int startRow, int startCol, int color)

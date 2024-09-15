@@ -4,7 +4,7 @@ void aggiorna(GameData *gameData)
 {
 	Collisione collisione = detectCollisione(gameData); // individuazione della possibile collisione
 
-	debugPrintCollision(gameData, collisione);
+	//debugPrintCollision(gameData, collisione);
 
 	if (collisione.tipoCollisione == NO_COLLISIONE)
 	{
@@ -12,7 +12,7 @@ void aggiorna(GameData *gameData)
 	}
 	else
 	{
-		mvprintw(31, 106, "                               "); // debug
+		//mvprintw(31, 106, "                               "); // debug
 		handleCollisione(gameData, collisione);				  // se collisione aggiornamento particolareggiato
 	}
 	return;
@@ -320,7 +320,8 @@ void normalUpdate(GameData *gameData)
 	{
 		// update tempo di gioco
 		gameData->gameInfo.secondi_di_gioco = gameData->pipeData.x;
-		printTempo(gameData); // aggiorna hud del tempo
+		// sostituire con avviso che il tempo è cambiato
+		printTempo(gameData); // aggiorna hud del tempo 
 		break;
 	}
 	default:
@@ -472,7 +473,7 @@ void handleCoccodrilloMovement(GameData *gameData)
 
 			if (!(controlloCoccodrillo->is_buono))
 			{
-				if ((controlloCoccodrillo->passi + 1) % 30 == 0)
+				if (generaRandom_r(0,30,&(gameData->randomSeed)) == 1 && controlloCoccodrillo->passi>10 && controlloCoccodrillo->passi<80)
 				{
 					controlloCoccodrillo->is_fase_pre_immersione = true;
 				}

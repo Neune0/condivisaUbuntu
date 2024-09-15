@@ -77,6 +77,8 @@ void stampaTitolo(int start_row,int start_col){
         "|_|  |_|  \\___/ \\__,  | |_|  |_|  \\___/ \\__, |",
         "                |___/                   |___/ "
     };
+                                       
+
     
     for(int row=start_row;row<start_row+DIMTITOLOROW;row++){
 			for(int col=start_col;col<start_col+DIMTITOLOCOL;col++){
@@ -86,6 +88,15 @@ void stampaTitolo(int start_row,int start_col){
 				usleep(10000);
 				refresh();
 			}
-	}		
+	}
+
+	 // char titoloMancheWin[6][61] = {
+    //     "  __  __                  _           __        _____       ",
+    //     " |  \\/  | __ _ _ __   ___| |__   ___  \\ \\      / /_ _|_ __  ",
+    //     " | |\\/| |/ _` | '_ \\ / __| '_ \\ / _ \\  \\ \\ /\\ / / | || '_ \\ ",
+    //     " | |  | | (_| | | | | (__| | | |  __/   \\ V  V /  | || | | |",
+    //     " |_|  |_|\\__,_|_| |_|\\___|_| |_|\\___|    \\_/\\_/  |___|_| |_|",
+    //     "                                                            "
+    // };		
 
 }

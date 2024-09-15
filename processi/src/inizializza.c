@@ -1,6 +1,6 @@
 #include "../hdr/inizializza.h"
 
-void inizializza(GameData* gameData, int* pipe_fd){
+void inizializza(GameData* gameData){
 	
 	inizializzaGameInfo(gameData);
 	inizializzaOggettiTane(gameData->tane);
@@ -11,10 +11,7 @@ void inizializza(GameData* gameData, int* pipe_fd){
 	inizializzaOldPos(&(gameData->oldPos));
 	
 	// inizializza posizione assoluta rana e aggiorna old pos della rana
-	inizializzaPosRana(&(gameData->ranaAbsPos));
-	gameData->oldPos.rana.x=gameData->ranaAbsPos.x;
-	gameData->oldPos.rana.y=gameData->ranaAbsPos.y;
-
+	inizializzaPosRana(gameData);
 	inizializzaSchermo(gameData); 
 	
 	inizializzaContatori(gameData);
@@ -102,16 +99,6 @@ void inizializzaSchermo(GameData* gameData){
 	inizializzaArgine(gameData->schermo.screenMatrix); // inizializza la parte dello schermo dedicata al prato
 	inizializzaMarciapiede(gameData->schermo.screenMatrix); // inizializza la parte dello schermo dedicata al marciapiede
 	copiaMatrice(gameData->schermo.screenMatrix, gameData->schermo.staticScreenMatrix ); //copia la matrice dinamica in quella statica
-	return;
-}
-
-void avviaProcessiBase(int* pipe_fd,GameData* gameData){
-	// avvia il processo che gestisce il movimento della rana
-	gameData->pids.pidRana = avviaRana(pipe_fd);
-	// avvia il processo che tiene il tempo di gioco
-	gameData->pids.pidTempo = avviaTempo(pipe_fd);
-	gameData->pids.soundPlayer = avvia_soundPlayer(gameData->pipe_suoni);
-	gameData->pids.pidMusica = avviaMusica();
 	return;
 }
 

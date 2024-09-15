@@ -22,12 +22,6 @@ void avviaDrawProcess(int pipe_fd[2]);
 */
 void drawProcess(int* pipe_fd);
 
-/** @brief stampa la schermata di win*/
-void stampaWin();
-
-/** @brief stampa la schermata di lose*/
-void stampaGameOver();
-
 /** @brief stampa lo sprite della rana
  * @param datiRana : i dati della rana tipo PipeData
  * @param sprite : la sprite della rana tipo Sprite

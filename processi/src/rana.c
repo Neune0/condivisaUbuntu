@@ -93,21 +93,14 @@ void moveProcess(int* pipe_fd) {
     return;
 }
 
-// per riavviare il processo rana
-void resetRana(GameData* gameData){
-	kill(gameData->pids.pidRana, SIGKILL);
-	waitpid(gameData->pids.pidRana, NULL,0);
-	gameData->pids.pidRana = avviaRana(gameData->pipe);
-	inizializzaPosRana(&(gameData->ranaAbsPos));
-	return;
-}
-
-void inizializzaPosRana(RanaAbsPos* ranaPos){
-	ranaPos->x=40;
-	//ranaPos->y=MARCIAPIEDEROWSTART;
-	ranaPos->y=ARGINEROWSTART;
-	ranaPos->on_coccodrillo=false;
-	ranaPos->id_coccodrillo=NOID;
-	ranaPos->offset_on_coccodrillo=0;
+void inizializzaPosRana(GameData* gameData){
+	gameData->ranaAbsPos.x=40;
+	//gameData->ranaAbsPos.y=MARCIAPIEDEROWSTART;
+	gameData->ranaAbsPos.y=ARGINEROWSTART;
+	gameData->ranaAbsPos.on_coccodrillo=false;
+	gameData->ranaAbsPos.id_coccodrillo=NOID;
+	gameData->ranaAbsPos.offset_on_coccodrillo=0;
+	gameData->oldPos.rana.x = gameData->ranaAbsPos.x;
+	gameData->oldPos.rana.y = gameData->ranaAbsPos.y;
 	return;
 }

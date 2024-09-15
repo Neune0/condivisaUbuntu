@@ -47,7 +47,7 @@ void coccodrillo(int *pipe_fd, PipeData *coccodrillo_init,int direction,int vel)
     unsigned int seed = time(NULL) ^ (getpid() << 16); 
 
     // numero randomico tra min e max compresi
-        int randomico = generaRandom_r(0 , 200000*15,&seed);
+        int randomico = generaRandom_r(velocity , velocity*15,&seed);
         // piccola usleep
         usleep(randomico);
     

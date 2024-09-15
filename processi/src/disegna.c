@@ -27,6 +27,8 @@ void drawProcess(int *pipe_fd)
 	gameData->pipe_suoni = pipe_suoni_fd;
 	gameData->pipe = pipe_fd;
 
+	gameData->randomSeed =  time(NULL) ^ (getpid() << 16);
+
 	inizializzaPid(gameData);
 
 	gameData->pids.pidRana = avviaRana(gameData->pipe);
@@ -35,7 +37,7 @@ void drawProcess(int *pipe_fd)
 	gameData->pids.pidMusica = avviaMusica();
 
 	// inizializza i dati del gioco
-	inizializza(gameData, pipe_fd);
+	inizializza(gameData);
 
 	// prima stampa dello schermo
 	printRana(&(gameData->oldPos.rana), &(gameData->sprites[S_RANA]), gameData);
@@ -65,7 +67,7 @@ void drawProcess(int *pipe_fd)
 			break;
 		}
 
-		debugPrintLastPipeData(gameData);
+		//debugPrintLastPipeData(gameData);
 
 		aggiorna(gameData); // aggiorna stato del gioco
 
@@ -124,9 +126,7 @@ void drawProcess(int *pipe_fd)
 				gameData->pids.soundPlayer = avvia_soundPlayer(gameData->pipe_suoni);
 				gameData->pids.pidMusica = avviaMusica();
 
-				inizializzaPosRana(&(gameData->ranaAbsPos));
-				gameData->oldPos.rana.x = gameData->ranaAbsPos.x;
-				gameData->oldPos.rana.y = gameData->ranaAbsPos.y;
+				inizializzaPosRana(gameData);
 				printRana(&(gameData->oldPos.rana), &(gameData->sprites[S_RANA]), gameData);
 				inizializzaFlussi(gameData);
 				printInitTempo(gameData);
@@ -143,7 +143,7 @@ void drawProcess(int *pipe_fd)
 		// se si è vinta una manche
 		if (gameData->gameInfo.mancheWin)
 		{
-			printViteMinus();
+			printSchermataManche();
 			// termino tutti i processi, pulisco tutte le sprite, refresh della schermata di gioco
 			terminaTuttiProcessi(gameData);
 			pulisciTutteLeSprite(gameData);
@@ -165,9 +165,7 @@ void drawProcess(int *pipe_fd)
 			gameData->pids.soundPlayer = avvia_soundPlayer(gameData->pipe_suoni);
 			gameData->pids.pidMusica = avviaMusica();
 
-			inizializzaPosRana(&(gameData->ranaAbsPos));
-			gameData->oldPos.rana.x = gameData->ranaAbsPos.x;
-			gameData->oldPos.rana.y = gameData->ranaAbsPos.y;
+			inizializzaPosRana(gameData);
 			printRana(&(gameData->oldPos.rana), &(gameData->sprites[S_RANA]), gameData);
 			inizializzaFlussi(gameData);
 			printInitTempo(gameData);
@@ -184,12 +182,12 @@ void drawProcess(int *pipe_fd)
 
 		avviaNemici(gameData, sec, contatore_dispari);
 
-		debugPrintContatori(9, gameData);
-		debugPrintPidNemici(10, gameData);
-		debugPrintOldPosNemici(11, gameData);
-		debugPrintOldPosCoccodrilli(19, gameData);
-		debugPrintFlussi(23, gameData);
-		debugPrintControlloCoccodrilli(31, gameData);
+		//debugPrintContatori(9, gameData);
+		//debugPrintPidNemici(10, gameData);
+		//debugPrintOldPosNemici(11, gameData);
+		//debugPrintOldPosCoccodrilli(19, gameData);
+		//debugPrintFlussi(23, gameData);
+		//debugPrintControlloCoccodrilli(31, gameData);
 
 		refresh();
 	}
@@ -197,11 +195,11 @@ void drawProcess(int *pipe_fd)
 	// if sul tipo di uscita dal gioco
 	if (isWin(gameData))
 	{
-		stampaWin();
+		printSchermataWin();
 	}
 	else
 	{
-		stampaGameOver();
+		printSchermataGameOver();
 	}
 
 	terminaTuttiProcessi(gameData);
@@ -363,30 +361,6 @@ void terminaTuttiProcessi(GameData *gameData)
 	return;
 }
 
-void stampaWin()
-{
-	clear();
-	stampaBox();
-	stampaLogoMenu(STARTROWLOGOMENU, STARTCOLLOGOMENU);
-	mvprintw(15, 80, "you win!!!!!!!!!!!!!");
-	refresh();
-	debugBlock();
-	return;
-}
-
-void stampaGameOver()
-{
-	clear();
-	stampaBox();
-	stampaLogoMenu(STARTROWLOGOMENU, STARTCOLLOGOMENU);
-	mvprintw(15, 80, "Game Over!");
-	mvprintw(17, 80, "premi un tasto per continuare");
-	refresh();
-	nodelay(stdscr, FALSE);
-	getch();
-	return;
-}
-
 void printRana(PipeData *datiRana, Sprite *sprite, GameData *gameData)
 {
 	int startRow = datiRana->y;
@@ -428,11 +402,14 @@ bool thereIsSpaceForCoccodrilloOnFila(GameData *gameData, int fila)
 
 		for (int i = begin_row; i < begin_row + COCCODRILLO_H; i++)
 		{
-			for (int j = begin_col; j < begin_col + COCCODRILLO_W; j++)
+			for (int j = begin_col; j < begin_col + COCCODRILLO_W + 1; j++)
 			{
 				if (gameData->schermo.screenMatrix[i][j].tipo == FIUME_OBJ)
 				{
 					space = true;
+				}
+				else{
+					return false;
 				}
 			}
 		}

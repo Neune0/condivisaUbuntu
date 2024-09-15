@@ -52,15 +52,8 @@ void inizializzaSprites(Sprite* sprites);
 
 /** @brief inizializza la struttura dati del gioco
  * @param gameData : la struttura dati del gioco
- * @param pipe_fd : il file descriptor della pipe
 */
-void inizializza(GameData* gameData, int* pipe_fd);
-
-/** @brief avvia i processi base del gioco
- * @param pipe_fd : la pipe
- * @param pids : puntatore a struttura dati che contiene i pid dei processi
-*/
-void avviaProcessiBase(int* pipe_fd,GameData* gameData);
+void inizializza(GameData* gameData);
 
 /***/
 Sprite inizializzaSprite(int rows, int cols, char sprite[rows][cols], int color, TipoObj tipo_oggetto);

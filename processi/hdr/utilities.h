@@ -433,6 +433,7 @@ typedef struct{
 	OldPos oldPos; // dati oggetti al passo precedente
 	CocodrileControl controlloCoccodrilli[MAXNCOCCODRILLI]; // dati per oggetti coccodrilli
 	Flusso flussi[NUMFLUSSI];
+	unsigned int randomSeed;
 }GameData;
 
 

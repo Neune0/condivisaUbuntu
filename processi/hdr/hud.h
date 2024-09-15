@@ -2,35 +2,71 @@
 #define DEBUG_H
 #include "./utilities.h"
 
-/***/
-void printVite(GameData* GameData);
+#define DIMLOGOROWS 7
+#define DIMLOGOCOLS 19
+
+#define DIMTITOLOROWS 6
+#define DIMTITOLOCOLS 46
+
+#define DIMLOSEROWS 6
+#define DIMLOSECOLS 40
+
+#define DIMWINROWS 5
+#define DIMWINCOLS 39
+
+#define DIMMANCHEROWS 5
+#define DIMMANCHECOLS 60
+
+#define DIMGAMEOVERROWS 5
+#define DIMGAMEOVERCOLS 52
 
 /***/
-void printInitTempo(GameData* gameData);
+void printVite(GameData *GameData);
 
 /***/
-void printTempo(GameData* gameData);
+void printInitTempo(GameData *gameData);
 
 /***/
-void printDefaultHudSup(GameData* gameData);
+void printTempo(GameData *gameData);
 
 /***/
-void printLvl(GameData* gameData);
+void printDefaultHudSup(GameData *gameData);
 
 /***/
-void printManche(GameData* gameData);
+void printLvl(GameData *gameData);
 
 /***/
-void printScore(GameData* gameData);
+void printManche(GameData *gameData);
 
 /***/
-void aggiornaHud(GameData* gameData);
+void printScore(GameData *gameData);
 
-void printViteMinus();
+/***/
+void aggiornaHud(GameData *gameData);
 
 void printDigit(Schermo *schermo, char digit[CIFRA_H][CIFRA_W], int startRow, int startCol, int color);
 
 void clearScreenArea(Schermo *schermo, int startRow, int startCol, int width, int height);
 
 char (*getDigits())[CIFRA_H][CIFRA_W];
+
+void printLogo(int start_row, int start_col);
+
+void printTitolo(int start_row, int start_col);
+
+void printLose(int start_row, int start_col);
+
+void printMancheWin(int start_row, int start_col);
+
+void printWin(int start_row, int start_col);
+
+void printGameOver(int start_row, int start_col);
+
+void printSchermataWin();
+
+void printSchermataGameOver();
+
+void printSchermataManche();
+
+void printViteMinus();
 #endif
