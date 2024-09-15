@@ -231,7 +231,18 @@ Collisione detectCollisione(GameData *gameData)
 
     return collisione;
 }
-
+/**
+ * Imposta correttamente il tipo di collisione
+ * @param collisione Struttura in cui inserire tutti i dati della collisione
+ * @param tipo Tipo di collisione
+ * @param attivo Tipo di oggetto attivo, quello che thriggera la collisione
+ * @param id_attivo id dell'oggetto attivo
+ * @param passivo Tipo oggetto passivo 
+ * @param id_passivo id oggetto passivo
+ * @param hit_x coordinata x del punto di collisione
+ * @param hit_y coordinata y del punto di collisione
+ * 
+ */
 void setCollision(Collisione *collisione, TipoCollisione tipo, TipoObj attivo, int id_attivo, TipoObj passivo, int id_passivo, int hit_x, int hit_y)
 {
     collisione->tipoCollisione = tipo;
@@ -243,6 +254,12 @@ void setCollision(Collisione *collisione, TipoCollisione tipo, TipoObj attivo, i
     collisione->hit_point_y = hit_y;
 }
 
+/**
+ * Prende un oggetto Collisione e la gestisce
+ * @param thread_args Struttura per i parametri da passare ai thread 
+ * @param gameData Struttura con i principali dati di gioco 
+ * @param collisione La collisione da gestire
+ */
 void handleCollisione(Params *thread_args, GameData *gameData, Collisione collisione)
 {
     Semaphore *semafori = thread_args->semafori; // Riferimento a struttura con tutti i semafori
@@ -253,10 +270,10 @@ void handleCollisione(Params *thread_args, GameData *gameData, Collisione collis
     case RANA_FIUME: // Rana è caduta nel fiume OK
     {
         ThreadControlBlock *tcb_rana = gameData->allTCB->tcb_rana;
-        if (isThreadTarget(tcb_rana, semaforoTCB))
+        if (isThreadTarget(tcb_rana, semaforoTCB)) // se la Rana è gia target allora esci
         {
             break;
-        } // se la Rana è gia target allora esci
+        } 
         // dico alla Rana di terminare
         int err = impostaThreadTarget(gameData->allTCB->tcb_rana, semaforoTCB);
         if (err)
@@ -268,31 +285,18 @@ void handleCollisione(Params *thread_args, GameData *gameData, Collisione collis
         PipeData newPosAbsRana;
         newPosAbsRana.x = gameData->pipeData.x + gameData->ranaAbsPos.x;
         newPosAbsRana.y = gameData->pipeData.y + gameData->ranaAbsPos.y;
-        // int newPosAbsRanaX = gameData->pipeData.x + gameData->ranaAbsPos.x;
-        // int newPosAbsRanaY = gameData->pipeData.y + gameData->ranaAbsPos.y;
-        // gameData->pipeData.x = newPosAbsRanaX;
-        // gameData->pipeData.y = newPosAbsRanaY;
-
+        
         // normale aggiornamento
         aggiornaOggettoNew_2(gameData, newPosAbsRana, &(gameData->oldPos.rana), S_RANA);
         gameData->ranaAbsPos.x = newPosAbsRana.x;
         gameData->ranaAbsPos.y = newPosAbsRana.y;
-
-        // aggiornaOggetto(gameData, &(gameData->oldPos.rana), S_RANA);
-        // gameData->ranaAbsPos.x = gameData->pipeData.x;
-        // gameData->ranaAbsPos.y = gameData->pipeData.y;
 
         sem_wait(semaforoWindow);
         stampaMatrice(gameData->schermo.screenMatrix); // stampa a video solo celle della matrice dinamica modificate rispetto al ciclo precedente
         refresh();                                     // Aggiorna la finestra
         sem_post(semaforoWindow);
         usleep(500000);
-        /**/
-        // riproduco suono plof
-        // tolgo una vita alla rana
-        // schermata vite--
-        // faccio ripartire la rana
-
+        
         if (gameData->gameInfo.vite > 0)
         { // decremento vite
             gameData->gameInfo.vite--;
@@ -305,10 +309,10 @@ void handleCollisione(Params *thread_args, GameData *gameData, Collisione collis
     case RANA_LAVA:
     {
         ThreadControlBlock *tcb_rana = gameData->allTCB->tcb_rana;
-        if (isThreadTarget(tcb_rana, semaforoTCB))
+        if (isThreadTarget(tcb_rana, semaforoTCB)) // se la Rana è gia target allora esci
         {
             break;
-        } // se la Rana è gia target allora esci
+        } 
         // dico alla Rana di terminare
         int err = impostaThreadTarget(gameData->allTCB->tcb_rana, semaforoTCB);
         if (err)
@@ -329,7 +333,7 @@ void handleCollisione(Params *thread_args, GameData *gameData, Collisione collis
         gameData->ranaAbsPos.y = newPosAbsRana.y;
 
         sem_wait(semaforoWindow);
-        stampaMatrice(gameData->schermo.screenMatrix); // stampa a video solo celle della matrice dinamica modificate rispetto al ciclo precedente
+        stampaMatrice(gameData->schermo.screenMatrix); // stampa sprite
         refresh();                                     // Aggiorna la finestra
         sem_post(semaforoWindow);
         usleep(500000);
@@ -346,17 +350,12 @@ void handleCollisione(Params *thread_args, GameData *gameData, Collisione collis
 
     case RANA_TANA_APERTA:
     {
-        /*  Resetta la manche,
-            - incrementa manche e punteggio
-            - resetta pos Rana
-            - modifica sprite della tana da aperta a chiusa
-        */
-
-        ThreadControlBlock *tcb_rana = gameData->allTCB->tcb_rana;
-        if (isThreadTarget(tcb_rana, semaforoTCB))
+        
+        ThreadControlBlock *tcb_rana = gameData->allTCB->tcb_rana; // recupera ThreadControlBlock della Rana
+        if (isThreadTarget(tcb_rana, semaforoTCB)) // se la Rana è gia target allora esci
         {
             break;
-        } // se la Rana è gia target allora esci
+        } 
         // dico alla Rana di terminare
         int err = impostaThreadTarget(gameData->allTCB->tcb_rana, semaforoTCB);
         if (err)
@@ -375,16 +374,16 @@ void handleCollisione(Params *thread_args, GameData *gameData, Collisione collis
         gameData->ranaAbsPos.y = newPosAbsRana.y;
 
         sem_wait(semaforoWindow);
-        stampaMatrice(gameData->schermo.screenMatrix); // stampa a video solo celle della matrice dinamica modificate rispetto al ciclo precedente
+        stampaMatrice(gameData->schermo.screenMatrix); // stampa sprite
         refresh();                                     // Aggiorna la finestra
         sem_post(semaforoWindow);
         usleep(500000);
 
-        gameData->ranaAbsPos.on_coccodrillo = false;
+        gameData->ranaAbsPos.on_coccodrillo = false; // resetta info su Rana e Coccodrillo
         gameData->ranaAbsPos.id_coccodrillo = -1;
 
         // modifico dati manche e punteggio
-        if (false == gameData->gameInfo.mancheIsChanged)
+        if (false == gameData->gameInfo.mancheIsChanged) 
         {
             gameData->gameInfo.manche++;
             gameData->gameInfo.mancheIsChanged = true;
@@ -404,11 +403,11 @@ void handleCollisione(Params *thread_args, GameData *gameData, Collisione collis
 
     case RANA_TANA_CHIUSA:
     {
-        ThreadControlBlock *tcb_rana = gameData->allTCB->tcb_rana;
-        if (isThreadTarget(tcb_rana, semaforoTCB))
+        ThreadControlBlock *tcb_rana = gameData->allTCB->tcb_rana; // recupera ThreadControlBlock della Rana
+        if (isThreadTarget(tcb_rana, semaforoTCB)) // se la Rana è gia target allora esci
         {
             break;
-        } // se la Rana è gia target allora esci
+        } 
         // dico alla Rana di terminare
         int err = impostaThreadTarget(gameData->allTCB->tcb_rana, semaforoTCB);
         if (err)
@@ -429,7 +428,7 @@ void handleCollisione(Params *thread_args, GameData *gameData, Collisione collis
         gameData->ranaAbsPos.y = newPosAbsRana.y;
 
         sem_wait(semaforoWindow);
-        stampaMatrice(gameData->schermo.screenMatrix); // stampa a video solo celle della matrice dinamica modificate rispetto al ciclo precedente
+        stampaMatrice(gameData->schermo.screenMatrix); // stampa sprite
         refresh();                                     // Aggiorna la finestra
         sem_post(semaforoWindow);
         usleep(500000);
@@ -449,11 +448,12 @@ void handleCollisione(Params *thread_args, GameData *gameData, Collisione collis
 
         if (collisione.oggetto_attivo == RANA_OBJ) // oggetto attivo = RANA
         {
-            ThreadControlBlock *tcb_rana = gameData->allTCB->tcb_rana;
+            // recupero ThreadControlBlock della Rana e del ProiettileNemico
+            ThreadControlBlock *tcb_rana = gameData->allTCB->tcb_rana; 
             ThreadControlBlock *tcb_proiettileNemico = &(gameData->allTCB->tcb_proiettili_nemici[collisione.id_oggetto_passivo]);
             pthread_t tid_rana = leggiTid(tcb_rana, semaforoTCB);
             pthread_t tid_proiettileNemico = leggiTid(tcb_proiettileNemico, semaforoTCB);
-
+            // controllo di validità sui tid
             if (tid_rana == 0)
             {
                 break;
@@ -462,7 +462,7 @@ void handleCollisione(Params *thread_args, GameData *gameData, Collisione collis
             {
                 break;
             }
-
+            // se uno dei due è già target, c'è gia una collisione ed esci
             if (isThreadTarget(tcb_proiettileNemico, semaforoTCB))
             {
                 break;
@@ -476,10 +476,7 @@ void handleCollisione(Params *thread_args, GameData *gameData, Collisione collis
                 perror("ERRORE imposta thread Target");
                 break;
             }
-            else
-            {
-                // beep();
-            }
+            
 
             if (impostaThreadTarget(tcb_rana, &semafori->tcb_mutex) != 0) // fa terminare la RANA
             {
@@ -489,7 +486,7 @@ void handleCollisione(Params *thread_args, GameData *gameData, Collisione collis
             else
             {
                 if (gameData->gameInfo.vite > 0)
-                { // decremento vite
+                { // decremento vite e manche
                     gameData->gameInfo.vite--;
                     gameData->gameInfo.viteIsChanged = true;
                     gameData->gameInfo.manche--;
@@ -499,14 +496,17 @@ void handleCollisione(Params *thread_args, GameData *gameData, Collisione collis
         }
         else // oggetto attivo = PRoiettile_Nemico
         {
-            /* Far terminare la Rana, Far terminare il Proiettile_Nemico */
-
+            /* Fa terminare la Rana, 
+                Fa terminare il Proiettile_Nemico 
+                Decrementa vite e manche    
+            */
+            // Recupero i ThreadControlBlock di Rana e ProiettileNemico
             ThreadControlBlock *tcb_proiettileNemico = &(gameData->allTCB->tcb_proiettili_nemici[collisione.id_oggetto_attivo]);
             ThreadControlBlock *tcb_rana = gameData->allTCB->tcb_rana;
 
             pthread_t tid_rana = leggiTid(tcb_rana, semaforoTCB);
             pthread_t tid_proiettileNemico = leggiTid(tcb_proiettileNemico, semaforoTCB);
-            // hai letto dei thread gia chiusi
+            // controllo sui tid. se hai letto dei thread gia chiusi, esci
             if (tid_rana == 0)
             {
                 break;
@@ -515,7 +515,7 @@ void handleCollisione(Params *thread_args, GameData *gameData, Collisione collis
             {
                 break;
             }
-
+            // se uno dei due è già target la collisione c'è già stata ed esci
             if (isThreadTarget(tcb_proiettileNemico, &semafori->tcb_mutex))
             {
                 break;
@@ -530,11 +530,7 @@ void handleCollisione(Params *thread_args, GameData *gameData, Collisione collis
                 perror("ERRORE imposta thread Target");
                 break;
             }
-            else
-            {
-                // beep();
-            }
-
+            
             if (impostaThreadTarget(tcb_rana, &semafori->tcb_mutex) != 0) // fa terminare la RANA
             {
                 perror("ERR: Imposta Rana Target Fallito");
@@ -542,7 +538,7 @@ void handleCollisione(Params *thread_args, GameData *gameData, Collisione collis
             }
             else
             {
-                cancellaOggettoDaMatrice(gameData, &gameData->oldPos.rana, &gameData->oldPos.rana, S_RANA); // cancella RANA
+                cancellaOggettoDaMatrice(gameData, &gameData->oldPos.rana, &gameData->oldPos.rana, S_RANA); // cancella sprite RANA
 
                 if (gameData->gameInfo.vite > 0)
                 { // decremento vite
@@ -557,7 +553,6 @@ void handleCollisione(Params *thread_args, GameData *gameData, Collisione collis
     }
     case PROIETTILE_RANA_NEMICO: // Proiettile_Rana ha colpito il Nemico
     {
-        // beep();
         /* Il proiettile è l'oggetto attivo , il nemico_pianta è l'oggetto passivo della collisione */
         // PipeData proiettile = gameData->pipeData;
 
@@ -576,8 +571,7 @@ void handleCollisione(Params *thread_args, GameData *gameData, Collisione collis
             break;
         }
         if (isThreadTarget(tcb_proiettile, &(semafori->tcb_mutex)))
-        { //??
-            // cancellaOggettoDaMatrice(gameData,&(gameData->oldPos.proiettili[collisione.id_oggetto_attivo]),gameData->oldPos.proiettili,S_PROIETTILE);
+        { 
             break;
         }
 
@@ -593,16 +587,14 @@ void handleCollisione(Params *thread_args, GameData *gameData, Collisione collis
             break;
         }
 
-        // gameData->gameInfo.mancheIsChanged=true;
-
         gameData->gameInfo.punteggio += 5;
         gameData->gameInfo.punteggioIsChanged = true;
-        // beep();
         break;
     }
     case PROIETTILE_RANA_PROIETTILE_NEMICO: // Proiettile_Rana ha colpito Proiettile_Nemico
-    {                                       // oggetto attivo = proiettileRana. oggetto passivo = proiettileNemico
-        // su gamData->pipeData è scritto ProiettileRana
+    {                                       
+        // oggetto attivo = proiettileRana. oggetto passivo = proiettileNemico
+        // su gameData->pipeData è scritto ProiettileRana
 
         ThreadControlBlock *tcb_proiettileRana = &(gameData->allTCB->tcb_proiettili[collisione.id_oggetto_attivo]);
         ThreadControlBlock *tcb_proiettileNemico = &(gameData->allTCB->tcb_proiettili_nemici[collisione.id_oggetto_passivo]);
@@ -611,7 +603,6 @@ void handleCollisione(Params *thread_args, GameData *gameData, Collisione collis
         if (tid_proiettile == 0) // il TCB del proiettile è gia stato resettato
         {
             cancellaOggetto(gameData, gameData->oldPos.proiettili, S_PROIETTILE);
-            // beep();
             break;
         }
 
@@ -620,7 +611,6 @@ void handleCollisione(Params *thread_args, GameData *gameData, Collisione collis
             if (isThreadTerminated(tcb_proiettileRana, semaforoTCB)) // ultima scrittura
             {
                 cancellaOggetto(gameData, gameData->oldPos.proiettili, S_PROIETTILE);
-                // beep();
                 break;
             }
         }
@@ -632,16 +622,14 @@ void handleCollisione(Params *thread_args, GameData *gameData, Collisione collis
                 PipeData *proiettileNemico = &(gameData->oldPos.proiettiliNemici[collisione.id_oggetto_passivo]);
                 cancellaOggettoDaMatrice(gameData, proiettileNemico, gameData->oldPos.proiettiliNemici, S_PROIETTILE_NEMICO);
 
-                // cancellaOggetto(gameData, gameData->oldPos.proiettiliNemici, S_PROIETTILE_NEMICO);
-                // beep();
                 break;
             }
         }
-        /**/
+        
+        // dico ai thread di terminare
         impostaThreadTarget(tcb_proiettileRana, semaforoTCB);
         impostaThreadTarget(tcb_proiettileNemico, semaforoTCB);
 
-        beep();
         break;
     }
 
@@ -657,7 +645,7 @@ void handleCollisione(Params *thread_args, GameData *gameData, Collisione collis
 
             if (tid_proiettile == 0) // collisione rilevata da thread gia chiuso e tcb resettato
             {
-                cancellaOggetto(gameData, gameData->oldPos.proiettili, S_PROIETTILE);
+                cancellaOggetto(gameData, gameData->oldPos.proiettili, S_PROIETTILE); //cancella sprite
                 break;
             }
 
@@ -665,19 +653,15 @@ void handleCollisione(Params *thread_args, GameData *gameData, Collisione collis
             {
                 if (isThreadTerminated(tcb_proiettile, semaforoTCB))
                 {
-                    cancellaOggetto(gameData, gameData->oldPos.proiettili, S_PROIETTILE);
+                    cancellaOggetto(gameData, gameData->oldPos.proiettili, S_PROIETTILE); //cancella sprite
                 }
                 break;
             }
 
             impostaThreadTarget(tcb_proiettile, semaforoTCB);
 
-            // uccidiProiettile(gameData->pids.pidProiettili, collisione.id_oggetto_attivo);
-
             // ucciso processo proiettile e impostato a zero il pid in array pid proiettili
-            // cancellaOggetto(gameData, gameData->oldPos.proiettili, S_PROIETTILE);
-            // gameData->contatori.contProiettili--;
-
+            
             // il coccodrillo diventa buono
             gameData->controlloCoccodrilli[collisione.id_oggetto_passivo].is_buono = true;
 
@@ -690,30 +674,6 @@ void handleCollisione(Params *thread_args, GameData *gameData, Collisione collis
             gameData->controlloCoccodrilli[collisione.id_oggetto_passivo].passi_in_immersione = 0;
             gameData->controlloCoccodrilli[collisione.id_oggetto_passivo].passi_in_pre_immersione = 0;
             gameData->controlloCoccodrilli[collisione.id_oggetto_passivo].passi_deep = 0;
-        }
-        else
-        {
-            /*
-            // l'oggetto attivo è il tronco
-            // faccio caso collisione apparte?
-
-            uccidiProiettile(gameData->pids.pidProiettili, collisione.id_oggetto_passivo); // uccide il processo proiettile
-            // ucciso processo proiettile e impostato a zero il pid in array pid proiettili
-            cancellaOggetto(gameData, gameData->oldPos.proiettili, S_PROIETTILE);
-            gameData->contatori.contProiettili--;
-
-            // il coccodrillo diventa buono
-            gameData->controlloCoccodrilli[collisione.id_oggetto_attivo].is_buono = true;
-            // il coccodrillo esce da tutte le fasi in cui si trova
-            gameData->controlloCoccodrilli[collisione.id_oggetto_attivo].offset_deep = 0;
-            gameData->controlloCoccodrilli[collisione.id_oggetto_attivo].is_fase_pre_immersione = false;
-            gameData->controlloCoccodrilli[collisione.id_oggetto_attivo].is_fase_immersione = false;
-            gameData->controlloCoccodrilli[collisione.id_oggetto_attivo].is_going_deep = false;
-            gameData->controlloCoccodrilli[collisione.id_oggetto_attivo].is_going_up = false;
-            gameData->controlloCoccodrilli[collisione.id_oggetto_attivo].passi_in_immersione = 0;
-            gameData->controlloCoccodrilli[collisione.id_oggetto_attivo].passi_in_pre_immersione = 0;
-            gameData->controlloCoccodrilli[collisione.id_oggetto_attivo].passi_deep = 0;
-            /**/
         }
         break;
     }
@@ -738,21 +698,18 @@ void handleCollisione(Params *thread_args, GameData *gameData, Collisione collis
                     break;
                 }
             }
-            impostaThreadTarget(tcb_proiettile, semaforoTCB);
+            impostaThreadTarget(tcb_proiettile, semaforoTCB); // dice al thread di terminare
         }
-        else // oggetto attivo = coccodrillo
-        {
-            /*  ce n'è bisogno ?.
-                devo distruggere solo il proiettile, al coccodrillo non succede nulla.
-            */
-        }
+        
         break;
     }
 
     case PROIETTILE_NEMICO_PROIETTILE_RANA: // proiettileNemico ha colpito proiettileRana
-    {                                       // oggetto attivo = proiettileNemico. oggetto passivo = proiettileRana
+    {                                       
+        // oggetto attivo = proiettileNemico. oggetto passivo = proiettileRana
         // su gameData->pipData è scritto il proiettileNemico !!
 
+        // recupero ThreadControlBlock del ProiettileRana e ProiettileNemico
         ThreadControlBlock *tcb_proiettileRana = &(gameData->allTCB->tcb_proiettili[collisione.id_oggetto_passivo]);
         ThreadControlBlock *tcb_proiettileNemico = &(gameData->allTCB->tcb_proiettili_nemici[collisione.id_oggetto_attivo]);
 
@@ -760,30 +717,28 @@ void handleCollisione(Params *thread_args, GameData *gameData, Collisione collis
         {
             if (isThreadTerminated(tcb_proiettileNemico, semaforoTCB)) // ha fatto l' ultima scrittura
             {
-                cancellaOggetto(gameData, gameData->oldPos.proiettiliNemici, S_PROIETTILE_NEMICO);
-                // beep();
+                cancellaOggetto(gameData, gameData->oldPos.proiettiliNemici, S_PROIETTILE_NEMICO);// cancella sprite proiettileNemico
                 break;
             }
         }
 
-        if (isThreadTarget(tcb_proiettileRana, semaforoTCB))
+        if (isThreadTarget(tcb_proiettileRana, semaforoTCB)) // già impostato per terminare
         {
             if (isThreadTerminated(tcb_proiettileRana, semaforoTCB)) // ultima scrittura
             {
-                PipeData *proiettile = &(gameData->oldPos.proiettili[collisione.id_oggetto_passivo]);
-                cancellaOggettoDaMatrice(gameData, proiettile, gameData->oldPos.proiettili, S_PROIETTILE);
-                // beep();
+                PipeData *proiettile = &(gameData->oldPos.proiettili[collisione.id_oggetto_passivo]); // recupera PipeData del proiettileRana
+                cancellaOggettoDaMatrice(gameData, proiettile, gameData->oldPos.proiettili, S_PROIETTILE); // cancella sprite
                 break;
             }
         }
+        // dice hai thread di terminare
         impostaThreadTarget(tcb_proiettileNemico, semaforoTCB);
         impostaThreadTarget(tcb_proiettileRana, semaforoTCB);
 
-        beep();
         break;
     }
 
-    case RANA_COCCODRILLO_BUONO:
+    case RANA_COCCODRILLO_BUONO: // Rana è sul Coccodrillo Buono
     {
         if (collisione.oggetto_attivo == RANA_OBJ)
         {
@@ -815,7 +770,6 @@ void handleCollisione(Params *thread_args, GameData *gameData, Collisione collis
         }
         else
         {
-
             // l'oggetto attivo è il coccodrillo buono
             // stampo il coccodrillo buono
             if (gameData->controlloCoccodrilli[gameData->pipeData.id].direction == 1)
@@ -847,7 +801,7 @@ void handleCollisione(Params *thread_args, GameData *gameData, Collisione collis
         break;
     }
 
-    case RANA_COCCODRILLO_CATTIVO:
+    case RANA_COCCODRILLO_CATTIVO: // Rana è sul Coccodrillo Cattivo
     {
         if (collisione.oggetto_attivo == RANA_OBJ)
         { // oggetto attivo=Rana. oggetto passivo=Coccodrillo
@@ -947,7 +901,6 @@ void handleCollisione(Params *thread_args, GameData *gameData, Collisione collis
         ranaData.type = 'X';
         ranaData.id = 0;
         aggiornaOggettoNew_2(gameData, ranaData, &(gameData->oldPos.rana), S_RANA);
-        beep();
         break;
     }
 
@@ -956,6 +909,8 @@ void handleCollisione(Params *thread_args, GameData *gameData, Collisione collis
         /* La Rana muore e perde la manche */
         if (collisione.oggetto_attivo == RANA_OBJ) // oggetto attivo = RANA
         {
+            /*  Manca teminazione thread Nemico ?
+             */
             ThreadControlBlock *tcb_rana = gameData->allTCB->tcb_rana;
             pthread_t tid_rana = leggiTid(tcb_rana, semaforoTCB);
             if (tid_rana == 0)
@@ -979,15 +934,9 @@ void handleCollisione(Params *thread_args, GameData *gameData, Collisione collis
                     gameData->gameInfo.viteIsChanged = true;
                     gameData->gameInfo.manche--;
                     gameData->gameInfo.mancheIsChanged = true;
-                    /*
-                    inizializzaPosRana(&(thread_args->gameData->ranaAbsPos));
-                    PipeData newPosRana = gameData->oldPos.rana;
-                    newPosRana.x = gameData->ranaAbsPos.x;
-                    newPosRana.y = gameData->ranaAbsPos.y;
-                    aggiornaOggettoNew_2(gameData,newPosRana,&(gameData->oldPos.rana) ,S_RANA);
-                    /**/
                 }
             }
+
         }
         break;
     }

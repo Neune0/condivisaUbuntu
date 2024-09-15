@@ -121,11 +121,6 @@ void inizializzaSchermo(GameData* gameData){
 	return;
 }
 
-void avviaProcessiBase(int* pipe_fd,Pids* pids){
-	// avvia il processo che gestisce il movimento della rana
-	pids->pidRana = avviaRana(pipe_fd); 
-	return;
-}
 
 pthread_t avviaThreadBase(Pids* pids, Params *param_general){
 	// avvia il processo che gestisce il movimento della rana
@@ -279,14 +274,11 @@ void inizializzaTane(GameData* gameData){
 }
 //------------------------------------------------------------------------------------------------------------------------------
 void inizializzaArgine(ScreenCell (*screenMatrix)[WIDTH]){
-	char carattere=' ';
 	for(int i = ARGINEROWSTART; i <= ARGINEROWEND; i++){
 		for(int j = FIRSTGAMECOL; j <= LASTGAMECOL; j++){
 			
 			int n_rand=rand()%1000;	// genera numero random
 			screenMatrix[i][j].ch = (n_rand%7==0) ? ';': ' ';
-
-			//screenMatrix[i][j].ch = carattere;
 			screenMatrix[i][j].color = ARGINE_COL;
 			screenMatrix[i][j].tipo = ARGINE_OBJ;
 			screenMatrix[i][j].id = 0;

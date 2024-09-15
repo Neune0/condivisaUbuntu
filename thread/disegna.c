@@ -69,14 +69,10 @@ void *fakeRana(void *param)
 	pthread_exit(NULL);
 }
 
-void avviaNemiciThread(Params *thread_param, int *countdown);
-
 void *drawThread(void *param)
 {
 
 	Params *p = (Params *)param;
-
-	pthread_t tidRana = 123;
 
 	int *pipe_fd = NULL;
 	GameData *gameData = p->gameData; // recupera indirizzio di gameData dai parametri
@@ -86,14 +82,12 @@ void *drawThread(void *param)
 	// inizializza i dati del gioco
 	inizializza(gameData, pipe_fd);
 
-	pthread_t tid_tempo = avviaTempoThread(p);
+	avviaTempoThread(p);
 
-	tidRana = avviaThreadBase(&(gameData->pids), &(arg_general)); // avvia la Rana
+	avviaThreadBase(&(gameData->pids), &(arg_general)); // avvia la Rana
 
 	usleep(1000);
-	// gameData->pids.pidRana = tidRana;
-	// gameData->allTCB->tcb_rana->thread_id = tidRana;
-
+	
 	if (gameData->allTCB->tcb_rana->thread_id == 123)
 	{
 		beep();
@@ -116,20 +110,8 @@ void *drawThread(void *param)
 	// loop principale di gioco
 	while (!isGameOver(gameData))
 	{
-		/*
-		ThreadControlBlock *tcb_tempo = &(gameData->allTCB->tcb_tempo);
-		if(leggiTid(tcb_tempo, &p->semafori->tcb_mutex) == 0){	// se ho azzerato il tempo, riavvialo
-			pthread_t tid_tempo = avviaTempoThread(p);
-
-			//copiaTCB();
-		}
-		/**/
-
+		
 		leggiDaBuffer(&(arg_general), &(gameData->pipeData));
-
-		//	ATTENZIONE: potresti aver letto da buffer l'ultima scrittura di un thread gia chiuso!!
-		//				coontrollare se tcb.thread_id==0  	|| 		usare la cercaThreadByTid(...)
-		//				oppure togliere ultima scrittura sul buffer dai thread che terminano?
 
 		if (gameData->pipeData.type == 'p' && isThreadTerminated(&gameData->allTCB->tcb_proiettili_nemici[gameData->pipeData.id], &(p->semafori->tcb_mutex)))
 		{
@@ -217,8 +199,8 @@ void *drawThread(void *param)
 		{
 
 			pulisciSpriteInMatrice(&(gameData->oldPos.rana), &(gameData->sprites[S_RANA]), gameData); // pulisce sprite Rana
-			resetManche_2(p);
-			printInitTempo(gameData); // per le librerie??
+			resetManche(p);
+			printInitTempo(gameData); // resetta HUD Tempo
 
 			resetRanaThread(&arg_general);
 		}
@@ -232,24 +214,18 @@ void *drawThread(void *param)
 
 		//--------------AVVIO NEMICI / PIANTE ------------------
 
-		/*
-		/** */
 		if (gameData->contatori.contNemici < MAXNNEMICI - 1 && countdown_piante == 0)
 		{
 
 			int nemicoID = rand() % MAXNNEMICI;
-			// int nemicoID = id_disponibile(p->gameData->pids.pidNemici,MAXNNEMICI);
-
+			
 			if (nemicoID >= 0 && (gameData->pids.pidNemici[nemicoID] == 0))
 			{
-				// if(nemicoID >= 0){
 				pthread_t nemico = avviaNemicoThread(&arg_general, nemicoID);
 				gameData->pids.pidNemici[nemicoID] = nemico;
-				// gameData->contatori.contNemici++;
 				gameData->contatori.contNemici = (gameData->contatori.contNemici + 1) % (MAXNNEMICI + 1);
 
 				countdown_piante = rand() % 1000;
-				// power_naps_piante = rand()%1000;
 			}
 		}
 		countdown_piante = (countdown_piante > 0) ? countdown_piante - 1 : rand() % 100;
@@ -400,69 +376,32 @@ pthread_t avviaDrawThread(Params *thread_args)
 	return tid_draw;
 }
 
-void avviaNemiciThread(Params *thread_param, int *countdown)
-{
-	//--------------AVVIO NEMICI / PIANTE ------------------
-	// int countdown_piante = *(countdown);
-
-	GameData *gameData = thread_param->gameData;
-	/*
-	for(int i=0; i<MAXNNEMICI;i++){
-		int id = id_disponibile(gameData->pids.pidNemici,MAXNNEMICI);
-		if(id!=-1){
-			pthread_t nemico = avviaNemicoThread(thread_param, id);
-			gameData->pids.pidNemici[id] = nemico;
-			//gameData->contatori.contNemici++;
-			gameData->contatori.contNemici = (gameData->contatori.contNemici +1) % (MAXNNEMICI+1);
-			//gameData->pids.pidNemici[id]=avviaNemico(gameData->pipe,id);
-		}
-	}
-	/**/
-
-	if (gameData->contatori.contNemici < MAXNNEMICI - 1 && *countdown == 0)
-	{
-
-		int nemicoID = rand() % MAXNNEMICI;
-		// int nemicoID = id_disponibile(p->gameData->pids.pidNemici,MAXNNEMICI);
-
-		if (nemicoID >= 0 && (gameData->pids.pidNemici[nemicoID] == 0))
-		{
-			// if(nemicoID >= 0){
-			pthread_t nemico = avviaNemicoThread(thread_param, nemicoID);
-			gameData->pids.pidNemici[nemicoID] = nemico;
-			// gameData->contatori.contNemici++;
-			gameData->contatori.contNemici = (gameData->contatori.contNemici + 1) % (MAXNNEMICI + 1);
-
-			*countdown = rand() % 100;
-			// power_naps_piante = rand()%1000;
-		}
-	}
-	*countdown = (*countdown > 0) ? (*countdown - 1) : rand() % 100; // se >0 decrementa, altrimenti reimposta valore
-																	 //*(countdown) = countdown_piante;	// assegna il nuovo valore a countdown
-																	 /**/
-} // end avviaNemiciThread
-
+/**
+ * Gestore della comparsa dei Coccodrilli
+ */
 void spawnCoccodrilli(GameData *gameData, int sec, int contatore_dispari,Params* p)
 {
 	for (int fila = 1; fila <= 8; fila++)
-	{
+	{	
+		// a intervalli di tempo controlla se c'è spazio sulla fila
 		if (thereIsSpaceForCoccodrilloOnFila(gameData, fila) && sec % TEMPO_SPAWN_COCCODRILLI == 0 && contatore_dispari == 1)
 		{
 			int id = id_disponibile(gameData->pids.pidCoccodrilli, MAXNCOCCODRILLI);
 			if (id != NOID)
 			{
+				// Imposta coordinate iniziali del coccodrillo, da passare al thread
 				PipeData coccodrillo_init;
-				coccodrillo_init.x = gameData->flussi[fila-1].direction == 1 ? FIRSTGAMECOL - 9 : LASTGAMECOL;
+				coccodrillo_init.x = gameData->flussi[fila-1].direction == 1 ? FIRSTGAMECOL - 9 : LASTGAMECOL; // se è a dx o sx in base alla direzione del flusso
 				
-				coccodrillo_init.y = fromFilaToRow(fila);
-				coccodrillo_init.type = gameData->flussi[fila-1].direction == 1 ? 'C' : 'c';
+				coccodrillo_init.y = fromFilaToRow(fila); // recupera le coordinate y in base alla fila
+				coccodrillo_init.type = gameData->flussi[fila-1].direction == 1 ? 'C' : 'c'; // il char in base alla direzione
 				coccodrillo_init.id = id;
 
 
 				Params_coccodrilli arg_coccodrillo = {p, coccodrillo_init};
-				pthread_t pid_coccodrillo = avviaCoccodrilloThread(&(arg_coccodrillo), id);
+				pthread_t pid_coccodrillo = avviaCoccodrilloThread(&(arg_coccodrillo), id);	// avvia thread coccodrillo
 
-				gameData->flussi[fila-1].n_coccodrilli_attivi++;
+				gameData->flussi[fila-1].n_coccodrilli_attivi++;	// incrementa conteggio coccodrilli
 
 				usleep(8000);
 				gameData->pids.pidCoccodrilli[id] = leggiTid(&(gameData->allTCB->tcb_coccodrilli[id]), &(p->semafori->tcb_mutex));

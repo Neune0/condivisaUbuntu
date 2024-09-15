@@ -3,13 +3,6 @@
 
 #include "utilities.h"
 
-/*  ----------  PROCESSI ------------ */
-
-pid_t avviaRana(int* pipe_fd);
-void moveProcess(int* pipe_fd);
-void resetRana(GameData* gameData);
-
-
 /*  ----------  THREAD ------------ */
 
 /** 
@@ -30,6 +23,9 @@ void *moveRanaThread(void *param);
 */
 int resetRanaThread(Params* thread_args);
 
+/**  
+    @brief Imposta il thread Rana a target. decrementa vite e manche. imposta ranaIsDead a TRUE 
+*/
 void uccidiRana(Params* thread_args);
 
 #endif

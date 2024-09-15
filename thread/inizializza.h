@@ -64,12 +64,6 @@ void inizializzaSprites(Sprite* sprites);
 */
 void inizializza(GameData* gameData, int* pipe_fd);
 
-/** @brief avvia i processi base del gioco
- * @param pipe_fd : la pipe
- * @param pids : puntatore a struttura dati che contiene i pid dei processi
-*/
-void avviaProcessiBase(int* pipe_fd,Pids* pids);
-
 
 /** @brief avvia il thread Rana
  * @param pids : puntatore a struttura dati che contiene i pid dei processi

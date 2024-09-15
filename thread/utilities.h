@@ -777,7 +777,8 @@ bool isFrogMoveLecit(int newX, int newY, RanaAbsPos ranaPos, PipeData pipeData);
 
 /** Chiude i thread attivi per resettare la manche */
 void resetManche(Params *p);
-void resetManche_2(Params *p);
+//void resetManche_2(Params *p);
+
 void terminaTuttiThread(GameData* gameData , struct Semaphore* allSem);
 
 int fromFilaToRow(int fila);
