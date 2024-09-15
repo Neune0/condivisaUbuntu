@@ -1,5 +1,0 @@
-int contatore=0;
-mvprintw(0,0,"ok: %d",contatore);
-refresh();
-usleep(1000000);
-contatore++;
