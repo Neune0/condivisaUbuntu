@@ -40,7 +40,11 @@ void musica()
 
 void spegniMusica(GameData *gameData)
 {
-    kill(gameData->pids.pidMusica, SIGKILL);
-    waitpid(gameData->pids.pidMusica, NULL, 0);
+    if(gameData->pids.pidMusica!=-1){
+        kill(gameData->pids.pidMusica, SIGKILL);
+        waitpid(gameData->pids.pidMusica, NULL, 0);
+        gameData->pids.pidMusica = -1;
+    }
+    
     return;
 }

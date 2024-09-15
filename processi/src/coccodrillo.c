@@ -1,8 +1,7 @@
 #include "../hdr/coccodrillo.h"
 
-pid_t avviaCoccodrillo(int *pipe_fd, PipeData* coccodrillo_init, int id,int direction,int vel)
+pid_t avviaCoccodrillo(int *pipe_fd, PipeData* coccodrillo_init,int direction,int vel)
 {
-
     pid_t coccodrillo_pid = fork();
 
     if (coccodrillo_pid < 0)
@@ -14,8 +13,7 @@ pid_t avviaCoccodrillo(int *pipe_fd, PipeData* coccodrillo_init, int id,int dire
     {
         // Processo coccodrillo
         close(pipe_fd[0]); // Chiudi l'estremità di lettura della pipe
-        
-        coccodrillo(pipe_fd, coccodrillo_init, id,direction,vel);
+        coccodrillo(pipe_fd, coccodrillo_init,direction,vel);
         exit(0);
     }
     else
@@ -24,13 +22,13 @@ pid_t avviaCoccodrillo(int *pipe_fd, PipeData* coccodrillo_init, int id,int dire
     }
 }
 
-void coccodrillo(int *pipe_fd, PipeData *coccodrillo_init, int id,int direction,int vel)
+void coccodrillo(int *pipe_fd, PipeData *coccodrillo_init,int direction,int vel)
 {
     PipeData coccodrillo;
     coccodrillo.x = coccodrillo_init->x; // le coordinate iniziali del coccodrillo sono quelle dell' oggetto che ha sparato
     coccodrillo.y = coccodrillo_init->y;
     coccodrillo.type = coccodrillo_init->type;
-    coccodrillo.id = id;
+    coccodrillo.id = coccodrillo_init->id;
     int dirX = direction;
     int velocity;
     switch(vel){
@@ -63,7 +61,7 @@ void coccodrillo(int *pipe_fd, PipeData *coccodrillo_init, int id,int direction,
 
 void uccidiCoccodrillo(pid_t *pids_coccodrilli, int id_coccodrillo)
 {
-    if ((id_coccodrillo != -1) && (pids_coccodrilli[id_coccodrillo] != 0))
+    if ((id_coccodrillo != NOID) && (pids_coccodrilli[id_coccodrillo] != NOPID))
     {
         kill(pids_coccodrilli[id_coccodrillo], SIGKILL);
         int err = waitpid(pids_coccodrilli[id_coccodrillo], NULL, 0);
@@ -72,7 +70,7 @@ void uccidiCoccodrillo(pid_t *pids_coccodrilli, int id_coccodrillo)
             perror("Errore nella waitpid");
             exit(1);
         }
-        pids_coccodrilli[id_coccodrillo] = 0;
+        pids_coccodrilli[id_coccodrillo] = NOPID;
     }
     return;
 }

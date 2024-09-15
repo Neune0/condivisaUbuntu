@@ -1,56 +1,65 @@
 #include "proiettile.h"
 
-pthread_t avviaProiettileThread(ParamsOggetti *thread_arg){
+pthread_t avviaProiettileThread(Params *thread_arg, int id)
+{
 	pthread_t tid_proiettile;
+	thread_arg->id = id; // incapsula l'id dell'oggetto nei parametri da passare al thread
 
 	// crea il thread proiettile e controlla.
-	if(pthread_create(&tid_proiettile, NULL, &moveProiettileThread,thread_arg) != 0){
+	
+	if (pthread_create(&tid_proiettile, NULL, &moveProiettileThread, (void*)thread_arg) != 0)
+	{
 		perror("ERR: Avvio Proiettile Fallito!");
 		_exit(3);
 	}
-	else{
+	else
+	{
 		return tid_proiettile;
-	
 	}
-	return tid_proiettile;
 }
 
 void *moveProiettileThread(void *param)
 {
-	// cast parametri
-	ParamsOggetti *parametri = (ParamsOggetti *)param;
-
-	int controlla=0;
-
-	int dirY = -1; // direzione del movimento del proiettile
+	Params *p = (Params *)param;
+	pthread_t my_tid = pthread_self();
+	ThreadControlBlock my_tcb = {my_tid,false,false};
 	
-	ThreadControlBlock *my_tcb = parametri->thread_tcb;
+	copiaTCB(&(p->gameData->allTCB->tcb_proiettili[p->id]), my_tcb, &(p->semafori->tcb_mutex));
+
+	RanaAbsPos *initPos = &(p->gameData->ranaAbsPos);
 	
+	int dirY = -1;
 	PipeData proiettile;
-	proiettile.x = parametri->init->x;
-	proiettile.y = parametri->init->y;
+	proiettile.x = initPos->x + 1; // le coordinate iniziali del proiettile sono quelle dell' oggetto che ha sparato
+	proiettile.y = initPos->y - 1;
 	proiettile.type = 'P';
-	proiettile.id = parametri->init->id;
-	proiettile.thread_id = my_tcb->thread_id;
+	proiettile.id = p->id;
+	proiettile.thread_id = my_tid;
 
-	ThreadControlBlock deb = *(my_tcb);
-	int aspetta=0;
-	my_tcb->thread_id = pthread_self(); // ci salvo il suo thread_id
+	ThreadControlBlock* tcbFromGameData = cercaThreadByTid(p->gameData->allTCB->tcb_proiettili,my_tid, &(p->semafori->tcb_mutex),MAXNPROIETTILI);
 
+	//ThreadControlBlock* tcbFromGameData = recuperaThreadTCB(p->gameData->allTCB->tcb_proiettili,my_tid,MAXNPROIETTILI);
+	
 	while (1)
 	{
-		if(my_tcb->is_target){
+		
+		if (!(isThreadTarget(tcbFromGameData, &(p->semafori->tcb_mutex))))
+		{
+			proiettile.y = proiettile.y + dirY;
+			scriviSuBuffer(p, proiettile, tcbFromGameData, false);
+			usleep(100000);
+		}
+		else{
 			break;
 		}
-		proiettile.y = proiettile.y + dirY;
-		scriviSuBuffer(parametri, proiettile, my_tcb, false);
-		usleep(100000);
+		
 	}
 
-	// indica l'ultima scrittura su buffer del proiettile
-	proiettile.type='Y';
-	scriviSuBuffer(parametri, proiettile, my_tcb, true);
-	
+	scriviSuBuffer(p, proiettile, tcbFromGameData, true);
+	//usleep(600000);
 	pthread_exit(NULL);
-	return NULL;
+	
 }
+
+
+

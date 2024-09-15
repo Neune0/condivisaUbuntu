@@ -9,26 +9,22 @@
 #include "hud.h"
 #include "schermo.h"
 
+//#include "nemico.h"             // in più?
+//#include "proiettileNemico.h"   // in più?
+//#include "tempo.h"              // in più?
+//#include "coccodrillo.h"
+
+/** @brief Avvia il thread Disegna e restituisce il suo thread_id.
+ *  @param thread_args: Parametri da passare al thread: semafori, buffer, e GameData.
+*/
+pthread_t avviaDrawThread(Params *thread_args);
+
+
 /** @brief Il Thread che disegna e legge da buffer 
  * @param param: parametri del thread (Param *)
 */
 void *drawThread (void *param);
 
-/** @brief Avvia il thread Disegna e restituisce il suo thread_id.
- *  @param thread_args: Parametri da passare al thread: semafori, buffer, e GameData.
-*/
-pthread_t avviaDrawThread(ParamsDisegna *thread_args);
-
-/** @brief avvia il processo disegna
- * @param pipe_fd : la pipe (array di int di dimensione 2)
-void avviaDrawProcess(int pipe_fd[2]);
-*/
-
-/** @brief processo disegna, 
- * si occupa di leggere la pipe aggiornare il gioco e stampare l'aggiornamento
- * @param pipe_fd : file descriptor della pipe
-void drawProcess(int* pipe_fd);
-*/
 
 /** @brief stampa la schermata di win*/
 void stampaWin();
@@ -43,12 +39,15 @@ void stampaGameOver();
 */
 void printRana(PipeData* datiRana, Sprite* sprite,GameData* gameData);
 
+bool thereIsSpaceForCoccodrilloOnFila(GameData *gameData, int fila);
+
+void spawnCoccodrilli(GameData *gameData, int sec, int contatore_dispari,Params* p);
+
+
 /***/
 void *buff_Reader(void *param); // thread di prova di lettura dal buffer
 
 void* buff_Writer(void *param );
-
-
 
 
 #endif

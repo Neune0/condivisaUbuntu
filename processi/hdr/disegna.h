@@ -35,6 +35,9 @@ void stampaGameOver();
 */
 void printRana(PipeData* datiRana, Sprite* sprite,GameData* gameData);
 bool thereIsSpaceForCoccodrilloOnFila(GameData *gameData, int fila);
-void avviaNemici(GameData* gameData);
+void avviaNemici(GameData *gameData,int sec,int contatore_dispari);
 void terminaTuttiProcessi(GameData* gameData);
+void pulisciTutteLeSprite(GameData* gameData);
+void spawnCoccodrilli(GameData* gameData, int sec, int contatore_dispari);
+void inizializzaCoccodrillo(PipeData* coccodrillo_init,GameData* gameData,int fila,int id);
 #endif

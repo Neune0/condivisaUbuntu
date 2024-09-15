@@ -60,7 +60,7 @@ void inizializza(GameData* gameData, int* pipe_fd);
  * @param pipe_fd : la pipe
  * @param pids : puntatore a struttura dati che contiene i pid dei processi
 */
-void avviaProcessiBase(int* pipe_fd,Pids* pids);
+void avviaProcessiBase(int* pipe_fd,GameData* gameData);
 
 /***/
 Sprite inizializzaSprite(int rows, int cols, char sprite[rows][cols], int color, TipoObj tipo_oggetto);
@@ -72,4 +72,6 @@ void inizializzaBox(GameData* gameData);
 void inizializzaTempo(GameData* gameData);
 
 void inizializzaFlussi(GameData* gameData);
+
+void inizializzaPid(GameData* gameData);
 #endif
