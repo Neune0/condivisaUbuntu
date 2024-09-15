@@ -193,7 +193,7 @@ void aggiornaHud(GameData *gameData)
     return;
 }
 
-void printSchermataWin()
+void printSchermataWin(int totalScore)
 {
     clear(); // pulisco schermo
     refresh();
@@ -210,6 +210,7 @@ void printSchermataWin()
 
     nodelay(stdscr, FALSE); // riabilita l'input bloccante
 
+    mvprintw(33,(LASTGAMECOL - 16)/2,"Your score: %d",totalScore);
     // stampa la scritta premi un tasto per continuare
     mvprintw(35, (LASTGAMECOL - 33) / 2, "Premi un tasto per continuare...");
     getch();

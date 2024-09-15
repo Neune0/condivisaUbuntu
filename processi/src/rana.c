@@ -95,8 +95,8 @@ void moveProcess(int* pipe_fd) {
 
 void inizializzaPosRana(GameData* gameData){
 	gameData->ranaAbsPos.x=40;
-	//gameData->ranaAbsPos.y=MARCIAPIEDEROWSTART;
-	gameData->ranaAbsPos.y=ARGINEROWSTART;
+	gameData->ranaAbsPos.y=MARCIAPIEDEROWSTART;
+	//gameData->ranaAbsPos.y=ARGINEROWSTART;
 	gameData->ranaAbsPos.on_coccodrillo=false;
 	gameData->ranaAbsPos.id_coccodrillo=NOID;
 	gameData->ranaAbsPos.offset_on_coccodrillo=0;

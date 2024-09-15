@@ -62,7 +62,7 @@ void printWin(int start_row, int start_col);
 
 void printGameOver(int start_row, int start_col);
 
-void printSchermataWin();
+void printSchermataWin(int totalScore);
 
 void printSchermataGameOver();
 

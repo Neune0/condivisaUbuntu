@@ -192,7 +192,7 @@ void drawProcess(int *pipe_fd)
 	// if sul tipo di uscita dal gioco
 	if (isWin(gameData))
 	{
-		printSchermataWin();
+		printSchermataWin(gameData->gameInfo.punteggio);
 	}
 	else
 	{
