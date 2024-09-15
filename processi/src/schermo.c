@@ -349,7 +349,9 @@ void printPianta(GameData *gameData, PipeData *old_pos, TipoSprite tipoSprite)
 void handleCoccodrilloMovement(GameData *gameData)
 {
 	CocodrileControl *controlloCoccodrillo = &(gameData->controlloCoccodrilli[gameData->pipeData.id]);
-	
+
+	int spriteDaDisegnare = determinaSpriteCoccodrillo(controlloCoccodrillo);
+
 	if (controlloCoccodrillo->is_fase_immersione)
 	{
 		if (controlloCoccodrillo->is_going_deep)
@@ -357,68 +359,36 @@ void handleCoccodrilloMovement(GameData *gameData)
 			if (controlloCoccodrillo->direction == 1)
 			{
 				// il coccodrillo va verso destra
-				aggiornaOggettoCoccodrillo(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_DX_C, controlloCoccodrillo);
-				
+				aggiornaOggettoCoccodrillo(gameData, gameData->oldPos.coccodrilli, spriteDaDisegnare, controlloCoccodrillo);
+
 				if (gameData->ranaAbsPos.id_coccodrillo == gameData->pipeData.id)
 				{
 					// se sommando i due ottengo 7 devo uccidere la rana
 					if (gameData->ranaAbsPos.offset_on_coccodrillo + gameData->controlloCoccodrilli[gameData->ranaAbsPos.id_coccodrillo].offset_deep >= 7)
 					{
 						// imposto rana is dead a true
-        				gameData->gameInfo.ranaIsDead= true;
+						gameData->gameInfo.ranaIsDead = true;
 					}
 					else
 					{
-						// ci stampo sopra la rana
-						PipeData rana;
-						rana.x = gameData->oldPos.coccodrilli[gameData->pipeData.id].x + gameData->ranaAbsPos.offset_on_coccodrillo;
-						rana.y = gameData->oldPos.coccodrilli[gameData->pipeData.id].y;
-						rana.id = 0;
-						rana.type = 'X';
-						// aggiorno rana abs pos
-						gameData->ranaAbsPos.x = rana.x;
-						gameData->ranaAbsPos.y = rana.y;
-						stampaSpriteInMatrice(&(rana), &(gameData->sprites[S_RANA]), gameData);
-
-						// se la rana esce fuori dallo schermo allora muore
-						if (gameData->ranaAbsPos.x >= LASTGAMECOL - 1 || gameData->ranaAbsPos.x < FIRSTGAMECOL)
-						{
-							// imposto rana is dead a true
-        					gameData->gameInfo.ranaIsDead= true;
-						}
+						stampaRanaOnCoccodrillo(gameData);
 					}
 				}
 			}
 			else
 			{
 				// il coccodrillo va verso sinistra
-				aggiornaOggettoCoccodrillo(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_SX_C, controlloCoccodrillo);
+				aggiornaOggettoCoccodrillo(gameData, gameData->oldPos.coccodrilli, spriteDaDisegnare, controlloCoccodrillo);
 				if (gameData->ranaAbsPos.id_coccodrillo == gameData->pipeData.id)
 				{
 					if (gameData->controlloCoccodrilli[gameData->pipeData.id].offset_deep - gameData->ranaAbsPos.offset_on_coccodrillo >= 1)
 					{
 						// imposto rana is dead a true
-        				gameData->gameInfo.ranaIsDead= true;
+						gameData->gameInfo.ranaIsDead = true;
 					}
 					else
 					{
-						// ci stampo sopra la rana
-						PipeData rana;
-						rana.x = gameData->oldPos.coccodrilli[gameData->pipeData.id].x + gameData->ranaAbsPos.offset_on_coccodrillo;
-						rana.y = gameData->oldPos.coccodrilli[gameData->pipeData.id].y;
-						rana.id = 0;
-						rana.type = 'X';
-						// aggiorno rana abs pos
-						gameData->ranaAbsPos.x = rana.x;
-						gameData->ranaAbsPos.y = rana.y;
-						stampaSpriteInMatrice(&(rana), &(gameData->sprites[S_RANA]), gameData);
-
-						// se la rana esce fuori dallo schermo allora muore
-						if (gameData->ranaAbsPos.x >= LASTGAMECOL - 1 || gameData->ranaAbsPos.x < FIRSTGAMECOL)
-						{
-							// imposto rana is dead a true
-        					gameData->gameInfo.ranaIsDead= true;
-						}
+						stampaRanaOnCoccodrillo(gameData);
 					}
 				}
 			}
@@ -436,57 +406,10 @@ void handleCoccodrilloMovement(GameData *gameData)
 
 			if (controlloCoccodrillo->is_going_up)
 			{
-				if (controlloCoccodrillo->direction != 1)
+				aggiornaOggettoCoccodrillo(gameData, gameData->oldPos.coccodrilli, spriteDaDisegnare, controlloCoccodrillo);
+				if (gameData->ranaAbsPos.id_coccodrillo == gameData->pipeData.id)
 				{
-					// il coccodrillo va verso destra
-					// cancellare lo posso lasciare come prima
-					// invece disegnare lo devo modificare
-					aggiornaOggettoCoccodrillo(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_DX_C, controlloCoccodrillo);
-					if (gameData->ranaAbsPos.id_coccodrillo == gameData->pipeData.id)
-					{
-						// ci stampo sopra la rana
-						PipeData rana;
-						rana.x = gameData->oldPos.coccodrilli[gameData->pipeData.id].x + gameData->ranaAbsPos.offset_on_coccodrillo;
-						rana.y = gameData->oldPos.coccodrilli[gameData->pipeData.id].y;
-						rana.id = 0;
-						rana.type = 'X';
-						// aggiorno rana abs pos
-						gameData->ranaAbsPos.x = rana.x;
-						gameData->ranaAbsPos.y = rana.y;
-						stampaSpriteInMatrice(&(rana), &(gameData->sprites[S_RANA]), gameData);
-
-						// se la rana esce fuori dallo schermo allora muore
-						if (gameData->ranaAbsPos.x >= LASTGAMECOL - 1 || gameData->ranaAbsPos.x < FIRSTGAMECOL)
-						{
-							// uccido la rana
-        					gameData->gameInfo.ranaIsDead= true;
-						}
-					}
-				}
-				else
-				{
-					// il coccodrillo va verso sinistra
-					aggiornaOggettoCoccodrillo(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_SX_C, controlloCoccodrillo);
-					if (gameData->ranaAbsPos.id_coccodrillo == gameData->pipeData.id)
-					{
-						// ci stampo sopra la rana
-						PipeData rana;
-						rana.x = gameData->oldPos.coccodrilli[gameData->pipeData.id].x + gameData->ranaAbsPos.offset_on_coccodrillo;
-						rana.y = gameData->oldPos.coccodrilli[gameData->pipeData.id].y;
-						rana.id = 0;
-						rana.type = 'X';
-						// aggiorno rana abs pos
-						gameData->ranaAbsPos.x = rana.x;
-						gameData->ranaAbsPos.y = rana.y;
-						stampaSpriteInMatrice(&(rana), &(gameData->sprites[S_RANA]), gameData);
-
-						// se la rana esce fuori dallo schermo allora muore
-						if (gameData->ranaAbsPos.x >= LASTGAMECOL - 1 || gameData->ranaAbsPos.x < FIRSTGAMECOL)
-						{
-							// imposto rana is dead a true
-        					gameData->gameInfo.ranaIsDead= true;
-						}
-					}
+					stampaRanaOnCoccodrillo(gameData);
 				}
 				// sta riemergendo
 				controlloCoccodrillo->offset_deep--;
@@ -519,122 +442,15 @@ void handleCoccodrilloMovement(GameData *gameData)
 	{
 		if (controlloCoccodrillo->is_fase_pre_immersione)
 		{
-			// questione lampeggio e passaggio a fase immersione
-			// dopo fase pre immersione lo faccio andare di nuovo in fase normale
-			if (controlloCoccodrillo->passi % 2 == 0)
+			// lampeggio e passaggio a fase immersione
+			controlloCoccodrillo->lampeggia = (controlloCoccodrillo->passi % 2 == 0);
+			spriteDaDisegnare = determinaSpriteCoccodrillo(controlloCoccodrillo);
+			aggiornaOggetto(gameData, gameData->oldPos.coccodrilli, spriteDaDisegnare);
+			if (gameData->ranaAbsPos.id_coccodrillo == gameData->pipeData.id)
 			{
-				// lo faccio lampeggiare
-				controlloCoccodrillo->lampeggia = true;
-			}
-			else
-			{
-				controlloCoccodrillo->lampeggia = false;
+				stampaRanaOnCoccodrillo(gameData);
 			}
 
-			if (controlloCoccodrillo->lampeggia)
-			{
-				if (gameData->pipeData.type == 'C')
-				{
-					aggiornaOggetto(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_DX_L);
-
-					if (gameData->ranaAbsPos.id_coccodrillo == gameData->pipeData.id)
-					{
-						// ci stampo sopra la rana
-						PipeData rana;
-						rana.x = gameData->oldPos.coccodrilli[gameData->pipeData.id].x + gameData->ranaAbsPos.offset_on_coccodrillo;
-						rana.y = gameData->oldPos.coccodrilli[gameData->pipeData.id].y;
-						rana.id = 0;
-						rana.type = 'X';
-						// aggiorno rana abs pos
-						gameData->ranaAbsPos.x = rana.x;
-						gameData->ranaAbsPos.y = rana.y;
-						stampaSpriteInMatrice(&(rana), &(gameData->sprites[S_RANA]), gameData);
-
-						// se la rana esce fuori dallo schermo allora muore
-						if (gameData->ranaAbsPos.x >= LASTGAMECOL - 1 || gameData->ranaAbsPos.x < FIRSTGAMECOL)
-						{
-							// imposto rana is dead a true
-        					gameData->gameInfo.ranaIsDead= true;
-						}
-					}
-				}
-				if (gameData->pipeData.type == 'c')
-				{
-					aggiornaOggetto(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_SX_L);
-					if (gameData->ranaAbsPos.id_coccodrillo == gameData->pipeData.id)
-					{
-						// ci stampo sopra la rana
-						PipeData rana;
-						rana.x = gameData->oldPos.coccodrilli[gameData->pipeData.id].x + gameData->ranaAbsPos.offset_on_coccodrillo;
-						rana.y = gameData->oldPos.coccodrilli[gameData->pipeData.id].y;
-						rana.id = 0;
-						rana.type = 'X';
-						// aggiorno rana abs pos
-						gameData->ranaAbsPos.x = rana.x;
-						gameData->ranaAbsPos.y = rana.y;
-						stampaSpriteInMatrice(&(rana), &(gameData->sprites[S_RANA]), gameData);
-
-						// se la rana esce fuori dallo schermo allora muore
-						if (gameData->ranaAbsPos.x >= LASTGAMECOL - 1 || gameData->ranaAbsPos.x < FIRSTGAMECOL)
-						{
-							// imposto rana is dead a true
-        					gameData->gameInfo.ranaIsDead= true;
-						}
-					}
-				}
-			}
-			else
-			{
-
-				if (gameData->pipeData.type == 'C')
-				{
-					aggiornaOggetto(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_DX_C);
-					if (gameData->ranaAbsPos.id_coccodrillo == gameData->pipeData.id)
-					{
-						// ci stampo sopra la rana
-						PipeData rana;
-						rana.x = gameData->oldPos.coccodrilli[gameData->pipeData.id].x + gameData->ranaAbsPos.offset_on_coccodrillo;
-						rana.y = gameData->oldPos.coccodrilli[gameData->pipeData.id].y;
-						rana.id = 0;
-						rana.type = 'X';
-						// aggiorno rana abs pos
-						gameData->ranaAbsPos.x = rana.x;
-						gameData->ranaAbsPos.y = rana.y;
-						stampaSpriteInMatrice(&(rana), &(gameData->sprites[S_RANA]), gameData);
-
-						// se la rana esce fuori dallo schermo allora muore
-						if (gameData->ranaAbsPos.x >= LASTGAMECOL - 1 || gameData->ranaAbsPos.x < FIRSTGAMECOL)
-						{
-							// imposto rana is dead a true
-        					gameData->gameInfo.ranaIsDead= true;
-						}
-					}
-				}
-				if (gameData->pipeData.type == 'c')
-				{
-					aggiornaOggetto(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_SX_C);
-					if (gameData->ranaAbsPos.id_coccodrillo == gameData->pipeData.id)
-					{
-						// ci stampo sopra la rana
-						PipeData rana;
-						rana.x = gameData->oldPos.coccodrilli[gameData->pipeData.id].x + gameData->ranaAbsPos.offset_on_coccodrillo;
-						rana.y = gameData->oldPos.coccodrilli[gameData->pipeData.id].y;
-						rana.id = 0;
-						rana.type = 'X';
-						// aggiorno rana abs pos
-						gameData->ranaAbsPos.x = rana.x;
-						gameData->ranaAbsPos.y = rana.y;
-						stampaSpriteInMatrice(&(rana), &(gameData->sprites[S_RANA]), gameData);
-
-						// se la rana esce fuori dallo schermo allora muore
-						if (gameData->ranaAbsPos.x >= LASTGAMECOL - 1 || gameData->ranaAbsPos.x < FIRSTGAMECOL)
-						{
-							// imposto rana is dead a true
-        					gameData->gameInfo.ranaIsDead= true;
-						}
-					}
-				}
-			}
 			gameData->controlloCoccodrilli[gameData->pipeData.id].passi++;
 			gameData->controlloCoccodrilli[gameData->pipeData.id].passi_in_pre_immersione++;
 			if (gameData->controlloCoccodrilli[gameData->pipeData.id].passi_in_pre_immersione >= 5)
@@ -648,112 +464,12 @@ void handleCoccodrilloMovement(GameData *gameData)
 		else
 		{
 			// aggiornamento normale
-			// switch su tipo del coccodrillo in base alla direzione
-			if (gameData->pipeData.type == 'C')
+			aggiornaOggetto(gameData, gameData->oldPos.coccodrilli, spriteDaDisegnare);
+			if (gameData->ranaAbsPos.id_coccodrillo == gameData->pipeData.id)
 			{
-				if (gameData->controlloCoccodrilli[gameData->pipeData.id].is_buono)
-				{
-					aggiornaOggetto(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_DX);
-					// se la rana è su quel coccodrillo
-					if (gameData->ranaAbsPos.id_coccodrillo == gameData->pipeData.id)
-					{
-						// ci stampo sopra la rana
-						PipeData rana;
-						rana.x = gameData->oldPos.coccodrilli[gameData->pipeData.id].x + gameData->ranaAbsPos.offset_on_coccodrillo;
-						rana.y = gameData->oldPos.coccodrilli[gameData->pipeData.id].y;
-						rana.id = 0;
-						rana.type = 'X';
-						// aggiorno rana abs pos
-						gameData->ranaAbsPos.x = rana.x;
-						gameData->ranaAbsPos.y = rana.y;
-						stampaSpriteInMatrice(&(rana), &(gameData->sprites[S_RANA]), gameData);
-
-						// se la rana esce fuori dallo schermo allora muore
-						if (gameData->ranaAbsPos.x >= LASTGAMECOL - 1 || gameData->ranaAbsPos.x < FIRSTGAMECOL)
-						{
-							// imposto rana is dead a true
-        					gameData->gameInfo.ranaIsDead= true;
-						}
-					}
-				}
-				else
-				{
-					aggiornaOggetto(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_DX_C);
-					if (gameData->ranaAbsPos.id_coccodrillo == gameData->pipeData.id)
-					{
-						// ci stampo sopra la rana
-						PipeData rana;
-						rana.x = gameData->oldPos.coccodrilli[gameData->pipeData.id].x + gameData->ranaAbsPos.offset_on_coccodrillo;
-						rana.y = gameData->oldPos.coccodrilli[gameData->pipeData.id].y;
-						rana.id = 0;
-						rana.type = 'X';
-						// aggiorno rana abs pos
-						gameData->ranaAbsPos.x = rana.x;
-						gameData->ranaAbsPos.y = rana.y;
-						stampaSpriteInMatrice(&(rana), &(gameData->sprites[S_RANA]), gameData);
-
-						// se la rana esce fuori dallo schermo allora muore
-						if (gameData->ranaAbsPos.x >= LASTGAMECOL - 1 || gameData->ranaAbsPos.x < FIRSTGAMECOL)
-						{
-							// imposto rana is dead a true
-        					gameData->gameInfo.ranaIsDead= true;
-						}
-					}
-				}
+				stampaRanaOnCoccodrillo(gameData);
 			}
 
-			if (gameData->pipeData.type == 'c')
-			{
-				if (gameData->controlloCoccodrilli[gameData->pipeData.id].is_buono)
-				{
-					aggiornaOggetto(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_SX);
-					// se la rana è su quel coccodrillo
-					if (gameData->ranaAbsPos.id_coccodrillo == gameData->pipeData.id)
-					{
-						// ci stampo sopra la rana
-						PipeData rana;
-						rana.x = gameData->oldPos.coccodrilli[gameData->pipeData.id].x + gameData->ranaAbsPos.offset_on_coccodrillo;
-						rana.y = gameData->oldPos.coccodrilli[gameData->pipeData.id].y;
-						rana.id = 0;
-						rana.type = 'X';
-						// aggiorno rana abs pos
-						gameData->ranaAbsPos.x = rana.x;
-						gameData->ranaAbsPos.y = rana.y;
-						stampaSpriteInMatrice(&(rana), &(gameData->sprites[S_RANA]), gameData);
-
-						// se la rana esce fuori dallo schermo allora muore
-						if (gameData->ranaAbsPos.x >= LASTGAMECOL - 1 || gameData->ranaAbsPos.x < FIRSTGAMECOL)
-						{
-							// imposto rana is dead a true
-        					gameData->gameInfo.ranaIsDead= true;
-						}
-					}
-				}
-				else
-				{
-					aggiornaOggetto(gameData, gameData->oldPos.coccodrilli, S_COCCODRILLO_SX_C);
-					if (gameData->ranaAbsPos.id_coccodrillo == gameData->pipeData.id)
-					{
-						// ci stampo sopra la rana
-						PipeData rana;
-						rana.x = gameData->oldPos.coccodrilli[gameData->pipeData.id].x + gameData->ranaAbsPos.offset_on_coccodrillo;
-						rana.y = gameData->oldPos.coccodrilli[gameData->pipeData.id].y;
-						rana.id = 0;
-						rana.type = 'X';
-						// aggiorno rana abs pos
-						gameData->ranaAbsPos.x = rana.x;
-						gameData->ranaAbsPos.y = rana.y;
-						stampaSpriteInMatrice(&(rana), &(gameData->sprites[S_RANA]), gameData);
-
-						// se la rana esce fuori dallo schermo allora muore
-						if (gameData->ranaAbsPos.x >= LASTGAMECOL - 1 || gameData->ranaAbsPos.x < FIRSTGAMECOL)
-						{
-							// imposto rana is dead a true
-        					gameData->gameInfo.ranaIsDead= true;
-						}
-					}
-				}
-			}
 			if (!(controlloCoccodrillo->is_buono))
 			{
 				if ((controlloCoccodrillo->passi + 1) % 30 == 0)
@@ -766,6 +482,65 @@ void handleCoccodrilloMovement(GameData *gameData)
 		}
 	}
 
+	return;
+}
+
+int determinaSpriteCoccodrillo(CocodrileControl *controlloCoccodrillo)
+{
+	if (controlloCoccodrillo->is_fase_immersione)
+	{
+		if (controlloCoccodrillo->direction == 1)
+		{
+			return S_COCCODRILLO_DX_C;
+		}
+		else
+		{
+			return S_COCCODRILLO_SX_C;
+		}
+	}
+	else if (controlloCoccodrillo->is_fase_pre_immersione)
+	{
+		if (controlloCoccodrillo->direction == 1)
+		{
+			return (controlloCoccodrillo->lampeggia) ? S_COCCODRILLO_DX_L : S_COCCODRILLO_DX_C;
+		}
+		else
+		{
+			return (controlloCoccodrillo->lampeggia) ? S_COCCODRILLO_SX_L : S_COCCODRILLO_SX_C;
+		}
+	}
+	else
+	{
+		if (controlloCoccodrillo->direction == 1)
+		{
+			return (controlloCoccodrillo->is_buono) ? S_COCCODRILLO_DX : S_COCCODRILLO_DX_C;
+		}
+		else
+		{
+			return (controlloCoccodrillo->is_buono) ? S_COCCODRILLO_SX : S_COCCODRILLO_SX_C;
+		}
+	}
+}
+
+void stampaRanaOnCoccodrillo(GameData *gameData)
+{
+	// ci stampo sopra la rana
+	PipeData rana;
+	rana.x = gameData->oldPos.coccodrilli[gameData->pipeData.id].x + gameData->ranaAbsPos.offset_on_coccodrillo;
+	rana.y = gameData->oldPos.coccodrilli[gameData->pipeData.id].y;
+	rana.id = 0;
+	rana.type = 'X';
+	// aggiorno rana abs pos
+	gameData->ranaAbsPos.x = rana.x;
+	gameData->ranaAbsPos.y = rana.y;
+	stampaSpriteInMatrice(&(rana), &(gameData->sprites[S_RANA]), gameData);
+
+	// se la rana esce fuori dallo schermo allora muore
+	if (gameData->ranaAbsPos.x >= LASTGAMECOL - 1 || gameData->ranaAbsPos.x < FIRSTGAMECOL)
+	{
+		// imposto rana is dead a true
+		gameData->gameInfo.ranaIsDead = true;
+	}
 	return;
 }
 

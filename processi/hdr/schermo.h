@@ -40,4 +40,8 @@ void cancellaOggettoDaMatrice(GameData* gameData, PipeData oggetto ,PipeData* ol
 
 void aggiornaOggettoNew(GameData *gameData,PipeData new_pos, PipeData *old_pos, TipoSprite tipoSprite);
 
+void stampaRanaOnCoccodrillo(GameData* gameData);
+
+int determinaSpriteCoccodrillo(CocodrileControl *controlloCoccodrillo);
+
 #endif
