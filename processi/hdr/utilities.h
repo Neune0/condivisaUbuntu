@@ -8,6 +8,7 @@
 #include <ncurses.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/time.h>
 #include <string.h>
 #include <signal.h>
 #include <fcntl.h>
@@ -18,8 +19,6 @@
 #define NOID -1 // indica che non esiste un id associato
 #define NOPOS -1 // indica che non esiste una posizione assegnata
 #define NO_OBJ -1 // indica che non esiste un oggetto associato
-
-#define DEBUGINITCOLUMN 106
 
 // colori aggiuntivi
 #define COLOR_GRAY 8
@@ -129,8 +128,6 @@
 #define PLANT3STARTCOL PLANT2STARTCOL + DISTRAPIANTE // prima colonna della quarta pianta
 #define INITCOCCODRILLOSXCOL LASTGAMECOL - COCCODRILLO_W // colonna di partenza per i coccodrilli che si muovono verso sinistra
 
-#define VITEMENOCOLSTART 20
-
 // colori
 #define SFONDO_COL 0 // colore sfondo
 #define RANA_COL 1 // colore rana
@@ -150,7 +147,7 @@
 #define LAMPEGGIA 16 // colore coccodrillo quando lampeggia
 
 // massimo numero di oggetti per tipo
-#define MAXNCOCCODRILLI 28
+#define MAXNCOCCODRILLI 24
 #define MAXNPROIETTILI 3
 #define MAXNNEMICI 4
 #define MAXNPROIETTILINEMICI 4
@@ -499,19 +496,7 @@ bool isWin(GameData* gameData);
 void stampaBox();
 bool isFrogMoveLecit(int newX, int newY,RanaAbsPos ranaPos,PipeData pipeData);
 int generaRandom_r(int min, int max, unsigned int *seed);
-void debugPrintContatori(int fila,GameData* gameData);
-void debugPrintPidNemici(int fila,GameData* gameData);
-void debugPrintLastPipeData(GameData* gameData);
-void debugPrintCollision(GameData* gameData,Collisione collisione);
 int fromFilaToRow(int fila);
 void setScreenCell(ScreenCell* screenCell,TipoObj tipo,char ch,int id,int color,bool changed);
 void setPipeData(PipeData* pipeData, char type, int id, int x,int y);
-void debugPrintOldPosNemici(int fila,GameData* gameData);
-void debugPrintOldPosCoccodrilli(int fila, GameData* gameData);
-void debugPrintFlussi(int fila,GameData* gameData);
-void debugPrintControlloCoccodrilli(int fila,GameData* gameData);
-void debugPrintAllPids(GameData* gameData,int fila);
-void debugBlock();
-void clearPortionScreen(int startRow,int startCol,int altezza,int larghezza);
-void debugPrintOldPosCoccodrilli2(int fila,GameData* gameData);
 #endif // UTILITIES_H

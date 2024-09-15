@@ -2,27 +2,40 @@
 
 int main()
 {
-    int pipe_fd[2];       // Pipe file descriptors
-    creaPipe(pipe_fd);    // Crea la pipe
-                          
+    int pipe_fd[2];    // Pipe file descriptors
+    creaPipe(pipe_fd); // Crea la pipe
+
     inizializzaNcurses(); // inizializzazione della libreria ncurses + inizializzazione seme per random
 
-    //avviaLogo();   // visualizza il logo ed aspetta che l'utente prema un tasto qualsiasi
+    avviaLogo();   // visualizza il logo ed aspetta che l'utente prema un tasto qualsiasi
 
-    //int scelta = avviaMenuIniziale(); // fa partire il processo per il menu iniziale, aspetta che termini e poi prosegue
+    int scelta = avviaMenuIniziale(); // fa partire il processo per il menu iniziale, aspetta che termini e poi prosegue
 
-    avviaDrawProcess(pipe_fd); // avvia il processo che gestisce la stampa a schermo
+    if (scelta == 0)
+    {
+        avviaDrawProcess(pipe_fd); // avvia il processo che gestisce la stampa a schermo
+    }
+    else
+    {
+        // Chiudi le estremità della pipe
+        close(pipe_fd[0]);
+        close(pipe_fd[1]);
 
-    // Chiudi le estremità della pipe
-    // close(pipe_fd[0]);
-    // close(pipe_fd[1]);
+        // Aspetta che il processo figlio termini
+        wait(NULL);
+
+        endwin(); // Termina ncurses
+
+        printf("FROGGER CLOSED GOODBYE\n");
+        return 0;
+    }
 
     // Aspetta che il processo figlio termini
     wait(NULL);
 
     endwin(); // Termina ncurses
 
-    printf("\n FROGGER: CLOSED \n\n");
+    printf("FROGGER CLOSED GOODBYE\n");
 
     return 0;
 }

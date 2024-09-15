@@ -33,12 +33,16 @@ void menuIniziale(){
 		scelta=getch();
 		switch(scelta){
 			case KEY_UP:
+			case 'w':
+			case 'W':
 				if(sottolineato>0){
 					sottolineato--;
 					Mix_PlayChannel(-1, switch_sound, 0);
 				}
 				break;
 			case KEY_DOWN:
+			case 's':
+			case 'S':
 				if(sottolineato<NUMOP-1){
 					sottolineato++;
 					Mix_PlayChannel(-1, switch_sound, 0);
@@ -67,7 +71,7 @@ void menuIniziale(){
 	Mix_CloseAudio();
 	SDL_Quit();
 
-	exit(scelta);
+	exit(sottolineato);
 }
 
 /** @brief fa partire il processo che menuIniziale*/
@@ -83,9 +87,16 @@ int avviaMenuIniziale() {
     if (pid_menu_iniziale == 0) {
         menuIniziale();
     }
-		int status;
+	int status;
+	// Aspetta che il processo figlio termini
     waitpid(pid_menu_iniziale, &status, 0);
-    return status;
+
+    // Estrai il vero valore di ritorno
+    if (WIFEXITED(status)) {
+        return WEXITSTATUS(status);
+    }
+
+    return -1; // Se il processo figlio non è terminato normalmente
 }
 
 void stampaLogoMenu(int start_row,int start_col){
@@ -108,7 +119,7 @@ void stampaLogoMenu(int start_row,int start_col){
 }
 
 void stampaOpzione(int i,int sottolineato){
-	char opzioni[NUMOP][DIMOP]={"|-  Nuova Partita  -|","|-    Continua     -|","|-     Carica      -|","|- Scegli  Livello -|","|-  Impostazioni   -|","|-      Esci       -|"};
+	char opzioni[NUMOP][DIMOP]={"|-      Start      -|","|-      Esci       -|"};
 	// per la stampa del sottolineato
 			if(i==sottolineato){
 				attron(COLOR_PAIR(RANA_COL));

@@ -16,7 +16,6 @@ pthread_t avviaCoccodrilloThread(Params_coccodrilli *thread_args, int id)
 }// end avviaCOccodrilloThread
 
 void *coccodrilloThread(void *param){
-    
     Params_coccodrilli *p_coccodrillo = (Params_coccodrilli*) param; // recupero ptr a parametri_coccodrillo
     Params *p = (Params*)p_coccodrillo->param;                      // recupero ptr ai parametri thread generali.
     

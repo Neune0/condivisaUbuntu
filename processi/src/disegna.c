@@ -67,13 +67,13 @@ void drawProcess(int *pipe_fd)
 			break;
 		}
 
-		//debugPrintLastPipeData(gameData);
 
 		aggiorna(gameData); // aggiorna stato del gioco
 
 		printVite(gameData);
 		printManche(gameData);
 		printScore(gameData);
+		aggiornaHud(gameData);
 
 		sec = gameData->gameInfo.secondi_di_gioco;
 
@@ -151,20 +151,21 @@ void drawProcess(int *pipe_fd)
 			inizializzaFlagMatrice(gameData->schermo.screenMatrix);
 			stampaMatrice(gameData->schermo.screenMatrix);
 			refresh();
-
-			// chiudo pipe
+			if(!isWin(gameData)){
+			// reset pipe
 			close(gameData->pipe[0]);
 			close(gameData->pipe[1]);
 			int pipe[2];
 			creaPipe(pipe);
 			gameData->pipe = pipe;
 
-			// faccio ripartire tutto
+			// faccio ripartire i processi principali
 			gameData->pids.pidRana = avviaRana(gameData->pipe);
 			gameData->pids.pidTempo = avviaTempo(gameData->pipe);
 			gameData->pids.soundPlayer = avvia_soundPlayer(gameData->pipe_suoni);
 			gameData->pids.pidMusica = avviaMusica();
 
+			// inizializzazione manche
 			inizializzaPosRana(gameData);
 			printRana(&(gameData->oldPos.rana), &(gameData->sprites[S_RANA]), gameData);
 			inizializzaFlussi(gameData);
@@ -175,19 +176,15 @@ void drawProcess(int *pipe_fd)
 			inizializzaContatori(gameData);
 			inizializzaControlloCoccodrilli(gameData);
 
+			
+			}
 			gameData->gameInfo.mancheWin = false;
+			
 		}
 
 		spawnCoccodrilli(gameData, sec, contatore_dispari);
 
 		avviaNemici(gameData, sec, contatore_dispari);
-
-		//debugPrintContatori(9, gameData);
-		//debugPrintPidNemici(10, gameData);
-		//debugPrintOldPosNemici(11, gameData);
-		//debugPrintOldPosCoccodrilli(19, gameData);
-		//debugPrintFlussi(23, gameData);
-		//debugPrintControlloCoccodrilli(31, gameData);
 
 		refresh();
 	}

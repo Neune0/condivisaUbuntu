@@ -14,7 +14,7 @@
 #define STARTCOLLOGOMENU 17
 
 #define DIMOP 21
-#define NUMOP 6
+#define NUMOP 2
 
 #define STARTROWOP 9
 #define STARTCOLOP 59

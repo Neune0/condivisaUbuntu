@@ -4,15 +4,12 @@ void aggiorna(GameData *gameData)
 {
 	Collisione collisione = detectCollisione(gameData); // individuazione della possibile collisione
 
-	//debugPrintCollision(gameData, collisione);
-
 	if (collisione.tipoCollisione == NO_COLLISIONE)
 	{
 		normalUpdate(gameData); // aggiornamento normale se no collisione
 	}
 	else
 	{
-		//mvprintw(31, 106, "                               "); // debug
 		handleCollisione(gameData, collisione);				  // se collisione aggiornamento particolareggiato
 	}
 	return;
@@ -320,8 +317,7 @@ void normalUpdate(GameData *gameData)
 	{
 		// update tempo di gioco
 		gameData->gameInfo.secondi_di_gioco = gameData->pipeData.x;
-		// sostituire con avviso che il tempo è cambiato
-		printTempo(gameData); // aggiorna hud del tempo 
+		gameData->gameInfo.tempoIsChanged = true;
 		break;
 	}
 	default:

@@ -1,5 +1,5 @@
-#ifndef DEBUG_H
-#define DEBUG_H
+#ifndef HUD_H
+#define HUD_H
 #include "./utilities.h"
 
 #define DIMLOGOROWS 7
