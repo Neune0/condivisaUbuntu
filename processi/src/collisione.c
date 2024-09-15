@@ -573,7 +573,7 @@ void handleCollisione(GameData *gameData, Collisione collisione)
     }
     return;
 }
-
+// print della rana in posizione
 void printRana2(GameData *gameData)
 {
     int newPosAbsRanaX = gameData->pipeData.x + gameData->ranaAbsPos.x;

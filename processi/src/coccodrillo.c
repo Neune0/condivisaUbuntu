@@ -11,8 +11,9 @@ pid_t avviaCoccodrillo(int *pipe_fd, PipeData* coccodrillo_init,int direction,in
     }
     else if (coccodrillo_pid == 0)
     {
+        // Chiudi l'estremità di lettura della pipe
+        close(pipe_fd[0]);
         // Processo coccodrillo
-        close(pipe_fd[0]); // Chiudi l'estremità di lettura della pipe
         coccodrillo(pipe_fd, coccodrillo_init,direction,vel);
         exit(0);
     }
@@ -24,8 +25,9 @@ pid_t avviaCoccodrillo(int *pipe_fd, PipeData* coccodrillo_init,int direction,in
 
 void coccodrillo(int *pipe_fd, PipeData *coccodrillo_init,int direction,int vel)
 {
-    PipeData coccodrillo;
-    coccodrillo.x = coccodrillo_init->x; // le coordinate iniziali del coccodrillo sono quelle dell' oggetto che ha sparato
+    // set informazioni iniziali del coccodrillo
+    PipeData coccodrillo; 
+    coccodrillo.x = coccodrillo_init->x;
     coccodrillo.y = coccodrillo_init->y;
     coccodrillo.type = coccodrillo_init->type;
     coccodrillo.id = coccodrillo_init->id;
@@ -42,14 +44,12 @@ void coccodrillo(int *pipe_fd, PipeData *coccodrillo_init,int direction,int vel)
         velocity= FLUSSO_VELOCE;
         break;
     }
-
     // Seme unico per ogni processo
     unsigned int seed = time(NULL) ^ (getpid() << 16); 
-
     // numero randomico tra min e max compresi
-        int randomico = generaRandom_r(velocity , velocity*15,&seed);
-        // piccola usleep
-        usleep(randomico);
+    int randomico = generaRandom_r(velocity , velocity*15,&seed);
+    // piccola usleep randomica
+    usleep(randomico);
     
     while (1)
     {
